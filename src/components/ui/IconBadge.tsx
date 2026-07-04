@@ -19,7 +19,11 @@ import {
   Users,
   FileText,
   Dumbbell,
-  Circle
+  Circle,
+  Ticket,
+  Flame,
+  ListOrdered,
+  Star
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -44,7 +48,11 @@ const icons = {
   file: FileText,
   message: MessageCircle,
   fighter: Dumbbell,
-  circle: Circle
+  circle: Circle,
+  ticket: Ticket,
+  flame: Flame,
+  list: ListOrdered,
+  star: Star
 };
 
 export type IconName = keyof typeof icons;

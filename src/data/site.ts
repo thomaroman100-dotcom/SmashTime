@@ -4,14 +4,18 @@ export const site = {
     "SmashTime aus St. Pölten steht für harte Kampfsportmomente, klare Inszenierung und echte Live-Atmosphäre.",
   logo: "/images/logo/smashtime-logo.png",
   navigation: [
-    { label: "Startseite", href: "/" },
+    { label: "Veranstaltungen", href: "/veranstaltungen" },
     { label: "Champions", href: "/champions" },
     { label: "Neuigkeiten", href: "/neuigkeiten" },
-    { label: "Veranstaltungen", href: "/veranstaltungen" },
-    { label: "Sponsoren", href: "/sponsoren" },
+    { label: "Tickets", href: "/tickets" },
+    { label: "Fight Night", href: "/fight-night" },
+    { label: "Über uns", href: "/ueber-uns" },
+    { label: "Partner", href: "/sponsoren" },
     { label: "Kontakt", href: "/kontakt" }
   ],
-  ticketHref: "/veranstaltungen#naechste-veranstaltung",
+  ticketHref: "/tickets",
+  eventHref: "/veranstaltungen/smashtime-3-cagetime",
+  fightNightHref: "/fight-night",
   socialLinks: [
     { label: "Instagram", href: "#" },
     { label: "Facebook", href: "#" },

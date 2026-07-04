@@ -19,14 +19,14 @@ export default function Home() {
         text="SmashTime ist die neue Generation des Kampfsports. Härter. Lauter. Unvergesslich."
         className="page-hero--home"
       >
-        <CTAButton href="#was-dich-erwartet" variant="outline">
+        <CTAButton href="/ueber-uns" variant="outline">
           Mehr erfahren
         </CTAButton>
       </PageHero>
 
       <section className="home-event-section" aria-label="Nächste Veranstaltung">
         <div className="container home-event-wrap">
-          <EventHighlight event={upcomingEvent} />
+          <EventHighlight event={upcomingEvent} detailsHref={upcomingEvent.detailHref} />
         </div>
       </section>
 

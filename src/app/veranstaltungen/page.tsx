@@ -5,6 +5,7 @@ import { FightCardList } from "@/components/sections/FightCardList";
 import { PageHero } from "@/components/sections/PageHero";
 import { SectionTitle } from "@/components/ui/SectionTitle";
 import { CTAButton } from "@/components/ui/CTAButton";
+import { SponsorStrip } from "@/components/sections/SponsorStrip";
 import { eventArchive, upcomingEvent } from "@/data/events";
 import { fightcards } from "@/data/fightcards";
 import { pageHeroes } from "@/data/heroes";
@@ -28,6 +29,7 @@ export default function EventsPage() {
           event={upcomingEvent}
           mediaImage={pageHeroes.eventsModule.image}
           mediaPosition={pageHeroes.eventsModule.position}
+          detailsHref={upcomingEvent.detailHref}
           showFightcard
         >
           <FightCardList fights={fightcards} />
@@ -48,7 +50,7 @@ export default function EventsPage() {
                 <p>
                   <MapPin aria-hidden="true" size={18} /> {event.location}
                 </p>
-                <CTAButton href="#naechste-veranstaltung" variant="outline">
+                <CTAButton href={event.detailHref ?? upcomingEvent.detailHref} variant="outline">
                   Details ansehen
                 </CTAButton>
               </article>
@@ -56,6 +58,7 @@ export default function EventsPage() {
           </div>
         </section>
       </div>
+      <SponsorStrip />
       <CallToActionBand />
     </>
   );

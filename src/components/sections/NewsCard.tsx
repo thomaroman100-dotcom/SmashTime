@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import type { NewsItem } from "@/data/news";
 
@@ -33,9 +34,9 @@ export function NewsCard({ item, featured }: NewsCardProps) {
         </div>
         <h2>{item.title}</h2>
         <p>{item.excerpt}</p>
-        <a href="#neuigkeiten" aria-label={`${item.title} lesen`}>
+        <Link href={`/neuigkeiten/${item.slug}`} aria-label={`${item.title} lesen`}>
           Mehr lesen <ArrowRight aria-hidden="true" size={17} />
-        </a>
+        </Link>
       </div>
     </article>
   );

@@ -11,6 +11,7 @@ type EventHighlightProps = {
   showFightcard?: boolean;
   mediaImage?: string;
   mediaPosition?: string;
+  detailsHref?: string;
   children?: React.ReactNode;
 };
 
@@ -19,6 +20,7 @@ export function EventHighlight({
   showFightcard,
   mediaImage,
   mediaPosition,
+  detailsHref,
   children
 }: EventHighlightProps) {
   return (
@@ -44,9 +46,16 @@ export function EventHighlight({
             <MetaItem icon="clock" label="Einlass" value={event.admission} />
             <MetaItem icon="clock" label="Beginn" value={event.start} />
           </div>
-          <CTAButton href={site.ticketHref}>
-            Tickets sichern
-          </CTAButton>
+          <div className="event-highlight__actions">
+            <CTAButton href={site.ticketHref}>
+              Tickets sichern
+            </CTAButton>
+            {detailsHref ? (
+              <CTAButton href={detailsHref} variant="outline">
+                Details ansehen
+              </CTAButton>
+            ) : null}
+          </div>
         </div>
 
         <Countdown targetDate={event.date} />

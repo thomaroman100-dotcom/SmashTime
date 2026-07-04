@@ -15,6 +15,7 @@ export type SmashEvent = {
   gastro?: string;
   status: "upcoming" | "archive-placeholder";
   image: string;
+  detailHref?: string;
 };
 
 export const upcomingEvent: SmashEvent = {
@@ -31,7 +32,8 @@ export const upcomingEvent: SmashEvent = {
   disciplines: ["Xtreme Boxen", "K1", "MMA", "Boxen"],
   gastro: "Figl Ratzersdorf",
   status: "upcoming",
-  image: "/images/backgrounds/arena-cage-front.png?v=20260704"
+  image: "/images/backgrounds/arena-cage-front.png?v=20260704",
+  detailHref: "/veranstaltungen/smashtime-3-cagetime"
 };
 
 export const eventArchive: SmashEvent[] = [
@@ -48,7 +50,8 @@ export const eventArchive: SmashEvent[] = [
     start: "Wird nachgetragen",
     disciplines: ["MMA", "K1", "Boxen", "Xtreme Boxen"],
     status: "archive-placeholder",
-    image: "/images/backgrounds/cage-chainlink.png"
+    image: "/images/backgrounds/cage-chainlink.png",
+    detailHref: "/veranstaltungen/smashtime-3-cagetime"
   },
   {
     id: "archiv-ausgabe-2",
@@ -63,6 +66,7 @@ export const eventArchive: SmashEvent[] = [
     start: "Wird nachgetragen",
     disciplines: ["MMA", "K1", "Boxen", "Xtreme Boxen"],
     status: "archive-placeholder",
-    image: "/images/backgrounds/arena-seats-cage.png"
+    image: "/images/backgrounds/arena-seats-cage.png",
+    detailHref: "/veranstaltungen/smashtime-3-cagetime"
   }
 ];

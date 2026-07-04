@@ -216,7 +216,7 @@ main {
 .site-header__nav {
   display: flex;
   justify-content: center;
-  gap: clamp(22px, 3.5vw, 50px);
+  gap: clamp(14px, 2vw, 28px);
   padding-top: 11px;
 }
 
@@ -485,6 +485,11 @@ main {
 
 .page-hero h1 span:last-child {
   color: var(--red);
+}
+
+.page-hero h1 span {
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 .page-hero p {
@@ -1826,6 +1831,945 @@ main {
   text-transform: uppercase;
 }
 
+.phase-page {
+  position: relative;
+  z-index: 5;
+  width: min(var(--container), calc(100% - 48px));
+  margin: -72px auto 58px;
+}
+
+.event-highlight__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.ticket-event {
+  display: grid;
+  grid-template-columns: 1.05fr 0.9fr 0.95fr;
+  min-height: 270px;
+  margin-bottom: 16px;
+}
+
+.ticket-event__media {
+  position: relative;
+  min-height: 270px;
+  overflow: hidden;
+}
+
+.ticket-event__media::after {
+  position: absolute;
+  inset: 0;
+  content: "";
+  background: linear-gradient(90deg, transparent, rgba(5, 5, 5, 0.82));
+}
+
+.ticket-event__media img,
+.news-detail__image img,
+.about-story__image img,
+.event-detail__image img,
+.event-gallery img {
+  object-fit: cover;
+}
+
+.ticket-event__content,
+.ticket-event__benefits {
+  position: relative;
+  z-index: 2;
+  padding: 28px;
+}
+
+.ticket-event__content > span,
+.news-event-box > span,
+.about-story__copy > span,
+.fight-main__label {
+  display: inline-flex;
+  margin-bottom: 12px;
+  padding: 7px 11px;
+  background: var(--red);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 900;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.ticket-event h2,
+.ticket-package h2,
+.ticket-info-panel h2,
+.ticket-faq h2,
+.ticket-venue h2,
+.news-detail h1,
+.news-detail h2,
+.about-page h2,
+.fight-night-page h2,
+.fight-main strong,
+.event-detail h1,
+.event-detail h2 {
+  margin: 0;
+  font-family: var(--font-heading), Impact, sans-serif;
+  font-weight: 700;
+  line-height: 0.96;
+  text-transform: uppercase;
+}
+
+.ticket-event h2 {
+  display: grid;
+  gap: 2px;
+  font-size: clamp(42px, 5vw, 64px);
+}
+
+.ticket-event h2 strong {
+  color: var(--red);
+  font: inherit;
+}
+
+.ticket-event dl,
+.ticket-venue dl,
+.news-event-box dl,
+.event-detail__info dl {
+  display: grid;
+  gap: 11px;
+  margin: 18px 0 0;
+}
+
+.ticket-event dl div,
+.ticket-venue dl div,
+.news-event-box dl div,
+.event-detail__info dl div {
+  display: grid;
+  grid-template-columns: 88px 1fr;
+  gap: 12px;
+}
+
+.ticket-event dt,
+.ticket-venue dt,
+.news-event-box dt,
+.event-detail__info dt {
+  color: var(--red);
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.ticket-event dd,
+.ticket-venue dd,
+.news-event-box dd,
+.event-detail__info dd {
+  margin: 0;
+  color: #fff;
+  font-weight: 800;
+}
+
+.ticket-event__benefits {
+  display: grid;
+  align-content: center;
+  gap: 18px;
+}
+
+.ticket-event__benefits article,
+.ticket-info-panel__items article,
+.fight-rules article,
+.fight-expect article {
+  display: grid;
+  grid-template-columns: 42px 1fr;
+  gap: 13px;
+  align-items: start;
+}
+
+.ticket-event__benefits h3,
+.ticket-info-panel h3,
+.fight-rules h3,
+.fight-expect h3 {
+  margin: 0 0 4px;
+  font-size: 13px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.ticket-event__benefits p,
+.ticket-info-panel p,
+.fight-rules p,
+.fight-expect p {
+  margin: 0;
+  color: var(--light);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.ticket-packages {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.ticket-package {
+  min-height: 360px;
+  padding: 28px 20px 22px;
+}
+
+.ticket-package--popular {
+  border-color: var(--red);
+  box-shadow:
+    0 0 0 1px rgba(215, 25, 32, 0.28),
+    0 24px 80px rgba(215, 25, 32, 0.14);
+}
+
+.ticket-package__flag {
+  position: absolute;
+  top: -1px;
+  right: 16px;
+  z-index: 4;
+  padding: 8px 16px;
+  background: var(--red);
+  font-size: 11px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.ticket-package h2 {
+  font-size: clamp(36px, 3.4vw, 48px);
+}
+
+.ticket-package p {
+  margin: 6px 0 10px;
+  color: var(--red);
+  font-family: var(--font-heading), Impact, sans-serif;
+  font-size: 17px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.ticket-package > strong {
+  display: block;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.16);
+  padding-bottom: 13px;
+  font-size: 28px;
+}
+
+.ticket-package ul {
+  display: grid;
+  gap: 9px;
+  min-height: 138px;
+  margin: 16px 0 20px;
+  padding: 0;
+  list-style: none;
+}
+
+.ticket-package li {
+  display: flex;
+  gap: 8px;
+  color: var(--light);
+  font-size: 13px;
+}
+
+.ticket-package li svg {
+  flex: 0 0 auto;
+  color: var(--red);
+}
+
+.ticket-package .cta-button {
+  width: 100%;
+}
+
+.ticket-info-grid {
+  display: grid;
+  grid-template-columns: 1.25fr 0.9fr 0.95fr;
+  gap: 12px;
+}
+
+.ticket-info-panel,
+.ticket-faq,
+.ticket-venue {
+  padding: 26px;
+}
+
+.ticket-info-panel h2,
+.ticket-faq h2,
+.ticket-venue h2,
+.related-news h2,
+.event-results h2,
+.event-description h2,
+.event-gallery h2 {
+  margin-bottom: 18px;
+  font-size: clamp(28px, 3vw, 38px);
+}
+
+.ticket-info-panel__items {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 18px;
+}
+
+.ticket-faq details {
+  border-top: 1px solid rgba(255, 255, 255, 0.14);
+  padding: 12px 0;
+}
+
+.ticket-faq summary {
+  cursor: pointer;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.ticket-faq p {
+  margin: 8px 0 0;
+  color: var(--light);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.ticket-venue .cta-button {
+  margin-top: 20px;
+}
+
+.news-detail,
+.event-detail {
+  position: relative;
+  z-index: 4;
+  padding: 132px 0 60px;
+}
+
+.news-detail::before,
+.event-detail::before {
+  position: absolute;
+  inset: 0 0 auto;
+  z-index: -1;
+  height: 660px;
+  content: "";
+  background:
+    linear-gradient(90deg, rgba(5, 5, 5, 0.96), rgba(5, 5, 5, 0.3) 58%, rgba(5, 5, 5, 0.88)),
+    linear-gradient(180deg, rgba(5, 5, 5, 0.08), #050505 94%),
+    url("/images/backgrounds/hero-news-cage-smoke.png") center / cover;
+}
+
+.event-detail::before {
+  background:
+    linear-gradient(90deg, rgba(5, 5, 5, 0.96), rgba(5, 5, 5, 0.26) 58%, rgba(5, 5, 5, 0.86)),
+    linear-gradient(180deg, rgba(5, 5, 5, 0.08), #050505 94%),
+    url("/images/backgrounds/hero-events-cage-wide.png") center / cover;
+}
+
+.news-detail__back {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  margin-bottom: 28px;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.news-detail__hero,
+.event-detail__hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(420px, 0.9fr);
+  gap: 34px;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.news-detail__meta {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.news-detail__meta span {
+  padding: 8px 13px;
+  background: var(--red);
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.news-detail__meta time {
+  color: var(--light);
+  font-size: 13px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.news-detail h1,
+.event-detail h1 {
+  display: grid;
+  gap: 4px;
+  font-size: clamp(52px, 6.5vw, 92px);
+}
+
+.event-detail h1 span:last-child,
+.news-detail h1 {
+  color: var(--red);
+}
+
+.event-detail h1 span:first-child {
+  color: #fff;
+}
+
+.news-detail__copy p,
+.event-detail__hero p {
+  width: min(640px, 100%);
+  margin: 20px 0 0;
+  color: #fff;
+  font-size: 19px;
+  line-height: 1.45;
+}
+
+.news-detail__image,
+.event-detail__image {
+  position: relative;
+  min-height: 330px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  background: #090909;
+}
+
+.news-detail__image::after,
+.event-detail__image::after,
+.about-story__image::after {
+  position: absolute;
+  inset: 0;
+  content: "";
+  background: linear-gradient(180deg, transparent, rgba(5, 5, 5, 0.72));
+}
+
+.news-detail__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(310px, 0.55fr);
+  gap: 16px;
+}
+
+.news-detail__body,
+.news-quote,
+.news-event-box {
+  padding: 30px;
+}
+
+.news-detail__body p,
+.event-description p {
+  margin: 0 0 17px;
+  color: var(--light);
+  font-size: 16px;
+  line-height: 1.72;
+}
+
+.news-detail__side {
+  display: grid;
+  gap: 16px;
+}
+
+.news-quote > span,
+.event-quote > span {
+  display: block;
+  color: var(--red);
+  font-family: var(--font-heading), Impact, sans-serif;
+  font-size: 78px;
+  line-height: 0.75;
+}
+
+.news-quote blockquote,
+.event-quote blockquote {
+  margin: 0 0 18px;
+  color: #fff;
+  font-size: 18px;
+  line-height: 1.55;
+}
+
+.news-quote strong,
+.event-quote strong {
+  color: var(--red);
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.news-event-box h2 {
+  color: #fff;
+  font-size: clamp(33px, 3vw, 46px);
+}
+
+.news-event-box h2 + dl {
+  margin-top: 18px;
+}
+
+.news-event-box .cta-button {
+  width: 100%;
+  margin-top: 20px;
+}
+
+.related-news {
+  margin-top: 38px;
+}
+
+.related-news__grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+}
+
+.about-pillars {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  margin-bottom: 12px;
+  padding: 30px;
+}
+
+.about-pillars article {
+  display: grid;
+  grid-template-columns: 72px 1fr;
+  gap: 18px;
+  padding: 0 24px;
+  border-right: 1px solid rgba(255, 255, 255, 0.14);
+}
+
+.about-pillars article:last-child {
+  border-right: 0;
+}
+
+.about-pillars h2,
+.about-value h2 {
+  margin-bottom: 8px;
+  font-size: clamp(27px, 2.6vw, 38px);
+}
+
+.about-pillars p,
+.about-value p,
+.about-story p,
+.about-invite p {
+  margin: 0;
+  color: var(--light);
+  font-size: 14px;
+  line-height: 1.58;
+}
+
+.about-values {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.about-value {
+  min-height: 190px;
+  padding: 28px;
+}
+
+.about-value h2 {
+  margin-top: 18px;
+}
+
+.about-story {
+  display: grid;
+  grid-template-columns: 0.9fr 1.1fr;
+  min-height: 250px;
+  margin-bottom: 12px;
+}
+
+.about-story__image {
+  position: relative;
+  min-height: 250px;
+}
+
+.about-story__copy {
+  padding: 34px;
+}
+
+.about-story__copy h2 {
+  margin-bottom: 14px;
+  font-size: clamp(34px, 4vw, 56px);
+}
+
+.about-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  margin-bottom: 12px;
+}
+
+.about-stats div {
+  display: grid;
+  min-height: 96px;
+  place-items: center;
+  border-right: 1px solid rgba(255, 255, 255, 0.14);
+  text-align: center;
+}
+
+.about-stats div:last-child {
+  border-right: 0;
+}
+
+.about-stats strong {
+  font-family: var(--font-heading), Impact, sans-serif;
+  font-size: clamp(36px, 5vw, 58px);
+  line-height: 0.9;
+}
+
+.about-stats span {
+  color: var(--light);
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.about-invite {
+  display: grid;
+  grid-template-columns: minmax(250px, 0.8fr) 1.2fr;
+  gap: 18px;
+  align-items: center;
+  padding: 28px;
+}
+
+.about-invite h2 {
+  margin-bottom: 8px;
+  font-size: clamp(30px, 3vw, 42px);
+}
+
+.about-invite__links {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.about-invite__links a {
+  display: grid;
+  grid-template-columns: 34px 1fr 18px;
+  gap: 10px;
+  align-items: center;
+  border: 1px solid var(--line);
+  padding: 14px;
+  background: rgba(0, 0, 0, 0.28);
+}
+
+.about-invite__links strong,
+.about-invite__links small {
+  display: block;
+}
+
+.about-invite__links strong {
+  font-size: 13px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.about-invite__links small {
+  color: var(--light);
+  font-size: 11px;
+}
+
+.fight-main {
+  display: grid;
+  grid-template-columns: 1fr minmax(300px, 0.9fr) 1fr;
+  gap: 26px;
+  align-items: center;
+  min-height: 300px;
+  margin-bottom: 12px;
+  padding: 34px;
+}
+
+.fight-main__label {
+  position: absolute;
+  top: 0;
+  left: 24px;
+}
+
+.fight-main__fighter {
+  display: grid;
+  min-height: 220px;
+  align-content: end;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 24px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(5, 5, 5, 0.74)),
+    url("/images/backgrounds/cage-chainlink.png") center / cover;
+}
+
+.fight-main__fighter--right {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(5, 5, 5, 0.74)),
+    url("/images/backgrounds/backstage-corridor.png") center / cover;
+}
+
+.fight-main__fighter strong {
+  font-size: clamp(32px, 4vw, 54px);
+}
+
+.fight-main__fighter small,
+.fight-main__center span {
+  color: var(--red);
+  font-size: 13px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.fight-main__center {
+  display: grid;
+  justify-items: center;
+  gap: 18px;
+  text-align: center;
+}
+
+.fight-main__center .cta-button {
+  color: #fff;
+  background: linear-gradient(135deg, var(--red), var(--deep-red));
+  box-shadow: 0 14px 38px rgba(184, 0, 18, 0.35);
+}
+
+.fight-main__center .cta-button span,
+.fight-main__center .cta-button svg {
+  color: #fff;
+  opacity: 1;
+}
+
+.fight-main__center b {
+  color: var(--red);
+  font-family: var(--font-heading), Impact, sans-serif;
+  font-size: clamp(48px, 6vw, 76px);
+}
+
+.fight-main__center dl {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin: 0;
+}
+
+.fight-main__center dt {
+  display: flex;
+  justify-content: center;
+  gap: 7px;
+  color: var(--red);
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.fight-main__center dd {
+  margin: 4px 0 0;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.fight-night-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(260px, 0.64fr) minmax(260px, 0.64fr);
+  gap: 12px;
+}
+
+.fight-table,
+.fight-rules,
+.fight-expect,
+.fight-countdown,
+.fight-cta {
+  padding: 24px;
+}
+
+.fight-table {
+  grid-row: span 2;
+}
+
+.fight-table h2,
+.fight-rules h2,
+.fight-expect h2,
+.fight-countdown h2,
+.fight-cta h2 {
+  margin-bottom: 18px;
+  font-size: clamp(28px, 3vw, 40px);
+}
+
+.fight-table__rows {
+  display: grid;
+  gap: 10px;
+}
+
+.fight-table__rows article {
+  display: grid;
+  grid-template-columns: 116px 1fr;
+  gap: 8px 16px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 15px;
+  background: rgba(0, 0, 0, 0.32);
+}
+
+.fight-table__rows span {
+  grid-row: span 2;
+  color: var(--red);
+  font-size: 11px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.fight-table__rows strong {
+  font-size: 16px;
+  text-transform: uppercase;
+}
+
+.fight-table__rows em,
+.event-results em {
+  color: var(--red);
+  font-style: normal;
+}
+
+.fight-table__rows small {
+  color: var(--light);
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.fight-table__empty {
+  margin: 0;
+  border: 1px solid rgba(215, 25, 32, 0.48);
+  padding: 28px 22px;
+  color: #fff;
+  font-family: var(--font-heading), Impact, sans-serif;
+  font-size: clamp(27px, 3vw, 40px);
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.fight-rules,
+.fight-expect {
+  display: grid;
+  align-content: start;
+  gap: 17px;
+}
+
+.fight-countdown .countdown {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.fight-cta {
+  display: grid;
+  align-content: center;
+  gap: 10px;
+  background:
+    linear-gradient(145deg, rgba(184, 0, 18, 0.78), rgba(5, 5, 5, 0.84)),
+    url("/images/backgrounds/arena-cage-front.png") center / cover;
+}
+
+.fight-cta p {
+  margin: 0 0 10px;
+  color: var(--red);
+  font-family: var(--font-heading), Impact, sans-serif;
+  font-size: 24px;
+  text-transform: uppercase;
+}
+
+.event-detail__hero {
+  grid-template-columns: minmax(0, 0.82fr) minmax(420px, 1fr);
+}
+
+.event-detail__info {
+  margin-top: 24px;
+  padding: 26px;
+}
+
+.event-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.event-stats article {
+  display: grid;
+  min-height: 128px;
+  place-items: center;
+  padding: 20px;
+  text-align: center;
+}
+
+.event-stats strong {
+  font-family: var(--font-heading), Impact, sans-serif;
+  font-size: clamp(34px, 4vw, 52px);
+  line-height: 0.9;
+}
+
+.event-stats span {
+  color: var(--light);
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.event-detail__content {
+  display: grid;
+  grid-template-columns: minmax(0, 0.78fr) minmax(0, 1.22fr);
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.event-description,
+.event-results,
+.event-quote,
+.event-gallery {
+  padding: 28px;
+}
+
+.event-results__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 14px;
+}
+
+.event-results__head h2 {
+  margin-bottom: 0;
+}
+
+.event-results__empty {
+  margin: 0;
+  color: #fff;
+  font-family: var(--font-heading), Impact, sans-serif;
+  font-size: clamp(26px, 3vw, 40px);
+  text-transform: uppercase;
+}
+
+.event-results__grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+.event-results__grid article {
+  display: grid;
+  gap: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 18px;
+}
+
+.event-results__grid span {
+  color: var(--red);
+  font-size: 11px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.event-media-grid {
+  display: grid;
+  grid-template-columns: 0.62fr 1fr;
+  gap: 12px;
+}
+
+.event-gallery > div {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.event-gallery figure {
+  position: relative;
+  min-height: 138px;
+  margin: 0;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
 @media (max-width: 1120px) {
   .site-header {
     grid-template-columns: 126px 1fr auto;
@@ -1853,6 +2797,39 @@ main {
   .benefit-grid,
   .package-grid {
     grid-template-columns: repeat(2, 1fr);
+  }
+
+  .ticket-event,
+  .ticket-info-grid,
+  .about-pillars,
+  .fight-night-grid,
+  .event-detail__content,
+  .event-media-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .ticket-packages,
+  .about-values,
+  .event-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .ticket-event__media {
+    min-height: 230px;
+  }
+
+  .fight-table {
+    grid-row: auto;
+  }
+
+  .about-pillars article {
+    border-right: 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+    padding: 22px 0;
+  }
+
+  .about-pillars article:last-child {
+    border-bottom: 0;
   }
 
   .champion-profile__top {
@@ -2031,8 +3008,33 @@ main {
   .champion-profile__top,
   .champion-profile__grid,
   .archive-section__grid,
-  .contact-page__grid {
+  .contact-page__grid,
+  .news-detail__hero,
+  .news-detail__grid,
+  .event-detail__hero,
+  .about-story,
+  .about-invite,
+  .fight-main {
     grid-template-columns: 1fr;
+  }
+
+  .related-news__grid,
+  .about-invite__links {
+    grid-template-columns: 1fr;
+  }
+
+  .news-detail,
+  .event-detail {
+    padding-top: 118px;
+  }
+
+  .news-detail__image,
+  .event-detail__image {
+    min-height: 280px;
+  }
+
+  .fight-main__center {
+    order: -1;
   }
 
   .champion-profile {
@@ -2080,11 +3082,15 @@ main {
   }
 
   .site-header__actions {
+    flex-direction: row-reverse;
     gap: 8px;
+    min-width: 0;
+    justify-content: flex-end;
   }
 
   .site-header__ticket {
-    min-width: 132px;
+    width: clamp(118px, 34vw, 132px);
+    min-width: 0;
     min-height: 44px;
     padding-inline: 12px;
     font-size: 12px;
@@ -2095,6 +3101,7 @@ main {
   }
 
   .site-header__menu {
+    flex: 0 0 44px;
     width: 44px;
   }
 
@@ -2120,7 +3127,8 @@ main {
   .page-hero h1 {
     max-width: 100%;
     overflow-wrap: anywhere;
-    font-size: clamp(36px, 9.5vw, 48px);
+    font-size: clamp(29px, 7.8vw, 36px);
+    line-height: 0.98;
   }
 
   .page-hero p {
@@ -2193,22 +3201,112 @@ main {
     grid-template-columns: repeat(2, 1fr);
   }
 
+  .champion-grid__filters {
+    display: grid;
+    grid-template-columns: 1fr;
+    overflow-x: visible;
+    gap: 8px;
+  }
+
+  .champion-grid__filters button {
+    width: 100%;
+    min-width: 0;
+    padding-inline: 10px;
+    line-height: 1.15;
+    white-space: normal;
+  }
+
   .champion-grid__cards,
   .benefit-grid,
-  .package-grid {
+  .package-grid,
+  .ticket-packages,
+  .ticket-info-panel__items,
+  .about-values,
+  .about-stats,
+  .event-stats,
+  .event-results__grid,
+  .event-gallery > div {
     grid-template-columns: 1fr;
   }
 
+  .phase-page {
+    width: calc(100% - 32px);
+    margin-top: -54px;
+  }
+
+  .ticket-event__content,
+  .ticket-event__benefits,
+  .ticket-info-panel,
+  .ticket-faq,
+  .ticket-venue,
+  .news-detail__body,
+  .news-quote,
+  .news-event-box,
+  .about-pillars,
+  .about-value,
+  .about-story__copy,
+  .about-invite,
+  .fight-main,
+  .fight-table,
+  .fight-rules,
+  .fight-expect,
+  .fight-countdown,
+  .fight-cta,
+  .event-detail__info,
+  .event-description,
+  .event-results,
+  .event-quote,
+  .event-gallery {
+    padding: 22px;
+  }
+
+  .ticket-event h2,
+  .news-detail h1,
+  .event-detail h1 {
+    font-size: clamp(40px, 12vw, 56px);
+  }
+
+  .ticket-event dl div,
+  .ticket-venue dl div,
+  .news-event-box dl div,
+  .event-detail__info dl div,
+  .fight-table__rows article,
+  .fight-main__center dl {
+    grid-template-columns: 1fr;
+  }
+
+  .fight-main__fighter {
+    min-height: 170px;
+  }
+
   .champion-card {
-    grid-template-columns: 42% 1fr;
+    grid-template-columns: 1fr;
+    min-width: 0;
+  }
+
+  .champion-card__image {
+    height: 300px;
+    min-height: 300px;
   }
 
   .champion-card__content {
+    min-width: 0;
     padding: 16px;
   }
 
   .champion-card h2 {
-    font-size: 30px;
+    overflow-wrap: anywhere;
+    font-size: clamp(28px, 8vw, 32px);
+  }
+
+  .champion-card dl div {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 4px;
+  }
+
+  .champion-card dd {
+    text-align: left;
   }
 
   .champion-card .cta-button {
@@ -2276,6 +3374,7 @@ main {
   }
 
   .champion-card__image {
+    height: 255px;
     min-height: 255px;
   }
 

@@ -12,6 +12,7 @@ import { cn } from "@/lib/utils";
 export function Header() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const isActive = (href: string) => pathname === href || pathname.startsWith(`${href}/`);
 
   return (
     <header className="site-header">
@@ -25,7 +26,7 @@ export function Header() {
             key={item.href}
             className={cn(
               "site-header__link",
-              pathname === item.href && "site-header__link--active"
+              isActive(item.href) && "site-header__link--active"
             )}
             href={item.href}
           >
