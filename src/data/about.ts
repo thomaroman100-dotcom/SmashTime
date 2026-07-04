@@ -72,8 +72,8 @@ export const aboutInvites = [
     icon: "calendar"
   },
   {
-    title: "Tickets",
-    text: "Dein Platz. Echte Action.",
+    title: "Ticketinfos",
+    text: "Platz vormerken",
     href: "/tickets",
     icon: "ticket"
   },

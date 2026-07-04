@@ -18,7 +18,7 @@ export default function TicketsPage() {
       <PageHero
         title="Tickets."
         redTitle="Dein Platz. Echte Action."
-        text="Sichere dir deinen Platz für SmashTime 3 / Cagetime. Der echte Ticketshop wird später angebunden."
+        text="Informiere dich über Plätze für SmashTime 3 / Cagetime. Der offizielle Verkauf wird später angebunden."
         image={pageHeroes.eventsModule.image}
         imagePosition={pageHeroes.eventsModule.position}
         compact
@@ -85,7 +85,7 @@ export default function TicketsPage() {
                 ))}
               </ul>
               <CTAButton href="/kontakt" variant={item.popular ? "solid" : "outline"}>
-                Ticket kaufen
+                Ticketinfos anfragen
               </CTAButton>
             </article>
           ))}
@@ -138,7 +138,7 @@ export default function TicketsPage() {
               </div>
             </dl>
             <CTAButton href="/veranstaltungen/smashtime-3-cagetime" variant="outline">
-              Zum Event
+              Event ansehen
             </CTAButton>
           </div>
         </section>

@@ -21,7 +21,7 @@ export function Footer() {
         <p className="site-footer__copy">© 2026 SmashTime. Alle Rechte vorbehalten.</p>
 
         <nav className="site-footer__nav" aria-label="Fussnavigation">
-          {site.navigation.map((item) => (
+          {site.footerNavigation.map((item) => (
             <Link key={item.href} href={item.href}>
               {item.label}
             </Link>

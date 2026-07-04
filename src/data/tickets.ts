@@ -32,7 +32,7 @@ export const ticketPackages: TicketPackage[] = [
     id: "standard",
     name: "Standard",
     subtitle: "Dein Einstieg in die Action",
-    price: "39 Euro",
+    price: "Preis wird bekanntgegeben",
     features: [
       "Sitzplatz in den hinteren Blöcken",
       "Sicht auf den Käfig",
@@ -44,7 +44,7 @@ export const ticketPackages: TicketPackage[] = [
     id: "premium",
     name: "Premium",
     subtitle: "Bessere Sicht. Mehr erleben.",
-    price: "69 Euro",
+    price: "Preis wird bekanntgegeben",
     features: [
       "Sitzplatz in mittleren Blöcken",
       "Bessere Sicht auf den Käfig",
@@ -56,7 +56,7 @@ export const ticketPackages: TicketPackage[] = [
     id: "vip",
     name: "VIP",
     subtitle: "Exklusiv. Komfort. Premium.",
-    price: "129 Euro",
+    price: "Preis wird bekanntgegeben",
     popular: true,
     features: [
       "Sitzplatz in vorderen Blöcken",
@@ -70,7 +70,7 @@ export const ticketPackages: TicketPackage[] = [
     id: "cage-side",
     name: "Käfigseite",
     subtitle: "Direkt dran. Maximale Nähe.",
-    price: "249 Euro",
+    price: "Preis wird bekanntgegeben",
     features: [
       "Premium-Sitzplatz am Käfig",
       "Unverbaute Sicht auf die Action",

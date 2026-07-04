@@ -1,16 +1,56 @@
+export type NavigationItem = {
+  label: string;
+  href: string;
+  children?: Array<{
+    label: string;
+    href: string;
+  }>;
+};
+
 export const site = {
   name: "SmashTime",
   description:
     "SmashTime aus St. Pölten steht für harte Kampfsportmomente, klare Inszenierung und echte Live-Atmosphäre.",
   logo: "/images/logo/smashtime-logo.png",
   navigation: [
+    {
+      label: "Veranstaltungen",
+      href: "/veranstaltungen",
+      children: [
+        { label: "Nächste Veranstaltung", href: "/veranstaltungen/smashtime-3-cagetime" },
+        { label: "Kampfabend", href: "/fight-night" },
+        { label: "Fightcard", href: "/fight-night#fightcard" },
+        { label: "Vergangene Veranstaltungen", href: "/veranstaltungen#archiv" }
+      ]
+    },
+    {
+      label: "Kämpfer",
+      href: "/champions",
+      children: [
+        { label: "Champions", href: "/champions" },
+        { label: "Gewichtsklassen", href: "/champions#gewichtsklassen" }
+      ]
+    },
+    { label: "Neuigkeiten", href: "/neuigkeiten" },
+    {
+      label: "Über uns",
+      href: "/ueber-uns",
+      children: [
+        { label: "SmashTime", href: "/ueber-uns" },
+        { label: "Sponsoren", href: "/sponsoren" },
+        { label: "Kontakt", href: "/kontakt" }
+      ]
+    }
+  ] satisfies NavigationItem[],
+  headerCta: {
+    label: "Nächste Veranstaltung",
+    href: "/veranstaltungen/smashtime-3-cagetime"
+  },
+  footerNavigation: [
     { label: "Veranstaltungen", href: "/veranstaltungen" },
     { label: "Champions", href: "/champions" },
     { label: "Neuigkeiten", href: "/neuigkeiten" },
-    { label: "Tickets", href: "/tickets" },
-    { label: "Fight Night", href: "/fight-night" },
-    { label: "Über uns", href: "/ueber-uns" },
-    { label: "Partner", href: "/sponsoren" },
+    { label: "Sponsoren", href: "/sponsoren" },
     { label: "Kontakt", href: "/kontakt" }
   ],
   ticketHref: "/tickets",

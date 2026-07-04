@@ -47,14 +47,14 @@ export function EventHighlight({
             <MetaItem icon="clock" label="Beginn" value={event.start} />
           </div>
           <div className="event-highlight__actions">
-            <CTAButton href={site.ticketHref}>
-              Tickets sichern
-            </CTAButton>
             {detailsHref ? (
-              <CTAButton href={detailsHref} variant="outline">
-                Details ansehen
+              <CTAButton href={detailsHref}>
+                Event ansehen
               </CTAButton>
             ) : null}
+            <CTAButton href={site.ticketHref} variant={detailsHref ? "outline" : "solid"}>
+              Ticketinfos anfragen
+            </CTAButton>
           </div>
         </div>
 

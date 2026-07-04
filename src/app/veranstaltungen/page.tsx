@@ -35,7 +35,7 @@ export default function EventsPage() {
           <FightCardList fights={fightcards} />
         </EventHighlight>
 
-        <section className="archive-section">
+        <section className="archive-section" id="archiv">
           <SectionTitle>Weitere Veranstaltungen</SectionTitle>
           <div className="archive-section__grid">
             {eventArchive.map((event) => (

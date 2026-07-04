@@ -8,6 +8,7 @@ type CTAButtonProps = {
   variant?: "solid" | "outline";
   className?: string;
   type?: "button" | "submit";
+  onClick?: () => void;
 };
 
 export function CTAButton({
@@ -15,7 +16,8 @@ export function CTAButton({
   children,
   variant = "solid",
   className,
-  type = "button"
+  type = "button",
+  onClick
 }: CTAButtonProps) {
   const classes = cn(
     "cta-button",
@@ -25,7 +27,7 @@ export function CTAButton({
 
   if (href) {
     return (
-      <Link className={classes} href={href}>
+      <Link className={classes} href={href} onClick={onClick}>
         <span>{children}</span>
         <ArrowRight aria-hidden="true" size={19} strokeWidth={2.4} />
       </Link>
@@ -33,7 +35,7 @@ export function CTAButton({
   }
 
   return (
-    <button className={classes} type={type}>
+    <button className={classes} type={type} onClick={onClick}>
       <span>{children}</span>
       <ArrowRight aria-hidden="true" size={19} strokeWidth={2.4} />
     </button>

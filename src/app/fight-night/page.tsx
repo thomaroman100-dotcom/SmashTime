@@ -10,7 +10,7 @@ import { fightCardBouts, fightCardNotice } from "@/data/fights";
 import { site } from "@/data/site";
 
 export const metadata = {
-  title: "Fight Night | SmashTime"
+  title: "Kampfabend | SmashTime"
 };
 
 export default function FightNightPage() {
@@ -53,7 +53,7 @@ export default function FightNightPage() {
                 <dd>{fightNight.location}</dd>
               </div>
             </dl>
-            <CTAButton href={site.ticketHref}>Tickets sichern</CTAButton>
+            <CTAButton href={site.headerCta.href}>Nächste Veranstaltung ansehen</CTAButton>
           </div>
           <div className="fight-main__fighter fight-main__fighter--right">
             <strong>{fightNight.mainEvent.fighterB}</strong>
@@ -62,7 +62,7 @@ export default function FightNightPage() {
         </section>
 
         <section className="fight-night-grid">
-          <div className="fight-table card-grunge">
+          <div className="fight-table card-grunge" id="fightcard">
             <h2>Fightcard</h2>
             <div className="fight-table__rows">
               {visibleBouts.length > 0 ? (
@@ -110,14 +110,14 @@ export default function FightNightPage() {
           </div>
 
           <div className="fight-countdown card-grunge">
-            <h2>Fight Night startet in</h2>
+            <h2>Kampfabend startet in</h2>
             <Countdown targetDate={fightNight.eventDate} />
           </div>
 
           <div className="fight-cta card-grunge">
             <h2>Sei dabei.</h2>
             <p>Erlebe echte Action.</p>
-            <CTAButton href={site.ticketHref}>Tickets sichern</CTAButton>
+            <CTAButton href="/kontakt">Kontakt aufnehmen</CTAButton>
           </div>
         </section>
       </div>

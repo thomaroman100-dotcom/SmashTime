@@ -20,7 +20,7 @@ export function ChampionGrid({ champions }: ChampionGridProps) {
   }, [active, champions]);
 
   return (
-    <section className="champion-grid" aria-labelledby="champion-filter-title">
+    <section className="champion-grid" id="gewichtsklassen" aria-labelledby="champion-filter-title">
       <h2 id="champion-filter-title">Gewichtsklassen</h2>
       <div className="champion-grid__filters" role="list" aria-label="Gewichtsklassen filtern">
         {weightFilters.map((filter) => (

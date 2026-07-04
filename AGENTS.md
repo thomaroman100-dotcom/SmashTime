@@ -1,95 +1,346 @@
-# SmashTime Projektregeln für Codex
+# AGENTS.md – SmashTime Codex-Arbeitsplan
 
-Diese Datei ist die verbindliche Arbeitsanweisung für Codex im Projekt **SmashTime v1**.  
-Codex muss diese Datei vor jeder Aufgabe lesen und die Regeln strikt einhalten.
+Diese Datei ist die verbindliche Arbeitsanweisung für Codex im Repository **SmashTime**.
+
+Codex muss diese Datei vor jeder Aufgabe vollständig lesen. Wenn eine Nutzeranweisung, ein Referenzbild, vorhandener Code oder eine ältere Markdown-Datei dieser Datei widerspricht, gilt diese Datei.
+
+Stand: 04. Juli 2026  
+Aktive Phase: **Phase 1 – öffentliches Frontend bereinigen, stabilisieren und fertigstellen**
 
 ---
 
-## 1. Projektziel
+## 1. Grundsatz
 
-Baue eine professionelle, moderne Kampfsport-Website für **SmashTime** aus St. Pölten.
+Arbeite professionell, sauber und kontrolliert.
 
-Die Seite soll wirken wie eine hochwertige Agenturarbeit:
+Nicht jedes Problem mit neuen Seiten, neuen Dateien, neuen Ports oder schnellen Workarounds lösen. Jede Änderung muss einem klaren Ziel dienen:
+
+1. öffentliche Website stabilisieren
+2. visuelle Qualität erhöhen
+3. Datenstruktur für spätere Verwaltung vorbereiten
+4. technische Schulden vermeiden
+5. vorhandene Widersprüche bereinigen
+
+Wenn etwas unklar ist, wähle die kleinste saubere Lösung, die zur bestehenden Struktur passt.
+
+---
+
+## 2. Projektziel
+
+SmashTime ist eine Kampfsport- und Event-Website aus St. Pölten.
+
+Die Website soll wirken wie eine hochwertige Agenturarbeit:
+
 - dunkel
 - aggressiv
 - sportlich
-- klar
 - hochwertig
+- grungy
+- klar strukturiert
 - schnell erfassbar
-- nicht verspielt
-- nicht überladen
 - nicht billig
+- nicht verspielt
+- nicht wie ein Baukasten
 
-Die Website soll wie eine echte Kampfsportorganisation wirken, nicht wie eine private Hobby- oder Vereinsbaukasten-Seite.
+Die Seite soll nach einer echten Kampfsportorganisation aussehen, nicht nach einer Testseite.
 
 ---
 
-## 2. Aktuelle Phase
+## 3. Aktueller technischer Stand
 
-### Phase 1: Öffentliches Frontend
+Das Projekt ist ein Next.js-Projekt mit TypeScript und Tailwind CSS.
 
-In Phase 1 wird ausschließlich das öffentliche Frontend gebaut.
+Bekannter Stand:
 
-Nicht bauen:
+- App Router wird verwendet
+- zentrale Daten liegen unter `src/data/`
+- wiederkehrende UI liegt unter `src/components/`
+- öffentliche Seiten liegen unter `src/app/`
+- `package.json` enthält Scripts für `dev`, `build`, `start`, `lint`
+
+Wichtig: Der aktuelle Code und ältere Planungsdateien enthalten Widersprüche. Diese Datei löst diese Widersprüche auf.
+
+---
+
+## 4. Phasenmodell
+
+Codex darf Phasen nicht eigenmächtig überspringen.
+
+### Phase 0 – Arbeitsumgebung und Sicherheit
+
+Ziel:
+
+- Projekt prüfen
+- Git-Status prüfen
+- Port-Situation prüfen
+- Abhängigkeiten prüfen
+- keine Zugangsdaten ausgeben
+- keine unnötigen Prozesse starten
+
+Pflicht:
+
+- zuerst `git status` prüfen
+- vorhandene Änderungen respektieren
+- keine fremden Änderungen überschreiben
+- nur einen lokalen Entwicklungsserver verwenden
+- festen Port verwenden
+
+### Phase 1 – Öffentliches Frontend bereinigen und fertigstellen
+
+Diese Phase ist aktuell aktiv.
+
+Ziel:
+
+- öffentliche Seiten professionell fertigstellen
+- Navigation korrigieren
+- falsche oder überflüssige Routen bereinigen
+- Eventdaten konsistent halten
+- Desktop und Mobile hochwertig machen
+- Daten lokal strukturiert vorbereiten
+
+Erlaubt:
+
+- Next.js Frontend
+- lokale TypeScript-Daten
+- Komponentenstruktur verbessern
+- CSS/Tailwind verbessern
+- öffentliche Seiten reparieren
+- Bilder aus `public/images/` korrekt verwenden
+- falsche Links korrigieren
+- vorhandene falsche Routen entfernen, umleiten oder in erlaubte Seiten integrieren
+
+Nicht erlaubt:
+
 - kein Admin-Dashboard
 - kein Login
 - keine Supabase-Anbindung
 - keine echte Datenbank
-- keine Upload-Funktionen
-- keine echte Ticketverkaufsintegration
+- keine Upload-Funktion
+- keine echte Ticketshop-Integration
+- keine neuen öffentlichen Seiten ohne klare Freigabe
 
-Stattdessen:
-- lokale Dummy-Daten verwenden
-- saubere Datenstruktur vorbereiten
-- responsive Desktop- und Mobile-Ansicht bauen
-- Bilder aus dem Projektordner sinnvoll einbinden
-- die spätere Supabase/Admin-Anbindung vorbereiten, aber noch nicht umsetzen
+### Phase 2 – Inhalte und Eventlogik erweitern
 
-### Spätere Phase
+Erst nach ausdrücklicher Freigabe.
 
-Admin-Dashboard, Supabase, Datenbank, Uploads und echte Verwaltung kommen erst später nach ausdrücklicher Freigabe.
+Ziel:
+
+- echte Fightcard-Daten ergänzen
+- Ticketinformationen besser strukturieren
+- Eventdetailseiten ausbauen
+- Newsdetailseiten redaktionell erweitern
+- Sponsorenpakete realistischer ausbauen
+
+Auch Phase 2 bleibt zunächst lokal und datenbasiert. Supabase oder Admin kommen nicht automatisch dazu.
+
+### Phase 3 – Admin, Supabase und Verwaltung
+
+Erst nach ausdrücklicher Freigabe.
+
+Ziel:
+
+- Admin-Dashboard
+- Login und Rollen
+- Supabase-Datenbank
+- Uploads
+- Fighter-Verwaltung
+- Events-Verwaltung
+- Fightcard-Verwaltung
+- News-Verwaltung
+- Sponsoren-Verwaltung
+
+Vor Phase 3 muss Codex zuerst ein Datenmodell vorschlagen und darf nicht direkt Tabellen oder Backend-Logik bauen.
+
+### Phase 4 – Deployment, Performance und Qualitätsfinalisierung
+
+Erst nach ausdrücklicher Freigabe oder wenn Phase 1 vollständig fertig ist.
+
+Ziel:
+
+- stabiler Build
+- stabiler Lint
+- Vercel sauber
+- Performance optimieren
+- SEO/Metadata verbessern
+- Bildgrößen prüfen
+- responsive Feinschliff
 
 ---
 
-## 3. Sprache und sichtbare Texte
+## 5. Strikte Port-Regel
 
-Die gesamte sichtbare Website muss auf **Deutsch** sein.
+Es darf nicht jedes Mal ein neuer localhost-Port geöffnet werden.
+
+### Fester Projekt-Port
+
+Für lokale Entwicklung gilt verbindlich:
+
+```text
+Port: 3000
+URL:  http://localhost:3000
+```
+
+Codex darf nicht automatisch auf `3001`, `3002`, `3003`, `5173`, `8080` oder andere Ports ausweichen.
+
+Wenn Port 3000 belegt ist:
+
+1. prüfen, welcher Prozess Port 3000 belegt
+2. prüfen, ob es ein alter Node/Next-Dev-Prozess aus diesem Projekt ist
+3. nur diesen alten Projektprozess sauber beenden
+4. danach wieder Port 3000 verwenden
 
 Nicht erlaubt:
-- englische Navigation wie `Events`, `News`, `Partner`, `Fight Night`
-- englische Buttons
-- englische Formulartexte
+
+- parallel mehrere Dev-Server starten
+- bei belegtem Port einfach neuen Port nehmen
+- zufällig Ports offen lassen
+- fremde/System-Prozesse beenden
+
+### package.json-Regel
+
+`package.json` muss so eingestellt sein, dass Next.js immer Port 3000 verwendet:
+
+```json
+{
+  "scripts": {
+    "dev": "next dev -p 3000",
+    "build": "next build",
+    "start": "next start -p 3000",
+    "lint": "eslint ."
+  }
+}
+```
+
+Nicht erlaubt:
+
+```json
+"dev": "next dev"
+```
+
+weil Next.js sonst bei belegtem Port auf weitere Ports ausweichen kann.
+
+### Dev-Server-Regel
+
+- maximal ein Dev-Server gleichzeitig
+- immer `npm run dev`
+- keine parallelen Terminals mit mehreren `next dev`
+- wenn Server schon läuft, nicht erneut starten
+- wenn Port 3000 blockiert ist, Ursache beheben, nicht Port wechseln
+
+---
+
+## 6. Git- und Arbeitsregeln
+
+Vor jeder Änderung:
+
+```bash
+git status
+```
+
+Regeln:
+
+- keine fremden Änderungen überschreiben
+- keine Assets löschen, außer sie sind eindeutig falsch oder doppelt und die Aufgabe verlangt Cleanup
+- keine Zugangsdaten anzeigen
+- keine `.env`-Dateien committen
+- keine großen Refactorings ohne konkreten Nutzen
+- kleine, nachvollziehbare Änderungen
+- nach größeren Änderungen Build/Lint prüfen
+
+Wenn ein Fehler gefunden wird, zuerst Ursache suchen, nicht Symptome übermalen.
+
+---
+
+## 7. Sichtbare Sprache
+
+Die gesamte sichtbare Website muss Deutsch sein.
+
+Nicht erlaubt als sichtbare UI-Texte:
+
+- Home
+- Events
+- News
+- Sponsors
+- Contact
+- Fighters
+- Fight Night als Navigationspunkt
+- Learn more
+- Read more
+- Buy tickets
 - Lorem Ipsum
-- Fake-Orte
-- Fake-Eventdaten
-- Fake-Kämpfernamen, wenn echte Daten vorhanden sind
+- gemischte Sprache
 
-Technische Dateinamen, Komponenten, Variablen und interne Code-Strukturen dürfen Englisch sein. Alles, was Besucher sehen, muss Deutsch sein.
+Erlaubt als Marke oder Fachbegriff:
+
+- SmashTime
+- Cagetime
+- MMA
+- K1
+- Fightcard
+
+Empfohlene deutsche Begriffe:
+
+```text
+Startseite
+Champions
+Neuigkeiten
+Veranstaltungen
+Sponsoren
+Kontakt
+Tickets sichern
+Mehr erfahren
+Details ansehen
+Profil ansehen
+Nachricht senden
+Sponsor werden
+Kontakt aufnehmen
+Mehr lesen
+Paket anfragen
+Kampfabend
+```
 
 ---
 
-## 4. Öffentliche Seiten
+## 8. Erlaubte öffentliche Routen in Phase 1
 
-Es dürfen in Phase 1 nur diese öffentlichen Seiten erstellt werden:
+In Phase 1 sind nur diese öffentlichen Routen erlaubt:
 
-1. Startseite `/`
-2. Champions `/champions`
-3. Champion-Profilseiten `/champions/[slug]`
-4. Neuigkeiten `/neuigkeiten`
-5. Veranstaltungen `/veranstaltungen`
-6. Sponsoren `/sponsoren`
-7. Kontakt `/kontakt`
+```text
+/
+/champions
+/champions/[slug]
+/neuigkeiten
+/neuigkeiten/[slug]
+/veranstaltungen
+/veranstaltungen/[slug]
+/sponsoren
+/kontakt
+```
 
-Keine zusätzlichen öffentlichen Seiten ohne Freigabe.  
-Keine Seite „Über uns“, keine Seite „Fight Night“, keine Seite „Tickets“ als eigene Route in Phase 1.
+### Nicht als eigene öffentliche Hauptseiten erlaubt
 
-Eine Schaltfläche **„Tickets sichern“** darf sichtbar sein. Sie soll in Phase 1 auf die Veranstaltungen-Seite oder auf den Eventbereich verlinken.
+```text
+/tickets
+/fight-night
+/ueber-uns
+```
+
+Falls diese Routen im Projekt vorhanden sind, werden sie nicht weiter als Hauptseiten ausgebaut.
+
+Korrekte Behandlung:
+
+- Inhalte aus `/tickets` gehören in `/veranstaltungen` oder in einen Abschnitt `#tickets` auf der Veranstaltungsseite.
+- Inhalte aus `/fight-night` gehören in `/veranstaltungen` oder in die Eventdetailseite.
+- Inhalte aus `/ueber-uns` werden in Phase 1 nicht als eigene Hauptseite geführt.
+- Navigation darf nicht auf diese Routen zeigen.
+- CTA `Tickets sichern` soll auf `/veranstaltungen` oder `/veranstaltungen#tickets` zeigen.
+- Wenn Routen bestehen bleiben müssen, dann nur als Weiterleitung auf die erlaubte Zielseite.
 
 ---
 
-## 5. Navigation
+## 9. Navigation
 
-Die Hauptnavigation muss deutsch sein:
+Die Hauptnavigation muss genau diese Punkte enthalten:
 
 ```text
 Startseite
@@ -100,206 +351,98 @@ Sponsoren
 Kontakt
 ```
 
-Zusätzlich rechts als CTA:
+Zusätzlich als CTA:
 
 ```text
 Tickets sichern
 ```
 
-Die Referenzbilder zeigen teilweise englische Begriffe. Diese dürfen nur als visuelle Vorlage verwendet werden. Die finale Website muss deutsch bleiben.
+Nicht in die Navigation:
+
+```text
+Tickets
+Fight Night
+Über uns
+Partner
+Events
+News
+Home
+```
+
+`Partner` wird sichtbar durch `Sponsoren` ersetzt.
+
+Aktive Links müssen korrekt sein. Keine Navigation darf auf eine 404-Seite zeigen.
 
 ---
 
-## 6. Verbindliche Eventdaten
+## 10. Verbindliche Eventdaten
 
-Für die nächste Veranstaltung gelten diese Daten verbindlich:
+Für die nächste Veranstaltung gelten verbindlich:
 
 ```text
 Name: SmashTime 3 / Cagetime
+Kurzname: SmashTime 3
+Untertitel: Cagetime
 Datum: 17. Oktober 2026
 Ort: Jahnturnhalle St. Pölten
+Adresse: Jahnstraße 15, 3100 St. Pölten
 Einlass: 18:00 Uhr
 Beginn: 19:00 Uhr
-Disziplinen: MMA · K1 · Xtreme Boxen · Boxen
+Disziplinen: Xtreme Boxen · K1 · MMA · Boxen
+Gastro: Figl Ratzersdorf
 ```
 
-Nicht übernehmen, auch wenn es in Referenzbildern steht:
-- SmashTime 05
-- Break the Limits
-- 24. August 2025
-- 21. Juni 2025
-- Hanse Messe Bremen
-- Sparkassen Arena
-- Hamburg
-- Oberhausen
-- Grappling als Pflichtdisziplin
-- falsche Straßennummern oder erfundene Adressen
+Nicht übernehmen, auch wenn es in Referenzen oder alten Dateien auftaucht:
 
-Wenn eine genaue Adresse nicht eindeutig in den Projektdaten vorhanden ist, nur **Jahnturnhalle St. Pölten** anzeigen und keine Adresse erfinden.
+```text
+SmashTime 05
+Break the Limits
+24. August 2025
+21. Juni 2025
+Hanse Messe Bremen
+Berlin
+Hamburg
+Oberhausen
+Sparkassen Arena
+Max-Schmeling-Halle
+Grappling als Pflichtdisziplin
+Kickboxen statt K1, außer als erklärender Zusatz
+```
+
+Alle Eventdaten müssen aus `src/data/events.ts` oder einer klaren lokalen Datenquelle kommen. Nicht dieselben Daten hart in mehreren Komponenten duplizieren.
 
 ---
 
-## 7. Design-System
+## 11. Datenstruktur-Regel
 
-Die Desktop-Referenzen im Ordner `Referenzbilder/Desktop/` sind die wichtigsten visuellen Vorgaben.
+Wiederkehrende Inhalte müssen aus lokalen Datenstrukturen kommen, nicht verteilt im JSX.
 
-Verbindliche Referenzseiten:
+Empfohlene Datenquellen:
 
 ```text
-Referenzbilder/Desktop/Startseite.png
-Referenzbilder/Desktop/Champs.png
-Referenzbilder/Desktop/Champ Profil.png
-Referenzbilder/Desktop/News.png
-Referenzbilder/Desktop/Veranstaltungen.png
-Referenzbilder/Desktop/PartnerSponsoren.png
-Referenzbilder/Desktop/Kontakt.png
+src/data/site.ts
+src/data/events.ts
+src/data/champions.ts
+src/data/news.ts
+src/data/sponsors.ts
+src/data/fights.ts
+src/data/fightcards.ts
+src/data/heroes.ts
 ```
 
-Diese Bilder definieren:
-- Layout-Richtung
-- Bildsprache
-- Header-Stil
-- rote Akzente
-- grungy Fight-Night-Look
-- Kartenstil
-- Typografie-Wirkung
-- CTA-Banner
-- Footer-Stil
+Regeln:
 
-Die Referenzbilder sind aber nicht 1:1 als statische Screenshots einzubauen. Sie sind visuelle Vorgaben für HTML/CSS-Komponenten.
+- zentrale Daten einmal definieren
+- Komponenten erhalten Daten als Props
+- keine sichtbaren Fake-Namen verwenden, wenn echte Daten vorhanden sind
+- fehlende Daten ehrlich als „Wird nachgetragen“ oder „wird bald veröffentlicht“ markieren
+- keine Lorem-Ipsum-Texte
 
 ---
 
-## 8. Visueller Stil
+## 12. Champions-Regel
 
-Die Website soll diesen Stil konsequent verwenden:
-
-- schwarzer/dunkelgrauer Hintergrund
-- starke rote Akzentflächen
-- weißer, rauer, sportlicher Headline-Look
-- grungy Brush-/Scratch-Elemente
-- dunkle Arena-/Cage-Bilder
-- harte, klare Karten
-- dünne rote Rahmen
-- starke CTA-Banner
-- klare Abstände
-- hochwertige Desktop- und Mobile-Darstellung
-
-Nicht verwenden:
-- bunte Zusatzfarben
-- billige Neon-Glow-Effekte
-- verspielte Rundungen
-- zufällige Animationen
-- uneinheitliche Karten
-- überladene Layouts
-- unscharfe Bilder
-
----
-
-## 9. Farben
-
-Empfohlene Farbwerte:
-
-```text
-Schwarz:        #050505
-Dunkelgrau:    #0B0B0D
-Card-Grau:     #111113
-SmashTime-Rot: #D71920
-Dunkelrot:     #B80012
-Gold-Akzent:   #C9A24A
-Weiß:          #FFFFFF
-Hellgrau:      #D8D8D8
-Mittelgrau:    #8A8A8A
-```
-
-Gold nur für Champion-/Titel-/Premium-Elemente einsetzen. Nicht überall verwenden.
-
----
-
-## 10. Typografie
-
-Überschriften:
-- groß
-- rau/sportlich
-- uppercase
-- condensed
-- stark und aggressiv
-
-Geeignete Fonts:
-- Oswald
-- Bebas Neue
-- Anton
-- Teko
-- ähnliche sportliche Condensed-Schriften
-
-Fließtext:
-- klar lesbar
-- modern
-- ruhig
-
-Geeignete Fonts:
-- Inter
-- Manrope
-- Satoshi
-- ähnliche Sans-Serif-Schriften
-
-Wenn externe Fonts eingebunden werden, muss die Seite stabil laden und fallback-sicher sein.
-
----
-
-## 11. Bildlogik
-
-### Logo
-
-Das Logo liegt im Hauptordner als:
-
-```text
-Logo.png
-```
-
-Es soll für Header und Footer verwendet werden.  
-Beim Umsetzen kann Codex es in einen sauberen Public-Pfad kopieren, z. B.:
-
-```text
-public/images/logo/smashtime-logo.png
-```
-
-### Champions Bilder
-
-Finale Champion-Bilder liegen in:
-
-```text
-Champions Bilder/
-```
-
-Diese Bilder dürfen nur verwendet werden für:
-- Champions-Seite
-- Champion-Profilseiten
-- echte dynamische Champion-Karten
-
-Diese Bilder dürfen nicht verwendet werden für:
-- Startseiten-Hero
-- Kontakt-Hero
-- Sponsoren-Hero
-- Neuigkeiten-Hero
-- Veranstaltungen-Hero
-- Footer
-- statische Dekoration
-
-Grund: Champions können wechseln. Die Seite darf nicht statisch von bestimmten Champions abhängig sein.
-
-### Champions Daten
-
-Die Champion-Daten liegen in:
-
-```text
-Champions Daten/Kämpferliste 4 Fighetr.pdf
-```
-
-Codex soll diese Daten für initiale Dummy-Daten verwenden.  
-Bilder innerhalb der PDF oder im Datenordner dienen nur zur Zuordnung, nicht als finale Website-Bilder.
-
-Bekannte Champion-Daten aus dem PDF:
+Aktuelle echte Champions aus den Projektdaten:
 
 ```text
 Tanyo Tanev
@@ -325,293 +468,437 @@ Herkunft: England / Österreich
 Denis Berisha
 Alter: 23 Jahre
 Bilanz: 25 / 1 / 1
+Gewicht/Klasse: wird nachgetragen, falls nicht offiziell bestätigt
 ```
 
-Wenn Bild-zu-Person-Zuordnung nicht eindeutig möglich ist, nicht raten. In diesem Fall sichtbar dokumentieren, welche Zuordnung unsicher ist.
+Regeln:
 
-### Referenzbilder und Assets
+- keine erfundenen Champions
+- keine fremden Fighter
+- keine KI-Fighter als echte Personen
+- keine Stock-Fighter als Champion
+- Championbilder nur für Champion-Seite und Champion-Profilseiten
+- Championbilder nicht als allgemeine Deko auf Startseite, Sponsoren, Kontakt oder News verwenden
 
-Der Ordner `Referenzbilder/Desktop/` enthält die verbindlichen Seitenreferenzen.  
-Andere Bilder im Ordner `Referenzbilder/` können als unterstützende Bildassets oder alte Varianten dienen.
-
-Codex soll diese unterstützenden Bilder nicht blind als Seitenreferenzen behandeln.  
-Er soll sie sinnvoll kategorisieren und bei Bedarf in saubere Public-Pfade kopieren, z. B.:
-
-```text
-public/images/backgrounds/
-public/images/news/
-public/images/champions/
-public/images/ui/
-```
-
----
-
-## 12. Dynamische Inhalte: Wichtig
-
-Die Website soll mit lokalen Dummy-Daten gebaut werden, aber so, dass später Supabase/Admin leicht angeschlossen werden kann.
-
-Empfohlene Dateien:
-
-```text
-src/data/champions.ts
-src/data/events.ts
-src/data/news.ts
-src/data/sponsors.ts
-src/data/fights.ts
-src/data/site.ts
-```
-
-Alle wiederkehrenden Inhalte müssen aus Datenstrukturen kommen, nicht hart im JSX verteilt werden.
+Wenn Bildzuordnung unsicher ist, nicht raten. Lieber neutral darstellen oder im Code klar kommentieren.
 
 ---
 
 ## 13. Fightcard-Regel
 
-Eine Fightcard darf niemals als starres Bild umgesetzt werden.
+Eine Fightcard darf niemals als starres Bild mit eingebrannten Namen umgesetzt werden.
 
-Das Fightcard-Bild in den Referenzen oder Assets ist nur:
-- visuelle Inspiration
-- Thumbnail für News möglich
-- Stilvorgabe
+Verboten:
 
-Die echte Fightcard muss später dynamisch aus Daten gerendert werden.
+- Fightcard als PNG/JPG mit fixem Text
+- Fighter-Namen nur im Bild
+- fremde Beispielkämpfer
+- `FIGHTER NAME` Platzhalter sichtbar
+- nicht editierbare Kampfpaare
 
-In Phase 1 darf eine Fightcard-Komponente vorbereitet werden, aber sie muss aus lokalen Daten kommen, z. B. `src/data/fights.ts`.
+Pflicht:
 
-Jeder Kampf soll als Datenobjekt existieren:
-
-```ts
-{
-  id: "kampf-1",
-  eventId: "smashtime-3-cagetime",
-  reihenfolge: 1,
-  fighterA: "Name A",
-  fighterB: "Name B",
-  gewichtsklasse: "Middleweight",
-  kampfart: "K1",
-  label: "Main Event",
-  sichtbar: true
-}
-```
-
-Keine `FIGHTER NAME` Platzhalter sichtbar auf der finalen Website.  
-Wenn echte Fightcard-Daten fehlen, soll die Website zeigen:
+- Fightcard als React/HTML/CSS-Komponente
+- Daten aus `src/data/fights.ts` oder `src/data/fightcards.ts`
+- später leicht durch Supabase ersetzbar
+- wenn keine echten Daten vorhanden sind, anzeigen:
 
 ```text
 Fightcard wird bald veröffentlicht.
 ```
 
+Keine Kämpfe erfinden.
+
 ---
 
-## 14. Seitenvorgaben
+## 14. Bild- und Asset-Regeln
 
-### Startseite
+### Logo
+
+Das Logo soll über einen sauberen Public-Pfad eingebunden werden:
+
+```text
+public/images/logo/smashtime-logo.png
+```
+
+Header und Footer verwenden dasselbe Logo.
+
+### Referenzbilder
+
+Referenzbilder sind visuelle Vorgaben, aber keine fertigen Website-Screenshots.
+
+Codex darf sie verwenden für:
+
+- Layoutverständnis
+- Bildsprache
+- Grunge-Stil
+- Header-Stimmung
+- Kartenoptik
+- rote Akzente
+- Footer-Anmutung
+
+Codex darf sie nicht verwenden, um falsche Inhalte zu übernehmen.
+
+### Bilder mit Text
+
+Wichtige Website-Daten dürfen nicht nur Teil eines Bildes sein.
+
+Pflicht als echter Text:
+
+- Datum
+- Ort
+- Einlass
+- Beginn
+- Fightcard-Daten
+- News-Titel
+- Ticketinformationen
+- Sponsorenpakete
+
+Bilder dienen als Hintergrund, Stimmung, Thumbnail, Logo, Championbild oder visuelles Asset.
+
+---
+
+## 15. Design-System
+
+Verbindlicher Stil:
+
+- schwarzer/dunkelgrauer Hintergrund
+- rote Akzente
+- harte Karten
+- grungy Scratch-/Brush-Details
+- hochwertige Arena-/Cage-Stimmung
+- klare Typografie
+- große Headlines
+- starke CTA-Flächen
+- wenig Ablenkung
+- professioneller Premium-Look
+
+Nicht verwenden:
+
+- bunte Zusatzfarben
+- billige Neon-Glow-Effekte
+- zufällige Animationen
+- zu starke Blur-Effekte auf Text
+- glatte Standard-Baukasten-Karten
+- uneinheitliche Border-Systeme
+- unscharfe Bilder
+- überladene Layouts
+
+Empfohlene Farben:
+
+```text
+Schwarz:        #050505
+Dunkelgrau:    #0B0B0D
+Card-Grau:     #111113
+SmashTime-Rot: #D71920
+Dunkelrot:     #B80012
+Gold-Akzent:   #C9A24A
+Weiß:          #FFFFFF
+Hellgrau:      #D8D8D8
+Mittelgrau:    #8A8A8A
+```
+
+Gold nur sparsam für Champion-, Titel- und Premium-Elemente verwenden.
+
+---
+
+## 16. Karten- und Grunge-Regel
+
+Cards sollen nicht wie normale glatte Rechtecke wirken.
+
+Für Event-, Champion-, News- und Sponsor-Cards bevorzugt:
+
+- dünne rote Basis-Border
+- dezente Scratch-/Grunge-Overlays
+- dunkle Vignette für Lesbarkeit
+- angerissene rote Ecklinien
+- subtile diagonale Linien
+- Content immer über Overlays mit sauberem `z-index`
+- responsive saubere Abstände
+
+Overlay-Effekte dürfen niemals Text unlesbar oder unscharf machen.
+
+---
+
+## 17. Seitenanforderungen Phase 1
+
+### Startseite `/`
 
 Muss enthalten:
+
 - Header mit Logo
-- deutsche Navigation
-- Hero im Stil der Referenz
-- Headline: `SMASH TIME. ECHTE ACTION.` oder ähnlich
-- Button `Mehr erfahren`
+- korrekte deutsche Navigation
+- Hero im SmashTime-Stil
+- starke Headline
+- CTA `Mehr erfahren` darf nicht auf `/ueber-uns` zeigen, sondern auf einen vorhandenen Abschnitt oder `/veranstaltungen`
 - nächstes Event prominent
-- Countdown-Komponente
+- Countdown
 - Eventdaten korrekt
-- Disziplinen: MMA, K1, Xtreme Boxen, Boxen
 - Bereich `Was dich erwartet`
 - News-Vorschau
-- Partner-/Sponsorenstreifen
-- CTA `Bereit für SmashTime?`
+- Sponsoren-/Partnerstreifen
+- CTA-Band
 - Footer
 
-Keine Champion-Portraits auf der Startseite, außer später ausdrücklich dynamisch freigegeben. In Phase 1 keine Championbilder auf der Startseite.
+Keine Championbilder als allgemeine Startseiten-Deko.
 
-### Champions
+### Champions `/champions`
 
 Muss enthalten:
-- Hero nach Referenz
-- Filter-/Gewichtsklassen-Leiste
-- 4 Champion-Karten aus lokalen Daten
-- finale Champion-Bilder aus `Champions Bilder/`
+
+- Hero
+- Filter/Gewichtsklassen
+- 4 echte Champion-Karten aus `src/data/champions.ts`
 - Button `Profil ansehen`
+- keine Fake-Champions
 
-Keine Fake-Champion-Namen aus Referenzbildern übernehmen.
-
-### Champion-Profil
+### Champion-Profil `/champions/[slug]`
 
 Muss enthalten:
-- Profil-Template im Stil der Referenz
+
 - echte Daten aus `src/data/champions.ts`
-- ein Champion-Bild passend zur Person
+- Bild passend zur Person, falls sicher zugeordnet
 - Stats
 - Kurzbiografie
 - Titel-/Gürtelbereich
-- keine fake Namen wie `Maximilian Köhler`, wenn echte Daten vorhanden sind
+- Backlink zur Champions-Seite
 
-Wenn Daten fehlen, kurze deutsche Platzhaltertexte verwenden, aber keine Lorem-Ipsum-Texte.
-
-### Neuigkeiten
+### Neuigkeiten `/neuigkeiten`
 
 Muss enthalten:
-- Hero nach Referenz
-- Featured-News-Karte
+
+- Hero
+- Featured-News oder klare News-Übersicht
 - News-Grid
-- Bilder aus passenden Assets
-- deutsche News-Titel
-- keine englischen Platzhalter
+- deutsche Titel
+- keine Lorem-Ipsum-Texte
+- keine fremden Fighter als echte News-Personen
 
-### Veranstaltungen
+### Neuigkeiten Detail `/neuigkeiten/[slug]`
+
+Erlaubt, wenn bereits vorhanden oder für News notwendig.
 
 Muss enthalten:
-- Hero nach Referenz
+
+- echte lokale News-Daten
+- Backlink
+- saubere Metadaten
+- keine erfundenen Tatsachen als offiziell darstellen
+
+### Veranstaltungen `/veranstaltungen`
+
+Muss enthalten:
+
+- Hero
 - großes Event-Modul für SmashTime 3 / Cagetime
 - korrekte Eventdaten
 - Countdown
 - Disziplinen korrekt
-- Karten für vergangene/weitere Events dürfen Dummy-Daten haben, aber keine falschen real wirkenden Orte übernehmen
+- Fightcard-Bereich als dynamische Komponente oder Hinweis
+- Ticketbereich/CTA integriert, nicht als separate Route notwendig
+- vergangene Events nur als klar markierte Platzhalter, wenn echte Daten fehlen
 
-### Sponsoren
+### Veranstaltungsdetail `/veranstaltungen/[slug]`
+
+Erlaubt.
 
 Muss enthalten:
-- Hero nach Referenz
-- Partner-/Logo-Bereich
+
+- Eventdaten aus lokaler Datenquelle
+- keine falschen Ergebnisse vor dem Event
+- Ergebnisse erst nach Event oder als `werden veröffentlicht` markieren
+- CTA zurück zur Veranstaltungsseite oder Ticketabschnitt
+
+### Sponsoren `/sponsoren`
+
+Muss enthalten:
+
+- Hero
+- Sponsoren-/Logo-Bereich
 - Vorteile für Sponsoren
-- Sponsorenpakete als Dummy-Daten
+- Sponsorenpakete als lokale Daten
 - CTA `Sponsor werden`
 
-Sponsorlogos in Referenzen können in Phase 1 als Dummy-/Platzhalterlogos umgesetzt werden. Später müssen echte Sponsorlogos verwaltbar sein.
-
-### Kontakt
+### Kontakt `/kontakt`
 
 Muss enthalten:
-- Hero mit Backstage-/Arena-Hintergrund
+
+- Hero
 - Kontaktformular mit deutschen Labels
 - Anfragearten: Sponsoring, Presse, Kämpfer, Allgemein
 - Eventinfos korrekt
-- keine erfundene E-Mail, wenn keine echte E-Mail angegeben ist; dann `kontakt@smashtime.at` nur als Platzhalter markieren oder neutral halten
+- keine erfundene echte E-Mail, wenn nicht bestätigt
 
 ---
 
-## 15. Mobile-Regeln
+## 18. Mobile-Regeln
 
-Auch wenn aktuell keine fertigen Mobile-Referenzbilder vorhanden sind, muss Mobile professionell umgesetzt werden.
+Mobile muss genauso ernst genommen werden wie Desktop.
 
-Mobile Pflicht:
+Pflicht:
+
 - Burger-Menü
 - Logo gut sichtbar
 - keine horizontale Scrollbar
 - Hero lesbar
-- Eventkarte untereinander gestapelt
-- Countdown kompakt
-- Karten sauber gestapelt
+- Cards sauber gestapelt
 - Buttons groß genug
 - Formulare gut bedienbar
 - Bilder nicht unkontrolliert abgeschnitten
 - Footer sauber
+- kein Text läuft aus Karten heraus
 
-Mindestens testen:
-- 390 px Breite
-- 430 px Breite
-- 768 px Breite
-- Desktop ab 1280 px
-
----
-
-## 16. Technische Umsetzung
-
-Empfohlen:
-- Next.js
-- TypeScript
-- Tailwind CSS
-- App Router
-- Komponentenstruktur in `src/components/`
-- Daten in `src/data/`
-- Bilder in `public/images/`
-
-Die Umsetzung soll klar, wartbar und später backendfähig sein.
-
-Keine riesigen unübersichtlichen Einzeldateien.  
-Wiederkehrende UI-Elemente müssen Komponenten sein.
-
-Empfohlene Komponenten:
+Mindestens prüfen:
 
 ```text
-Header
-Footer
-PageHero
-SectionTitle
-CTAButton
-EventHighlight
-Countdown
-NewsCard
-ChampionCard
-ChampionProfile
-SponsorStrip
-SponsorPackageCard
-ContactForm
-FightCardList
+390 px
+430 px
+768 px
+1280 px
+1440 px
 ```
 
----
-
-## 17. Sicherheit und Umgebungsvariablen
-
-Im Projekt kann eine Datei mit Supabase-Zugangsdaten vorhanden sein.
-
-Wichtig:
-- Geheimnisse niemals ausgeben
-- keine Keys in Code einbauen
-- keine Keys in Screenshots/Logs ausgeben
-- `.env`, `.env.local`, `.env.*.local` in `.gitignore` aufnehmen
-- `env supabase.txt` nicht committen
-- Supabase in Phase 1 nicht verwenden
-
-Wenn eine `env supabase.txt` vorhanden ist, darf Codex sie in `.env.local` umbenennen oder eine `.env.local` daraus erstellen, aber niemals den Inhalt anzeigen. Für Phase 1 ist Supabase nicht nötig.
+Wenn ein Design auf Mobile nicht funktioniert, nicht verstecken, sondern responsive sauber lösen.
 
 ---
 
-## 18. Qualitätskontrolle
+## 19. Technische Struktur
 
-Codex muss nach der Umsetzung prüfen:
+Bevorzugte Struktur:
 
-- Build läuft ohne Fehler
-- Lint läuft ohne Fehler oder mit dokumentierten Ausnahmen
-- alle Seiten erreichbar
+```text
+src/app/
+src/components/layout/
+src/components/sections/
+src/components/ui/
+src/data/
+src/lib/
+public/images/
+```
+
+Regeln:
+
+- keine riesigen unübersichtlichen Komponenten
+- wiederkehrende Elemente auslagern
+- Daten nicht quer in JSX verteilen
+- Props sauber typisieren
+- keine toten Imports
+- keine ungenutzten Dateien endlos liegen lassen
+- keine neue Library installieren, wenn CSS/React reicht
+
+---
+
+## 20. Sicherheit
+
+Wenn Supabase-Keys, `.env`, Tokens oder andere Zugangsdaten vorhanden sind:
+
+- niemals anzeigen
+- niemals in Logs schreiben
+- niemals committen
+- niemals in Code hardcoden
+
+`.gitignore` muss Zugangsdaten ausschließen.
+
+Phase 1 verwendet keine Supabase-Verbindung.
+
+---
+
+## 21. Qualitätskontrolle vor Abschluss
+
+Codex muss nach relevanten Änderungen prüfen:
+
+```bash
+npm run lint
+npm run build
+```
+
+Wenn ein Befehl fehlschlägt:
+
+- Fehlerursache nennen
+- keine Fehler verschweigen
+- keine Fake-Erfolgsmeldung
+- wenn möglich sauber beheben
+
+Zusätzlich prüfen:
+
+- alle erlaubten Seiten erreichbar
 - Navigation funktioniert
-- keine englischen sichtbaren Texte außer Markenbegriffe wie `SmashTime`
+- CTA-Links führen nicht auf verbotene oder fehlende Routen
+- keine englischen UI-Texte außer erlaubte Fachbegriffe
 - keine Lorem-Ipsum-Texte
-- keine falschen Eventdaten
-- keine Fake-Kämpfernamen auf Champion-Seiten
-- keine statische Fightcard als Bild
-- keine Championbilder außerhalb Champions/Profil
-- keine fehlenden Bilder
-- keine kaputten Links
-- keine horizontale Scrollbar auf Mobile
-- Desktop sieht wie Referenz aus
-- Mobile sieht eigenständig sauber aus
+- Eventdaten stimmen überall überein
+- keine erfundenen Fighter
+- Fightcard nicht als statisches Bild
+- keine Championbilder auf falschen Seiten
+- Mobile ohne horizontales Scrollen
+- Port 3000 bleibt einziger Dev-Port
 
 ---
 
-## 19. Fertig ist Phase 1 erst, wenn
+## 22. Fertig ist Phase 1 erst, wenn
 
-- alle 7 öffentlichen Seiten existieren
-- alle Seiten deutsch sind
-- Desktop und Mobile professionell umgesetzt sind
-- die Desktop-Referenzen visuell klar erkennbar nachgebaut wurden
-- alle Bildassets sinnvoll kopiert und verwendet werden
-- Championbilder korrekt und nur an erlaubten Stellen verwendet werden
-- die Fightcard nicht als statisches Bild umgesetzt wurde
-- Eventdaten korrekt sind
-- lokale Datenstrukturen sauber vorbereitet sind
-- Build/Lint geprüft wurden
-- Codex am Ende die geänderten Dateien zusammenfasst
+- Hauptnavigation korrekt ist
+- `/tickets`, `/fight-night`, `/ueber-uns` nicht mehr als Hauptseiten wirken
+- CTA `Tickets sichern` auf erlaubten Veranstaltungs-/Ticketabschnitt zeigt
+- alle erlaubten öffentlichen Seiten fertig sind
+- Desktop hochwertig wirkt
+- Mobile hochwertig wirkt
+- Build läuft
+- Lint läuft oder Ausnahmen klar dokumentiert sind
+- Daten zentral strukturiert sind
+- Eventdaten überall korrekt sind
+- keine neuen Ports geöffnet wurden
+- Codex am Ende alle Änderungen zusammenfasst
 
 ---
 
-## 20. Grundregel
+## 23. Abschlussbericht von Codex
 
-Optik wie Referenz, aber technisch sauber als echte Website.  
-Keine statischen Screenshots.  
-Keine harten Fake-Daten.  
-Keine Abkürzungen, die später das Admin-Dashboard erschweren.
+Am Ende jeder Aufgabe muss Codex kurz berichten:
 
-Lieber weniger Funktionen, aber dafür sauber, hochwertig und stabil.
+```text
+Geändert:
+- ...
+
+Geprüft:
+- npm run lint
+- npm run build
+- Port 3000 geprüft
+- Navigation geprüft
+
+Offen:
+- ...
+```
+
+Keine langen Ausreden. Keine allgemeinen Floskeln. Nur konkrete Ergebnisse.
+
+---
+
+## 24. Harte Stop-Regeln
+
+Codex muss stoppen und nicht weiterbauen, wenn:
+
+- Zugangsdaten sichtbar würden
+- ein fremder Prozess betroffen wäre, der nicht eindeutig zum Projekt gehört
+- eine Aufgabe Supabase/Admin verlangt, aber Phase 3 nicht freigegeben ist
+- eine Änderung Daten löschen würde, die nicht gesichert sind
+- ein Referenzbild falsche reale Daten vorgibt
+
+Dann kurz erklären, was blockiert und welche sichere Lösung möglich ist.
+
+---
+
+## 25. Leitlinie
+
+Optik wie hochwertige Kampfsport-Referenz.
+
+Technisch aber sauber als echte Website:
+
+- echte Komponenten
+- echte Texte
+- echte Datenstruktur
+- feste Routen
+- fester Port
+- keine wilden Abkürzungen
+
+Lieber weniger Features, aber stabil, hochwertig und später erweiterbar.

@@ -101,7 +101,7 @@ export default async function EventDetailPage({ params }: EventDetailPageProps) 
               <div className="event-results__head">
                 <h2>Ergebnisse</h2>
                 <CTAButton href={site.fightNightHref} variant="outline">
-                  Fight Night ansehen
+                  Kampfabend ansehen
                 </CTAButton>
               </div>
               {event.results.length === 0 ? (
@@ -146,7 +146,7 @@ export default async function EventDetailPage({ params }: EventDetailPageProps) 
       </article>
 
       <SponsorStrip />
-      <CallToActionBand href="/tickets" />
+      <CallToActionBand />
     </>
   );
 }

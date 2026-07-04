@@ -7,6 +7,8 @@ import { NewsCard } from "@/components/sections/NewsCard";
 import { SponsorStrip } from "@/components/sections/SponsorStrip";
 import { CallToActionBand } from "@/components/sections/CallToActionBand";
 import { upcomingEvent } from "@/data/events";
+import { fightCardNotice } from "@/data/fights";
+import { fightNight, fightNightHighlights } from "@/data/fightNight";
 import { featureItems } from "@/data/site";
 import { newsItems } from "@/data/news";
 
@@ -27,6 +29,27 @@ export default function Home() {
       <section className="home-event-section" aria-label="Nächste Veranstaltung">
         <div className="container home-event-wrap">
           <EventHighlight event={upcomingEvent} detailsHref={upcomingEvent.detailHref} />
+        </div>
+      </section>
+
+      <section className="home-fight-preview" aria-labelledby="home-fight-preview-title">
+        <div className="container home-fight-preview__grid">
+          <article className="home-fight-preview__main card-grunge">
+            <span>Kampfabend</span>
+            <h2 id="home-fight-preview-title">Fightcard & Ablauf</h2>
+            <p>{fightNight.text}</p>
+            <div className="home-fight-preview__actions">
+              <CTAButton href="/fight-night">Zum Kampfabend</CTAButton>
+              <CTAButton href="/fight-night#fightcard" variant="outline">
+                Fightcard ansehen
+              </CTAButton>
+            </div>
+          </article>
+
+          <aside className="home-fight-preview__notice card-grunge" aria-label="Fightcard Status">
+            <strong>{fightCardNotice}</strong>
+            <p>{fightNightHighlights[0]?.text}</p>
+          </aside>
         </div>
       </section>
 

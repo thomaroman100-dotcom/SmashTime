@@ -1,10 +1,10 @@
 import { upcomingEvent } from "@/data/events";
 
 export const fightNight = {
-  title: "Fight Night.",
+  title: "Kampfabend.",
   redTitle: "Die Highlights des Abends.",
   text:
-    "Elite-Kämpfe, harte Duelle und echte Emotionen. SmashTime Fight Night zeigt die sportliche Dramaturgie des Abends.",
+    "Elite-Kämpfe, harte Duelle und echte Emotionen. Der SmashTime-Kampfabend zeigt die sportliche Dramaturgie des Abends.",
   eventName: upcomingEvent.name,
   eventDate: upcomingEvent.date,
   dateLabel: upcomingEvent.dateLabel,
