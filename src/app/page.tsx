@@ -21,7 +21,7 @@ export default function Home() {
         text="SmashTime ist die neue Generation des Kampfsports. Härter. Lauter. Unvergesslich."
         className="page-hero--home"
       >
-        <CTAButton href="/ueber-uns" variant="outline">
+        <CTAButton href="#was-dich-erwartet" variant="outline">
           Mehr erfahren
         </CTAButton>
       </PageHero>
@@ -39,8 +39,8 @@ export default function Home() {
             <h2 id="home-fight-preview-title">Fightcard & Ablauf</h2>
             <p>{fightNight.text}</p>
             <div className="home-fight-preview__actions">
-              <CTAButton href="/fight-night">Zum Kampfabend</CTAButton>
-              <CTAButton href="/fight-night#fightcard" variant="outline">
+              <CTAButton href="/veranstaltungen#fightcard">Zum Kampfabend</CTAButton>
+              <CTAButton href="/veranstaltungen#fightcard" variant="outline">
                 Fightcard ansehen
               </CTAButton>
             </div>

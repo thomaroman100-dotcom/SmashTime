@@ -83,12 +83,12 @@ export const newsItems: NewsItem[] = [
     date: "03. Juli 2026",
     category: "Sponsoring",
     excerpt:
-      "Partnerplätze, Pakete und Kontaktwege sind als lokale Daten angelegt und später verwaltbar.",
+      "Sponsorplätze, Pakete und Kontaktwege sind als lokale Daten angelegt und später verwaltbar.",
     image: "/images/sponsors/handshake-cage.png",
     heroImage: "/images/backgrounds/hero-sponsors-corridor.png",
     body: [
-      "Der Sponsorenbereich ist so aufgebaut, dass Partnerplätze, Vorteile und Pakete später verwaltbar bleiben.",
-      "In Phase 2 werden Kontaktwege, Pakete und Partnerflächen weiter verdichtet, ohne echte Logos oder Zusagen zu erfinden.",
+      "Der Sponsorenbereich ist so aufgebaut, dass Sponsorplätze, Vorteile und Pakete später verwaltbar bleiben.",
+      "In Phase 2 werden Kontaktwege, Pakete und Sponsorenflächen weiter verdichtet, ohne echte Logos oder Zusagen zu erfinden.",
       "Interessierte Unternehmen können über den Kontaktbereich eine Anfrage stellen."
     ],
     relatedIds: ["kontakt-fuer-anfragen", "tickets-smashtime-3", "hinter-den-kulissen"]

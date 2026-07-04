@@ -1,6 +1,6 @@
 export const aboutHero = {
   title: "Über SmashTime.",
-  redTitle: "Mehr als ein Event.",
+  redTitle: "Mehr als eine Veranstaltung.",
   text:
     "SmashTime steht für echte Action, starke Athleten und unvergessliche Momente. Wir bringen Kampfsport dorthin, wo Leidenschaft entsteht."
 };
@@ -15,13 +15,13 @@ export const aboutPillars = [
   {
     title: "Wofür wir stehen",
     text:
-      "Echte Kämpfe, Respekt im Cage, klare Chancen für neue Talente und Events, die verbinden.",
+      "Echte Kämpfe, Respekt im Cage, klare Chancen für neue Talente und Veranstaltungen, die verbinden.",
     icon: "shield"
   },
   {
     title: "Warum SmashTime",
     text:
-      "Weil Kampfsport eine Bühne verdient, die Athleten, Fans und Partner ernst nimmt.",
+      "Weil Kampfsport eine Bühne verdient, die Athleten, Fans und Sponsoren ernst nimmt.",
     icon: "fighter"
   }
 ];
@@ -29,7 +29,7 @@ export const aboutPillars = [
 export const aboutValues = [
   {
     title: "Respekt",
-    text: "Respekt vor Sport, Gegnern, Publikum und der gemeinsamen Arbeit hinter jedem Event.",
+    text: "Respekt vor Sport, Gegnern, Publikum und der gemeinsamen Arbeit hinter jeder Veranstaltung.",
     icon: "handshake"
   },
   {
@@ -44,7 +44,7 @@ export const aboutValues = [
   },
   {
     title: "Community",
-    text: "SmashTime wächst mit Fans, Athleten, Teams und Partnern aus der Region.",
+    text: "SmashTime wächst mit Fans, Athleten, Teams und Sponsoren aus der Region.",
     icon: "users"
   }
 ];
@@ -74,11 +74,11 @@ export const aboutInvites = [
   {
     title: "Ticketinfos",
     text: "Platz vormerken",
-    href: "/tickets",
+    href: "/veranstaltungen#tickets",
     icon: "ticket"
   },
   {
-    title: "Partner werden",
+    title: "Sponsor werden",
     text: "Gemeinsam wachsen",
     href: "/sponsoren",
     icon: "handshake"

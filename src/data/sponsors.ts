@@ -11,12 +11,12 @@ export type SponsorPackage = {
 };
 
 export const sponsorLogos: SponsorLogo[] = [
-  { name: "Partnerplatz 01", label: "Logofläche" },
-  { name: "Partnerplatz 02", label: "Logofläche" },
-  { name: "Partnerplatz 03", label: "Logofläche" },
-  { name: "Partnerplatz 04", label: "Logofläche" },
-  { name: "Partnerplatz 05", label: "Logofläche" },
-  { name: "Partnerplatz 06", label: "Logofläche" }
+  { name: "Sponsorplatz 01", label: "Logofläche" },
+  { name: "Sponsorplatz 02", label: "Logofläche" },
+  { name: "Sponsorplatz 03", label: "Logofläche" },
+  { name: "Sponsorplatz 04", label: "Logofläche" },
+  { name: "Sponsorplatz 05", label: "Logofläche" },
+  { name: "Sponsorplatz 06", label: "Logofläche" }
 ];
 
 export const sponsorBenefits = [
@@ -39,7 +39,7 @@ export const sponsorBenefits = [
     icon: "handshake"
   },
   {
-    title: "Langfristige Partnerschaft",
+    title: "Langfristiges Sponsoring",
     text:
       "Pakete werden bewusst als Platzhalter angelegt und später verwaltbar gemacht.",
     icon: "chart"
@@ -52,7 +52,7 @@ export const sponsorPackages: SponsorPackage[] = [
     price: "ab 1.000 Euro",
     tone: "bronze",
     benefits: [
-      "Logo auf der Partnerseite",
+      "Logo auf der Sponsorenseite",
       "Nennung auf sozialen Kanälen",
       "Sichtbarkeit bei Veranstaltungen"
     ]

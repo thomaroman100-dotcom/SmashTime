@@ -16,8 +16,8 @@ export default function SponsorsPage() {
   return (
     <>
       <PageHero
-        title="Partner &"
-        redTitle="Sponsoren."
+        title="Sponsoren."
+        redTitle="Starke Marken."
         text="Gemeinsam für echten Kampfsport. Werde Teil von SmashTime und präsentiere deine Marke in einem starken Umfeld."
         image={pageHeroes.sponsors.image}
         imagePosition={pageHeroes.sponsors.position}

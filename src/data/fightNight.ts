@@ -9,7 +9,7 @@ export const fightNight = {
   eventDate: upcomingEvent.date,
   dateLabel: upcomingEvent.dateLabel,
   location: upcomingEvent.location,
-  mainEventLabel: "Main Event",
+  mainEventLabel: "Hauptkampf",
   championship: "SmashTime Titelkampf",
   mainEvent: {
     fighterA: "Kämpfer wird bekanntgegeben",

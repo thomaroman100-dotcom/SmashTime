@@ -38,7 +38,7 @@ export const eventRecaps: EventRecap[] = [
     title: "SmashTime 3.",
     redTitle: "Cagetime.",
     intro:
-      "Die nächste SmashTime-Ausgabe ist vorbereitet. Ergebnisse und Rückblick werden nach dem Event ergänzt.",
+      "Die nächste SmashTime-Ausgabe ist vorbereitet. Ergebnisse und Rückblick werden nach der Veranstaltung ergänzt.",
     date: upcomingEvent.dateLabel,
     location: upcomingEvent.location,
     address: upcomingEvent.address,
@@ -47,14 +47,14 @@ export const eventRecaps: EventRecap[] = [
     disciplines: upcomingEvent.disciplines,
     image: "/images/backgrounds/arena-cage-front.png",
     stats: [
-      { value: "17.10.", label: "Eventdatum", icon: "calendar" },
+      { value: "17.10.", label: "Veranstaltungsdatum", icon: "calendar" },
       { value: "19:00", label: "Beginn", icon: "clock" },
       { value: "4", label: "Disziplinen", icon: "fighter" },
       { value: "Bald", label: "Fightcard", icon: "list" }
     ],
     description: [
       "SmashTime 3 / Cagetime findet am 17. Oktober 2026 in der Jahnturnhalle St. Pölten statt.",
-      "Die Seite ist bereits als Eventdetail vorbereitet. Sobald Ergebnisse, Bilder und offizielle Rückblicke vorliegen, können sie strukturiert ergänzt werden."
+      "Die Detailseite ist bereits vorbereitet. Sobald Ergebnisse, Bilder und offizielle Rückblicke vorliegen, können sie strukturiert ergänzt werden."
     ],
     results: [],
     quote: {

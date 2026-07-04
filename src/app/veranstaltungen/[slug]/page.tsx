@@ -91,7 +91,7 @@ export default async function EventDetailPage({ params }: EventDetailPageProps) 
 
           <section className="event-detail__content">
             <div className="event-description card-grunge">
-              <h2>Das Event</h2>
+              <h2>Die Veranstaltung</h2>
               {event.description.map((paragraph) => (
                 <p key={paragraph}>{paragraph}</p>
               ))}
@@ -101,11 +101,11 @@ export default async function EventDetailPage({ params }: EventDetailPageProps) 
               <div className="event-results__head">
                 <h2>Ergebnisse</h2>
                 <CTAButton href={site.fightNightHref} variant="outline">
-                  Kampfabend ansehen
+                  Fightcard ansehen
                 </CTAButton>
               </div>
               {event.results.length === 0 ? (
-                <p className="event-results__empty">Ergebnisse werden nach dem Event veröffentlicht.</p>
+                <p className="event-results__empty">Ergebnisse werden nach der Veranstaltung veröffentlicht.</p>
               ) : (
                 <div className="event-results__grid">
                   {event.results.map((result) => (

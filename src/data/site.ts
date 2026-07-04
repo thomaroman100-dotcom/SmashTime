@@ -13,49 +13,28 @@ export const site = {
     "SmashTime aus St. Pölten steht für harte Kampfsportmomente, klare Inszenierung und echte Live-Atmosphäre.",
   logo: "/images/logo/smashtime-logo.png",
   navigation: [
-    {
-      label: "Veranstaltungen",
-      href: "/veranstaltungen",
-      children: [
-        { label: "Nächste Veranstaltung", href: "/veranstaltungen/smashtime-3-cagetime" },
-        { label: "Kampfabend", href: "/fight-night" },
-        { label: "Fightcard", href: "/fight-night#fightcard" },
-        { label: "Vergangene Veranstaltungen", href: "/veranstaltungen#archiv" }
-      ]
-    },
-    {
-      label: "Kämpfer",
-      href: "/champions",
-      children: [
-        { label: "Champions", href: "/champions" },
-        { label: "Gewichtsklassen", href: "/champions#gewichtsklassen" }
-      ]
-    },
-    { label: "Neuigkeiten", href: "/neuigkeiten" },
-    {
-      label: "Über uns",
-      href: "/ueber-uns",
-      children: [
-        { label: "SmashTime", href: "/ueber-uns" },
-        { label: "Sponsoren", href: "/sponsoren" },
-        { label: "Kontakt", href: "/kontakt" }
-      ]
-    }
-  ] satisfies NavigationItem[],
-  headerCta: {
-    label: "Nächste Veranstaltung",
-    href: "/veranstaltungen/smashtime-3-cagetime"
-  },
-  footerNavigation: [
-    { label: "Veranstaltungen", href: "/veranstaltungen" },
+    { label: "Startseite", href: "/" },
     { label: "Champions", href: "/champions" },
     { label: "Neuigkeiten", href: "/neuigkeiten" },
+    { label: "Veranstaltungen", href: "/veranstaltungen" },
+    { label: "Sponsoren", href: "/sponsoren" },
+    { label: "Kontakt", href: "/kontakt" }
+  ] satisfies NavigationItem[],
+  headerCta: {
+    label: "Tickets sichern",
+    href: "/veranstaltungen#tickets"
+  },
+  footerNavigation: [
+    { label: "Startseite", href: "/" },
+    { label: "Champions", href: "/champions" },
+    { label: "Neuigkeiten", href: "/neuigkeiten" },
+    { label: "Veranstaltungen", href: "/veranstaltungen" },
     { label: "Sponsoren", href: "/sponsoren" },
     { label: "Kontakt", href: "/kontakt" }
   ],
-  ticketHref: "/tickets",
+  ticketHref: "/veranstaltungen#tickets",
   eventHref: "/veranstaltungen/smashtime-3-cagetime",
-  fightNightHref: "/fight-night",
+  fightNightHref: "/veranstaltungen#fightcard",
   socialLinks: [
     { label: "Instagram", href: "#" },
     { label: "Facebook", href: "#" },

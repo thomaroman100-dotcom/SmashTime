@@ -40,7 +40,7 @@ export default async function NewsDetailPage({ params }: NewsDetailPageProps) {
       <article className="news-detail">
         <div className="container">
           <Link className="news-detail__back" href="/neuigkeiten">
-            <ArrowLeft aria-hidden="true" size={18} /> Zurück zur News-Übersicht
+            <ArrowLeft aria-hidden="true" size={18} /> Zurück zur Neuigkeiten-Übersicht
           </Link>
 
           <header className="news-detail__hero">
@@ -81,7 +81,7 @@ export default async function NewsDetailPage({ params }: NewsDetailPageProps) {
 
               {item.eventInfo ? (
                 <section className="news-event-box card-grunge">
-                  <span>Event Infos</span>
+                  <span>Veranstaltungsinfos</span>
                   <h2>{item.eventInfo.title}</h2>
                   <dl>
                     <div>
@@ -108,7 +108,7 @@ export default async function NewsDetailPage({ params }: NewsDetailPageProps) {
           </div>
 
           <section className="related-news">
-            <h2>Weitere News</h2>
+            <h2>Weitere Neuigkeiten</h2>
             <div className="related-news__grid">
               {relatedNews.map((news) => (
                 <NewsCard key={news.id} item={news} />

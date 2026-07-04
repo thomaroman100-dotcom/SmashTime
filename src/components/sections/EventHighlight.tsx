@@ -49,11 +49,11 @@ export function EventHighlight({
           <div className="event-highlight__actions">
             {detailsHref ? (
               <CTAButton href={detailsHref}>
-                Event ansehen
+                Details ansehen
               </CTAButton>
             ) : null}
             <CTAButton href={site.ticketHref} variant={detailsHref ? "outline" : "solid"}>
-              Ticketinfos anfragen
+              Tickets sichern
             </CTAButton>
           </div>
         </div>

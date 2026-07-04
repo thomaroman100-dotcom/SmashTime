@@ -99,7 +99,7 @@ export const ticketInclusions = [
   },
   {
     title: "Fan-Zone Zugang",
-    text: "Vor Ort entstehen Bereiche für Fans, Partner und Community.",
+    text: "Vor Ort entstehen Bereiche für Fans, Sponsoren und Community.",
     icon: "users"
   }
 ];

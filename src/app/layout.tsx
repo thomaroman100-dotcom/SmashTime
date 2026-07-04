@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { Header } from "@/components/layout/Header";
-import { Footer } from "@/components/layout/Footer";
 import { RouteBodyClass } from "@/components/layout/RouteBodyClass";
+import { SiteChrome } from "@/components/layout/SiteChrome";
 
 export const metadata: Metadata = {
   title: "SmashTime",
@@ -15,9 +14,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     <html lang="de">
       <body>
         <RouteBodyClass />
-        <Header />
-        <main>{children}</main>
-        <Footer />
+        <SiteChrome>{children}</SiteChrome>
       </body>
     </html>
   );
