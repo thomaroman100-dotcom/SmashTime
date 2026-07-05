@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { AdminShell } from "@/components/admin/AdminShell";
 import { getAdminSession } from "@/lib/admin/auth";
+import "../admin.css";
 
 export const dynamic = "force-dynamic";
 

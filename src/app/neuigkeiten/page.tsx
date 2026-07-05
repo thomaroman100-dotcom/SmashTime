@@ -16,8 +16,7 @@ export default function NewsPage() {
         title="Aktuelle"
         redTitle="Neuigkeiten."
         text="Bleib auf dem Laufenden: Veranstaltungen, Fightcard-Status, Sponsoring und alles rund um SmashTime."
-        image={pageHeroes.news.image}
-        imagePosition={pageHeroes.news.position}
+        preset={pageHeroes.news}
         compact
       />
       <section className="news-page" id="neuigkeiten">

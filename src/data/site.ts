@@ -9,6 +9,7 @@ export type NavigationItem = {
 
 export const site = {
   name: "SmashTime",
+  claim: "Keine Regeln. Nur Respekt.",
   description:
     "SmashTime aus St. Pölten steht für harte Kampfsportmomente, klare Inszenierung und echte Live-Atmosphäre.",
   logo: "/images/logo/smashtime-logo.png",
@@ -16,25 +17,72 @@ export const site = {
     { label: "Startseite", href: "/" },
     { label: "Champions", href: "/champions" },
     { label: "Neuigkeiten", href: "/neuigkeiten" },
-    { label: "Veranstaltungen", href: "/veranstaltungen" },
-    { label: "Sponsoren", href: "/sponsoren" },
-    { label: "Kontakt", href: "/kontakt" }
+    { label: "Über uns", href: "/ueber-uns" },
+    {
+      label: "Mehr",
+      href: "/veranstaltungen",
+      children: [
+        { label: "Veranstaltungen", href: "/veranstaltungen" },
+        { label: "Nächste Veranstaltung", href: "/veranstaltungen/smashtime-3-respekt-steigt-in-den-ring" },
+        { label: "Kampfabend", href: "/fight-night" },
+        { label: "Fightcard", href: "/fight-night#fightcard" },
+        { label: "Sponsoren", href: "/sponsoren" },
+        { label: "Kontakt", href: "/kontakt" }
+      ]
+    }
   ] satisfies NavigationItem[],
   headerCta: {
     label: "Tickets sichern",
-    href: "/veranstaltungen#tickets"
+    href: "/tickets"
+  },
+  loginLink: {
+    label: "Login",
+    href: "/admin/login"
   },
   footerNavigation: [
-    { label: "Startseite", href: "/" },
+    { label: "Veranstaltungen", href: "/veranstaltungen" },
     { label: "Champions", href: "/champions" },
     { label: "Neuigkeiten", href: "/neuigkeiten" },
-    { label: "Veranstaltungen", href: "/veranstaltungen" },
     { label: "Sponsoren", href: "/sponsoren" },
     { label: "Kontakt", href: "/kontakt" }
   ],
-  ticketHref: "/veranstaltungen#tickets",
-  eventHref: "/veranstaltungen/smashtime-3-cagetime",
-  fightNightHref: "/veranstaltungen#fightcard",
+  footerColumns: [
+    {
+      title: "SmashTime",
+      links: [
+        { label: "Über uns", href: "/ueber-uns" },
+        { label: "Sponsoren", href: "/sponsoren" },
+        { label: "Kontakt", href: "/kontakt" },
+        { label: "Kampfabend", href: "/fight-night" }
+      ]
+    },
+    {
+      title: "Service",
+      links: [
+        { label: "Tickets sichern", href: "/tickets" },
+        { label: "Veranstaltungen", href: "/veranstaltungen" },
+        { label: "Champions", href: "/champions" },
+        { label: "Neuigkeiten", href: "/neuigkeiten" }
+      ]
+    },
+    {
+      title: "Rechtliches",
+      links: [
+        { label: "Impressum", href: "/impressum" },
+        { label: "Datenschutz", href: "/datenschutz" }
+      ]
+    }
+  ],
+  newsletter: {
+    title: "Newsletter",
+    text: "Keine Kampfnacht verpassen. Melde dich jetzt an!",
+    placeholder: "Deine E-Mail-Adresse",
+    success: "Danke! Deine Anmeldung ist eingegangen.",
+    error: "Bitte gib eine gültige E-Mail-Adresse ein."
+  },
+  ticketHref: "/tickets",
+  eventHref: "/veranstaltungen/smashtime-3-respekt-steigt-in-den-ring",
+  fightNightHref: "/fight-night#fightcard",
   socialLinks: [
     { label: "Instagram", href: "#" },
     { label: "Facebook", href: "#" },

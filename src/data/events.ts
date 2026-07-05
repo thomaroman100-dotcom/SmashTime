@@ -19,21 +19,20 @@ export type SmashEvent = {
 };
 
 export const upcomingEvent: SmashEvent = {
-  id: "smashtime-3-cagetime",
-  name: "SmashTime 3 / Cagetime",
+  id: "smashtime-3-respekt-steigt-in-den-ring",
+  name: "SmashTime 3 - Respekt steigt in den Ring",
   shortName: "SmashTime 3",
-  subtitle: "Cagetime",
-  date: "2026-10-17T19:00:00+02:00",
+  subtitle: "Respekt steigt in den Ring",
+  date: "2026-10-17T18:00:00+02:00",
   dateLabel: "17. Oktober 2026",
   location: "Jahnturnhalle St. Pölten",
   address: "Jahnstraße 15, 3100 St. Pölten",
-  admission: "18:00 Uhr",
-  start: "19:00 Uhr",
+  admission: "17:00 Uhr",
+  start: "18:00 Uhr",
   disciplines: ["Xtreme Boxen", "K1", "MMA", "Boxen"],
-  gastro: "Figl Ratzersdorf",
   status: "upcoming",
-  image: "/images/backgrounds/arena-cage-front.png?v=20260704",
-  detailHref: "/veranstaltungen/smashtime-3-cagetime"
+  image: "/images/events/smashtime-3-respekt-steigt-in-den-ring.png",
+  detailHref: "/veranstaltungen/smashtime-3-respekt-steigt-in-den-ring"
 };
 
 export const eventArchive: SmashEvent[] = [
@@ -51,7 +50,7 @@ export const eventArchive: SmashEvent[] = [
     disciplines: ["MMA", "K1", "Boxen", "Xtreme Boxen"],
     status: "archive-placeholder",
     image: "/images/backgrounds/cage-chainlink.png",
-    detailHref: "/veranstaltungen/smashtime-3-cagetime"
+    detailHref: "/veranstaltungen/smashtime-3-respekt-steigt-in-den-ring"
   },
   {
     id: "archiv-ausgabe-2",
@@ -67,6 +66,6 @@ export const eventArchive: SmashEvent[] = [
     disciplines: ["MMA", "K1", "Boxen", "Xtreme Boxen"],
     status: "archive-placeholder",
     image: "/images/backgrounds/arena-seats-cage.png",
-    detailHref: "/veranstaltungen/smashtime-3-cagetime"
+    detailHref: "/veranstaltungen/smashtime-3-respekt-steigt-in-den-ring"
   }
 ];

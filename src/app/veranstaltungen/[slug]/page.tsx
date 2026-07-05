@@ -44,6 +44,7 @@ export default async function EventDetailPage({ params }: EventDetailPageProps) 
 
           <header className="event-detail__hero">
             <div>
+              <span className="page-hero__kicker event-detail__kicker">SmashTime Kampfabend</span>
               <h1>
                 <span>{event.title}</span>
                 <span>{event.redTitle}</span>

@@ -28,7 +28,7 @@ export const newsItems: NewsItem[] = [
   {
     id: "tickets-smashtime-3",
     slug: "tickets-smashtime-3",
-    title: "SmashTime 3 / Cagetime rückt näher",
+    title: "SmashTime 3: Respekt steigt in den Ring",
     date: "03. Juli 2026",
     category: "Veranstaltung",
     excerpt:
@@ -36,8 +36,8 @@ export const newsItems: NewsItem[] = [
     image: "/images/backgrounds/arena-brush-wide.png",
     heroImage: "/images/backgrounds/hero-news-cage-smoke.png",
     body: [
-      "Die nächste SmashTime-Ausgabe nimmt Form an. Am 17. Oktober 2026 steht SmashTime 3 / Cagetime in der Jahnturnhalle St. Pölten an.",
-      "Der Fokus liegt auf einer klaren, harten Kampfsportnacht mit MMA, K1, Xtreme Boxen und Boxen. Alle offiziellen Details werden Schritt für Schritt ergänzt, sobald sie bestätigt sind.",
+      "Die nächste SmashTime-Ausgabe nimmt Form an. Am 17. Oktober 2026 steht SmashTime 3 in der Jahnturnhalle St. Pölten an.",
+      "Der Abend steht unter dem Motto \"Respekt steigt in den Ring\" und setzt ein klares Zeichen für Respekt, Stärke und Zusammenhalt gegen Mobbing.",
       "Tickets, Fightcard und weitere organisatorische Informationen werden datengetrieben vorbereitet, damit die Seite später sauber mit echten Verwaltungsdaten verbunden werden kann."
     ],
     quote: {
@@ -45,20 +45,20 @@ export const newsItems: NewsItem[] = [
       author: "SmashTime Team"
     },
     eventInfo: {
-      title: "SmashTime 3 / Cagetime",
+      title: "SmashTime 3 - Respekt steigt in den Ring",
       date: "17. Oktober 2026",
       location: "Jahnturnhalle St. Pölten",
-      admission: "18:00 Uhr",
-      start: "19:00 Uhr",
-      href: "/veranstaltungen/smashtime-3-cagetime"
+      admission: "17:00 Uhr",
+      start: "18:00 Uhr",
+      href: "/veranstaltungen/smashtime-3-respekt-steigt-in-den-ring"
     },
-    relatedIds: ["fightcard-bald", "cagetime-format", "kontakt-fuer-anfragen"],
+    relatedIds: ["fightcard-bald", "smashtime-3-format", "kontakt-fuer-anfragen"],
     featured: true
   },
   {
     id: "fightcard-bald",
     slug: "fightcard-wird-bald-veroeffentlicht",
-    title: "Fightcard wird bald veröffentlicht",
+    title: "Fightcard wird bald veröffent­licht",
     date: "03. Juli 2026",
     category: "Fightcard",
     excerpt:
@@ -74,12 +74,12 @@ export const newsItems: NewsItem[] = [
       text: "Keine Fake-Fightcard. Erst wenn Paarungen bestätigt sind, werden sie sichtbar.",
       author: "Redaktion SmashTime"
     },
-    relatedIds: ["tickets-smashtime-3", "cagetime-format", "hinter-den-kulissen"]
+    relatedIds: ["tickets-smashtime-3", "smashtime-3-format", "hinter-den-kulissen"]
   },
   {
     id: "partnerbereich",
     slug: "sponsorenbereich-vorbereitet",
-    title: "Sponsorenbereich für Phase 1 vorbereitet",
+    title: "Sponsoren­bereich für Phase 1 vorbereitet",
     date: "03. Juli 2026",
     category: "Sponsoring",
     excerpt:
@@ -108,12 +108,12 @@ export const newsItems: NewsItem[] = [
       "Die Website nimmt diese Stimmung auf und übersetzt sie in harte Kanten, dunkle Flächen, rote Akzente und klare Informationsbereiche.",
       "So bleibt das öffentliche Frontend nah an der Atmosphäre, ohne auf statische Screenshots als Seitenersatz zurückzugreifen."
     ],
-    relatedIds: ["partnerbereich", "cagetime-format", "fightcard-bald"]
+    relatedIds: ["partnerbereich", "smashtime-3-format", "fightcard-bald"]
   },
   {
-    id: "cagetime-format",
-    slug: "cagetime-setzt-auf-klare-disziplinen",
-    title: "Cagetime setzt auf klare Disziplinen",
+    id: "smashtime-3-format",
+    slug: "smashtime-3-setzt-auf-klare-disziplinen",
+    title: "SmashTime 3 setzt auf klare Disziplinen",
     date: "03. Juli 2026",
     category: "Veranstaltung",
     excerpt:
@@ -121,17 +121,17 @@ export const newsItems: NewsItem[] = [
     image: "/images/events/k1-ring.png",
     heroImage: "/images/backgrounds/hero-events-stage.png",
     body: [
-      "SmashTime 3 / Cagetime konzentriert sich auf MMA, K1, Xtreme Boxen und Boxen.",
+      "SmashTime 3 konzentriert sich auf MMA, K1, Xtreme Boxen und Boxen.",
       "Diese Disziplinen werden auf der Website konsistent geführt und nicht durch alte Referenzdaten ersetzt.",
       "Sobald offizielle Paarungen vorliegen, werden sie im Fightcard-Bereich als echte UI veröffentlicht."
     ],
     eventInfo: {
-      title: "SmashTime 3 / Cagetime",
+      title: "SmashTime 3 - Respekt steigt in den Ring",
       date: "17. Oktober 2026",
       location: "Jahnturnhalle St. Pölten",
-      admission: "18:00 Uhr",
-      start: "19:00 Uhr",
-      href: "/veranstaltungen/smashtime-3-cagetime"
+      admission: "17:00 Uhr",
+      start: "18:00 Uhr",
+      href: "/veranstaltungen/smashtime-3-respekt-steigt-in-den-ring"
     },
     relatedIds: ["tickets-smashtime-3", "fightcard-bald", "hinter-den-kulissen"]
   },

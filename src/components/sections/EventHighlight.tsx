@@ -1,4 +1,3 @@
-import { Ticket } from "lucide-react";
 import type { SmashEvent } from "@/data/events";
 import { CTAButton } from "@/components/ui/CTAButton";
 import { BrushLabel } from "@/components/ui/BrushLabel";
@@ -39,22 +38,17 @@ export function EventHighlight({
             <span>{event.shortName}</span>
             <span>{event.subtitle}</span>
           </h2>
-          <p className="event-highlight__official-name">{event.name}</p>
           <div className="event-highlight__meta">
             <MetaItem icon="calendar" value={event.dateLabel} />
             <MetaItem icon="map" value={event.location} detail={event.address} />
-            <MetaItem icon="clock" label="Einlass" value={event.admission} />
-            <MetaItem icon="clock" label="Beginn" value={event.start} />
           </div>
           <div className="event-highlight__actions">
+            <CTAButton href={site.ticketHref}>Tickets sichern</CTAButton>
             {detailsHref ? (
-              <CTAButton href={detailsHref}>
+              <CTAButton href={detailsHref} variant="outline">
                 Details ansehen
               </CTAButton>
             ) : null}
-            <CTAButton href={site.ticketHref} variant={detailsHref ? "outline" : "solid"}>
-              Tickets sichern
-            </CTAButton>
           </div>
         </div>
 
@@ -65,11 +59,9 @@ export function EventHighlight({
           {event.disciplines.map((discipline) => (
             <span key={discipline}>{discipline}</span>
           ))}
-          {event.gastro ? <small>Gastro: {event.gastro}</small> : null}
         </div>
       </div>
       {showFightcard && children ? <div className="event-highlight__extra">{children}</div> : null}
-      <Ticket className="event-highlight__watermark" aria-hidden="true" size={90} />
     </section>
   );
 }

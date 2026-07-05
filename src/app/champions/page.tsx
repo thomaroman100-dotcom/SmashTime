@@ -15,8 +15,7 @@ export default function ChampionsPage() {
         title="Champions."
         redTitle="Unsere Titelträger."
         text="Hier stehen sie: die bestätigten Titelträger von SmashTime. Vier echte Champions, keine Beispielnamen, keine fremden Fighter."
-        image={pageHeroes.champions.image}
-        imagePosition={pageHeroes.champions.position}
+        preset={pageHeroes.champions}
         compact
       />
       <div className="container">

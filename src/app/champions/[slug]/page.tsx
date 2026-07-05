@@ -36,8 +36,7 @@ export default async function ChampionPage({ params }: ChampionPageProps) {
         title="Champion"
         redTitle="Profil"
         text="Jeder Champion hat seine Geschichte. Hier stehen die bestätigten Daten."
-        image={pageHeroes.championProfile.image}
-        imagePosition={pageHeroes.championProfile.position}
+        preset={pageHeroes.championProfile}
         compact
       />
       <div className="container">

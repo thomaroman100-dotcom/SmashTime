@@ -34,37 +34,38 @@ export type EventRecap = {
 
 export const eventRecaps: EventRecap[] = [
   {
-    slug: "smashtime-3-cagetime",
+    slug: "smashtime-3-respekt-steigt-in-den-ring",
     title: "SmashTime 3.",
-    redTitle: "Cagetime.",
+    redTitle: "Respekt steigt in den Ring.",
     intro:
-      "Die nächste SmashTime-Ausgabe ist vorbereitet. Ergebnisse und Rückblick werden nach der Veranstaltung ergänzt.",
+      "Gemeinsam gegen Mobbing: SmashTime 3 bringt Respekt, Stärke und Zusammenhalt in die Jahnturnhalle St. Pölten.",
     date: upcomingEvent.dateLabel,
     location: upcomingEvent.location,
     address: upcomingEvent.address,
     admission: upcomingEvent.admission,
     start: upcomingEvent.start,
     disciplines: upcomingEvent.disciplines,
-    image: "/images/backgrounds/arena-cage-front.png",
+    image: upcomingEvent.image,
     stats: [
       { value: "17.10.", label: "Veranstaltungsdatum", icon: "calendar" },
-      { value: "19:00", label: "Beginn", icon: "clock" },
+      { value: "18:00", label: "Beginn", icon: "clock" },
       { value: "4", label: "Disziplinen", icon: "fighter" },
       { value: "Bald", label: "Fightcard", icon: "list" }
     ],
     description: [
-      "SmashTime 3 / Cagetime findet am 17. Oktober 2026 in der Jahnturnhalle St. Pölten statt.",
-      "Die Detailseite ist bereits vorbereitet. Sobald Ergebnisse, Bilder und offizielle Rückblicke vorliegen, können sie strukturiert ergänzt werden."
+      "SmashTime 3 findet am 17. Oktober 2026 in der Jahnturnhalle St. Pölten statt. Einlass ist um 17:00 Uhr, Beginn um 18:00 Uhr.",
+      "Die Veranstaltung steht unter dem Motto \"Respekt steigt in den Ring\" und setzt ein klares Zeichen für Respekt, Stärke und Zusammenhalt gegen Mobbing.",
+      "Die Fightcard wird erst veröffentlicht, sobald Paarungen offiziell bestätigt sind. Bis dahin bleiben Ergebnisse und Rückblick bewusst vorbereitet, ohne Namen zu erfinden."
     ],
     results: [],
     quote: {
-      text: "SmashTime steht für klare Inszenierung, echte Kämpfe und ein Publikum, das jede Runde spürt.",
+      text: "Ein Abend für Respekt, Stärke und Zusammenhalt.",
       author: "SmashTime Team"
     },
     gallery: [
+      { src: "/images/events/smashtime-3-respekt-steigt-in-den-ring.png", alt: "SmashTime 3 Eventposter Respekt steigt in den Ring" },
       { src: "/images/backgrounds/hero-events-cage-wide.png", alt: "Cage und Arena bei SmashTime" },
-      { src: "/images/backgrounds/arena-seats-cage.png", alt: "Arena mit Käfig" },
-      { src: "/images/backgrounds/backstage-wide.png", alt: "Backstage-Bereich" }
+      { src: "/images/backgrounds/arena-seats-cage.png", alt: "Arena mit Käfig" }
     ]
   }
 ];

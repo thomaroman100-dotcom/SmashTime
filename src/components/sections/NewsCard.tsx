@@ -6,9 +6,10 @@ import type { NewsItem } from "@/data/news";
 type NewsCardProps = {
   item: NewsItem;
   featured?: boolean;
+  hideImage?: boolean;
 };
 
-export function NewsCard({ item, featured }: NewsCardProps) {
+export function NewsCard({ item, featured, hideImage }: NewsCardProps) {
   return (
     <article
       className={
@@ -17,7 +18,7 @@ export function NewsCard({ item, featured }: NewsCardProps) {
           : "news-card card-grunge card-grunge--news"
       }
     >
-      {item.image ? (
+      {item.image && !hideImage ? (
         <div className="news-card__image">
           <Image
             src={item.image}

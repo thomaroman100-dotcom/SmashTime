@@ -3,5 +3,11 @@ export function cn(...classes: Array<string | false | null | undefined>) {
 }
 
 export function formatRecord(record: string) {
+  const numbers = record.match(/\d+/g);
+
+  if (numbers?.length) {
+    return numbers.join(" - ");
+  }
+
   return record.replaceAll(" / ", " - ");
 }

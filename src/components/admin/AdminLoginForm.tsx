@@ -55,7 +55,7 @@ export function AdminLoginForm({ status }: AdminLoginFormProps) {
   return (
     <section className="admin-login">
       <div className="admin-login__panel">
-        <Image src={site.logo} alt="SmashTime" width={150} height={150} priority />
+        <Image src={site.logo} alt="SmashTime" width={216} height={72} priority unoptimized />
         <div>
           <h1>Admin-Anmeldung</h1>
           <p>Inhalte, Veranstaltungen, Medien und Anfragen verwalten.</p>

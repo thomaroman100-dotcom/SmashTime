@@ -25,3 +25,6 @@ yarn-error.log*
 Thumbs.db
 .idea
 .vscode
+supabase-temp.js
+.codex-remote-attachments/
+.claude/settings.local.json

@@ -16,9 +16,9 @@ export default function ContactPage() {
     <>
       <PageHero
         title="Kontakt."
-        text="Du hast Fragen, Anregungen oder möchtest Teil von SmashTime werden? Schreib uns - wir melden uns so schnell wie möglich."
-        image={pageHeroes.contact.image}
-        imagePosition={pageHeroes.contact.position}
+        redTitle="Direkter Draht."
+        text="Du hast Fragen, Anregungen oder möchtest Teil von SmashTime werden? Schreib uns – wir melden uns so schnell wie möglich."
+        preset={pageHeroes.contact}
         compact
       />
 

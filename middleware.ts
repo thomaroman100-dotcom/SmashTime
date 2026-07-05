@@ -28,7 +28,17 @@ export async function middleware(request: NextRequest) {
     }
   });
 
-  await supabase.auth.getUser();
+  const {
+    data: { user }
+  } = await supabase.auth.getUser();
+
+  const isLoginRoute = request.nextUrl.pathname === "/admin/login";
+
+  if (!user && !isLoginRoute) {
+    const loginUrl = new URL("/admin/login", request.url);
+    loginUrl.searchParams.set("status", "unauthenticated");
+    return NextResponse.redirect(loginUrl);
+  }
 
   return response;
 }

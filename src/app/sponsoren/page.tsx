@@ -19,8 +19,7 @@ export default function SponsorsPage() {
         title="Sponsoren."
         redTitle="Starke Marken."
         text="Gemeinsam für echten Kampfsport. Werde Teil von SmashTime und präsentiere deine Marke in einem starken Umfeld."
-        image={pageHeroes.sponsors.image}
-        imagePosition={pageHeroes.sponsors.position}
+        preset={pageHeroes.sponsors}
         compact
       >
         <CTAButton href="/kontakt" variant="outline">

@@ -24,7 +24,7 @@ export const ticketEvent = {
   admission: upcomingEvent.admission,
   start: upcomingEvent.start,
   disciplines: upcomingEvent.disciplines,
-  image: "/images/backgrounds/hero-events-cage-wide.png"
+  image: upcomingEvent.image
 };
 
 export const ticketPackages: TicketPackage[] = [
@@ -107,7 +107,7 @@ export const ticketInclusions = [
 export const ticketFaqs: TicketFaq[] = [
   {
     question: "Ab wann ist der Einlass?",
-    answer: "Der Einlass beginnt um 18:00 Uhr."
+    answer: "Der Einlass beginnt um 17:00 Uhr. Der Kampfabend startet um 18:00 Uhr."
   },
   {
     question: "Kann ich mein Ticket zurückgeben?",
