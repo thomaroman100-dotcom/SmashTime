@@ -49,9 +49,13 @@ const nextConfig: NextConfig = {
       { source: "/partners", destination: "/sponsoren", permanent: false },
       { source: "/fighters", destination: "/champions", permanent: false },
       { source: "/rankings", destination: "/champions", permanent: false },
-      { source: "/login", destination: "/admin/login", permanent: false },
+      { source: "/career", destination: "/kontakt", permanent: false },
+      { source: "/faq", destination: "/kontakt", permanent: false },
+      { source: "/media", destination: "/neuigkeiten", permanent: false },
+      { source: "/shop", destination: "/tickets", permanent: false },
       { source: "/legal/impressum", destination: "/impressum", permanent: false },
-      { source: "/legal/datenschutz", destination: "/datenschutz", permanent: false }
+      { source: "/legal/datenschutz", destination: "/datenschutz", permanent: false },
+      { source: "/legal/agb", destination: "/datenschutz", permanent: false }
     ];
   }
 };

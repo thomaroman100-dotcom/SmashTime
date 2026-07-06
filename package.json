@@ -12,22 +12,22 @@
   "dependencies": {
     "@supabase/ssr": "0.12.0",
     "@supabase/supabase-js": "2.110.0",
-    "lucide-react": "latest",
-    "next": "latest",
-    "react": "latest",
-    "react-dom": "latest"
+    "lucide-react": "1.23.0",
+    "next": "16.2.10",
+    "react": "19.2.7",
+    "react-dom": "19.2.7"
   },
   "devDependencies": {
-    "@eslint/eslintrc": "latest",
-    "@tailwindcss/forms": "latest",
-    "@types/node": "latest",
-    "@types/react": "latest",
-    "@types/react-dom": "latest",
-    "autoprefixer": "latest",
-    "eslint": "^9.39.1",
-    "eslint-config-next": "latest",
-    "postcss": "latest",
-    "tailwindcss": "^3.4.17",
-    "typescript": "latest"
+    "@eslint/eslintrc": "3.3.5",
+    "@tailwindcss/forms": "0.5.11",
+    "@types/node": "26.1.0",
+    "@types/react": "19.2.17",
+    "@types/react-dom": "19.2.3",
+    "autoprefixer": "10.5.2",
+    "eslint": "9.39.4",
+    "eslint-config-next": "16.2.10",
+    "postcss": "8.5.16",
+    "tailwindcss": "3.4.19",
+    "typescript": "6.0.3"
   }
 }

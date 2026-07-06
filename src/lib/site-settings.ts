@@ -2,6 +2,7 @@ import { cache } from "react";
 import { createClient } from "@supabase/supabase-js";
 import { homeCountdown, homeHero, homeSections, homeTicketCta } from "@/data/homepage";
 import { site, type NavigationItem } from "@/data/site";
+import { normalizePublicHref } from "@/lib/public-url";
 import { isSupabaseConfigured, supabaseAnonKey, supabaseUrl } from "@/lib/supabase/config";
 
 type SettingRow = {
@@ -52,16 +53,6 @@ export type PublicSettings = {
   };
 };
 
-const routeAliases: Record<string, string> = {
-  "/events": "/events",
-  "/news": "/news",
-  "/sponsors": "/sponsors",
-  "/about": "/about",
-  "/contact": "/contact",
-  "/fighters": "/fighters",
-  "/rankings": "/rankings"
-};
-
 function setting(rows: Record<string, string>, key: string, fallback: string) {
   const value = rows[key]?.trim();
   return value ? value : fallback;
@@ -84,15 +75,7 @@ function intSetting(rows: Record<string, string>, key: string, fallback: number)
 }
 
 function normalizePath(path: string) {
-  const trimmed = path.trim();
-  if (!trimmed) {
-    return "/";
-  }
-  if (/^https?:\/\//.test(trimmed)) {
-    return trimmed;
-  }
-  const normalized = trimmed.startsWith("/") ? trimmed : `/${trimmed}`;
-  return routeAliases[normalized] ?? normalized;
+  return normalizePublicHref(path);
 }
 
 function parseNavigation(rows: Record<string, string>) {
@@ -171,10 +154,13 @@ export const getPublicSiteSettings = cache(async (): Promise<PublicSettings> => 
   const textColor = setting(rows, "branding.theme.textColor", "#E5E5E5");
   const heroTitle = setting(rows, "homepage.hero.title", "");
   const heroSubtitle = setting(rows, "homepage.hero.subtitle", "");
-  const ticketHref = setting(rows, "homepage.cta.primaryUrl", site.ticketHref);
+  const ticketHref = normalizePublicHref(setting(rows, "homepage.cta.primaryUrl", site.ticketHref), site.ticketHref);
   const ticketLabel = setting(rows, "homepage.cta.primaryLabel", site.headerCta.label);
   const secondaryLabel = setting(rows, "homepage.cta.secondaryLabel", homeHero.secondaryCta.label);
-  const secondaryHref = setting(rows, "homepage.cta.secondaryUrl", homeHero.secondaryCta.href);
+  const secondaryHref = normalizePublicHref(
+    setting(rows, "homepage.cta.secondaryUrl", homeHero.secondaryCta.href),
+    homeHero.secondaryCta.href
+  );
 
   const configuredSite: PublicSiteContent = {
     ...site,
@@ -199,7 +185,7 @@ export const getPublicSiteSettings = cache(async (): Promise<PublicSettings> => 
   };
 
   return {
-    faviconUrl: setting(rows, "branding.faviconUrl", "/favicon.ico"),
+    faviconUrl: setting(rows, "branding.faviconUrl", "/favicon.svg"),
     theme: {
       primaryColor,
       accentColor,
@@ -232,7 +218,10 @@ export const getPublicSiteSettings = cache(async (): Promise<PublicSettings> => 
           description: setting(rows, "homepage.modules.champions.description", ""),
           displayLimit: intSetting(rows, "homepage.modules.champions.displayLimit", 4),
           ctaLabel: setting(rows, "homepage.modules.champions.buttonLabel", homeSections.champions.ctaLabel),
-          ctaHref: setting(rows, "homepage.modules.champions.buttonUrl", homeSections.champions.ctaHref)
+          ctaHref: normalizePublicHref(
+            setting(rows, "homepage.modules.champions.buttonUrl", homeSections.champions.ctaHref),
+            homeSections.champions.ctaHref
+          )
         },
         news: {
           ...homeSections.news,
@@ -241,7 +230,10 @@ export const getPublicSiteSettings = cache(async (): Promise<PublicSettings> => 
           description: setting(rows, "homepage.modules.news.description", ""),
           displayLimit: intSetting(rows, "homepage.modules.news.displayLimit", 3),
           ctaLabel: setting(rows, "homepage.modules.news.buttonLabel", homeSections.news.ctaLabel),
-          ctaHref: setting(rows, "homepage.modules.news.buttonUrl", homeSections.news.ctaHref)
+          ctaHref: normalizePublicHref(
+            setting(rows, "homepage.modules.news.buttonUrl", homeSections.news.ctaHref),
+            homeSections.news.ctaHref
+          )
         },
         sponsors: {
           enabled: boolSetting(rows, "homepage.modules.sponsors.enabled", true),
@@ -249,7 +241,7 @@ export const getPublicSiteSettings = cache(async (): Promise<PublicSettings> => 
           description: setting(rows, "homepage.modules.sponsors.description", ""),
           displayLimit: intSetting(rows, "homepage.modules.sponsors.displayLimit", 6),
           ctaLabel: setting(rows, "homepage.modules.sponsors.buttonLabel", "Alle Partner ansehen"),
-          ctaHref: setting(rows, "homepage.modules.sponsors.buttonUrl", "/sponsors")
+          ctaHref: normalizePublicHref(setting(rows, "homepage.modules.sponsors.buttonUrl", "/sponsoren"), "/sponsoren")
         }
       },
       ticketCta: {
