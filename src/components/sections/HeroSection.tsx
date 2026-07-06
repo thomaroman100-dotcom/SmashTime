@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, Ticket } from "lucide-react";
 import type { HomeEventPoster, HomeHero } from "@/data/homepage";
@@ -13,22 +14,22 @@ export function HeroSection({ hero, poster }: HeroSectionProps) {
     "--home-hero-position": hero.backgroundPosition
   } as React.CSSProperties;
   const hasConfiguredTitle = Boolean(hero.title?.trim());
+  const claimLines = hero.claimLines.length > 0 ? hero.claimLines : ["Keine Regeln.", "Nur Respekt."];
+  const showPoster = poster.showInHero && Boolean(poster.image || poster.eventTitle);
 
   return (
-    <section className="home-hero" style={style} aria-label="SmashTime Kampfnacht">
+    <section
+      className={`home-hero${showPoster ? "" : " home-hero--no-poster"}`}
+      style={style}
+      aria-label="SmashTime Kampfnacht"
+    >
       <div className="container home-hero__inner">
         <div className="home-hero__copy">
           <h1 className="home-hero__headline">
-            {hasConfiguredTitle ? (
-              <span className="home-hero__brand">{hero.title}</span>
-            ) : (
-              <>
-                {hero.claimLines.map((line) => (
-                  <span key={line}>{line}</span>
-                ))}
-                <span className="home-hero__brand">{hero.brandLine}</span>
-              </>
-            )}
+            {claimLines.map((line) => (
+              <span key={line}>{line}</span>
+            ))}
+            <span className="home-hero__brand">{hero.brandLine}</span>
           </h1>
           {hero.subtitle ? <p className="home-hero__subtitle">{hero.subtitle}</p> : null}
           <p className="home-hero__tagline">{hero.tagline}</p>
@@ -44,12 +45,31 @@ export function HeroSection({ hero, poster }: HeroSectionProps) {
           </div>
         </div>
 
-        <div className="home-hero__poster">
-          <span className="home-hero__poster-number">{poster.eventNumber}</span>
-          <span className="home-hero__poster-title">{poster.eventTitle}</span>
-          <span className="home-hero__poster-date">{poster.dateLabel}</span>
-          <span className="home-hero__poster-venue">{poster.venueLabel}</span>
-        </div>
+        {showPoster ? (
+          <div className="home-hero__poster">
+            {poster.image ? (
+              <div className="home-hero__poster-media">
+                <Image
+                  src={poster.image}
+                  alt={poster.imageAlt ?? `${poster.eventTitle} Eventposter`}
+                  fill
+                  sizes="(max-width: 1023px) 90vw, 34vw"
+                  priority
+                  unoptimized
+                  className="home-hero__poster-image"
+                />
+              </div>
+            ) : (
+              <div className="home-hero__poster-fallback">
+                {hasConfiguredTitle ? <span className="home-hero__poster-edition">{hero.title}</span> : null}
+                <span className="home-hero__poster-number">{poster.eventNumber}</span>
+                <span className="home-hero__poster-title">{poster.eventTitle}</span>
+                <span className="home-hero__poster-date">{poster.dateLabel}</span>
+                <span className="home-hero__poster-venue">{poster.venueLabel}</span>
+              </div>
+            )}
+          </div>
+        ) : null}
       </div>
     </section>
   );

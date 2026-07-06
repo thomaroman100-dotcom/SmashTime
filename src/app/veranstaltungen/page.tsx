@@ -7,14 +7,16 @@ import { SectionTitle } from "@/components/ui/SectionTitle";
 import { CTAButton } from "@/components/ui/CTAButton";
 import { SponsorStrip } from "@/components/sections/SponsorStrip";
 import { eventArchive, upcomingEvent } from "@/data/events";
-import { fightcards } from "@/data/fightcards";
 import { pageHeroes } from "@/data/heroes";
+import { getPublicFightcardsForEvent } from "@/lib/public-fightcards";
 
 export const metadata = {
   title: "Veranstaltungen | SmashTime"
 };
 
-export default function EventsPage() {
+export default async function EventsPage() {
+  const visibleFights = await getPublicFightcardsForEvent(upcomingEvent.id);
+
   return (
     <>
       <PageHero
@@ -32,7 +34,7 @@ export default function EventsPage() {
           detailsHref={upcomingEvent.detailHref}
           showFightcard
         >
-          <FightCardList fights={fightcards} />
+          <FightCardList fights={visibleFights} />
         </EventHighlight>
 
         <section className="events-ticket-section card-grunge" id="tickets" aria-label="Tickets sichern">

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ListOrdered, Plus, ShieldAlert } from "lucide-react";
 import { FightcardBoard } from "@/components/admin/FightcardBoard";
 import type { FighterProfileOption } from "@/components/admin/FighterProfilePicker";
+import { upcomingEvent } from "@/data/events";
 import type { FightRow } from "@/lib/admin/actions/fightcards";
 import { loadVerifiedFighterOptions } from "@/lib/admin/fighters";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
@@ -32,7 +33,7 @@ export default async function AdminFightcardsPage({ searchParams }: AdminFightca
   const { event } = await searchParams;
   const supabase = await createSupabaseServerClient();
 
-  let events: Array<{ id: number; name: string; dateLabel: string; location: string }> = [];
+  let events: Array<{ id: number; slug: string; name: string; dateLabel: string; location: string }> = [];
   let fights: FightRow[] = [];
   let fighterOptions: FighterProfileOption[] = [];
   let loadError: string | null = null;
@@ -43,7 +44,7 @@ export default async function AdminFightcardsPage({ searchParams }: AdminFightca
     const [{ data: eventData, error: eventError }, fighterOptionsResult] = await Promise.all([
       supabase
         .from("events")
-        .select("id, name, date_label, event_date, location")
+        .select("id, slug, name, date_label, event_date, location")
         .order("event_date", { ascending: false, nullsFirst: false }),
       loadVerifiedFighterOptions(supabase)
     ]);
@@ -54,6 +55,7 @@ export default async function AdminFightcardsPage({ searchParams }: AdminFightca
       events = (eventData ?? []).map((item) => {
         const row = item as {
           id: number;
+          slug: string;
           name: string;
           date_label: string | null;
           event_date: string | null;
@@ -61,6 +63,7 @@ export default async function AdminFightcardsPage({ searchParams }: AdminFightca
         };
         return {
           id: row.id,
+          slug: row.slug,
           name: row.name,
           dateLabel: dateLabelFor(row),
           location: row.location ?? "Ort offen"
@@ -73,13 +76,13 @@ export default async function AdminFightcardsPage({ searchParams }: AdminFightca
   const selectedEventId = Number.parseInt(event ?? "", 10);
   const activeEventId = Number.isFinite(selectedEventId) && events.some((item) => item.id === selectedEventId)
     ? selectedEventId
-    : events[0]?.id;
+    : events.find((item) => item.slug === upcomingEvent.id)?.id ?? events[0]?.id;
 
   if (supabase && !loadError && activeEventId) {
     const { data, error } = await supabase
       .from("fight_cards")
       .select(
-        "id, event_id, sort_order, label, fighter_a_user_id, fighter_b_user_id, fighter_a, fighter_b, fighter_a_is_tba, fighter_b_is_tba, weight_class, discipline, is_main_event, is_visible, status, notes"
+        "id, event_id, sort_order, label, fighter_a_user_id, fighter_b_user_id, fighter_a, fighter_b, fighter_a_image_path, fighter_b_image_path, fighter_a_is_tba, fighter_b_is_tba, weight_class, discipline, is_main_event, is_visible, status, notes"
       )
       .eq("event_id", activeEventId)
       .order("sort_order", { ascending: true });

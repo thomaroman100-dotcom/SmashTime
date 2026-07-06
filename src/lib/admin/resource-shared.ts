@@ -1,7 +1,7 @@
-export const EVENT_DISCIPLINES = ["Xtreme Boxen", "K1", "MMA", "Boxen"] as const;
+export const EVENT_DISCIPLINES = ["Xtreme Boxen", "K1", "MMA", "Boxen", "Influenza Kämpfe"] as const;
 
 export const eventSelectColumns =
-  "id, slug, name, short_name, subtitle, event_date, date_label, location, address, admission, starts_at, disciplines, gastro, image_path, ticket_url, status, updated_at";
+  "id, slug, name, short_name, subtitle, event_date, date_label, location, address, admission, starts_at, disciplines, gastro, image_path, ticket_url, status, show_in_hero, updated_at";
 
 export const NEWS_CATEGORIES = ["Veranstaltung", "Fightcard", "Sponsoring", "Neuigkeit"] as const;
 

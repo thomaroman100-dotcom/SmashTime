@@ -3,13 +3,17 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Bell,
   CalendarDays,
+  ChevronDown,
+  CheckCircle2,
   Crown,
+  ExternalLink,
   FileCheck2,
   Handshake,
+  KeyRound,
   Images,
   LayoutDashboard,
   ListOrdered,
@@ -19,6 +23,7 @@ import {
   Newspaper,
   Settings,
   ShieldCheck,
+  UserRound,
   UsersRound,
   X
 } from "lucide-react";
@@ -30,6 +35,8 @@ import { AdminUiProvider } from "@/components/admin/ui/AdminUiProvider";
 import { InitialsAvatar } from "@/components/admin/ui/primitives";
 
 type AdminShellUser = {
+  userId: string;
+  email: string;
   displayName: string;
   role: "admin" | "staff";
   permissions: AdminPermission[];
@@ -65,10 +72,14 @@ export function AdminShell({ user, children }: AdminShellProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [open, setOpen] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
+  const profileRef = useRef<HTMLDivElement | null>(null);
 
   const signOut = async () => {
     const supabase = createSupabaseBrowserClient();
     await supabase?.auth.signOut();
+    setProfileOpen(false);
+    setOpen(false);
     router.push("/admin/login");
     router.refresh();
   };
@@ -76,12 +87,37 @@ export function AdminShell({ user, children }: AdminShellProps) {
   const referenceMode = process.env.NODE_ENV !== "production" && searchParams.get("reference") === "1";
   const displayName = referenceMode ? "Thomas Roman" : user.displayName;
   const roleLabel = referenceMode ? "Administrator" : user.role === "admin" ? "Administrator" : "Mitarbeiter";
+  const canManageUsers = hasAdminPermission(user, "users.manage");
+  const canManageSettings = hasAdminPermission(user, "settings.manage");
+  const permissionSummary = user.role === "admin" ? "Vollzugriff" : `${user.permissions.length} aktive Rechte`;
   const visibleNavigation = adminNavigation.filter((item) => !item.permission || hasAdminPermission(user, item.permission));
   const activeHref = visibleNavigation
     .filter((item) =>
       item.href === "/admin" ? pathname === "/admin" : pathname === item.href || pathname.startsWith(`${item.href}/`)
     )
     .sort((a, b) => b.href.length - a.href.length)[0]?.href;
+
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setOpen(false);
+        setProfileOpen(false);
+      }
+    };
+
+    const onPointerDown = (event: PointerEvent) => {
+      if (profileRef.current && !profileRef.current.contains(event.target as Node)) {
+        setProfileOpen(false);
+      }
+    };
+
+    window.addEventListener("keydown", onKeyDown);
+    window.addEventListener("pointerdown", onPointerDown);
+    return () => {
+      window.removeEventListener("keydown", onKeyDown);
+      window.removeEventListener("pointerdown", onPointerDown);
+    };
+  }, []);
 
   return (
     <AdminUiProvider>
@@ -126,38 +162,86 @@ export function AdminShell({ user, children }: AdminShellProps) {
               );
             })}
           </nav>
-
-          <Link href="/admin/account" className="adm-sidebar__user" onClick={() => setOpen(false)}>
-            <InitialsAvatar name={displayName} online />
-            <div style={{ minWidth: 0 }}>
-              <strong>{displayName}</strong>
-              <span>{roleLabel}</span>
-            </div>
-          </Link>
-
-          <button className="adm-sidebar__logout" type="button" onClick={signOut}>
-            <LogOut aria-hidden="true" size={18} />
-            <span>Abmelden</span>
-          </button>
         </aside>
 
         <section className="adm-main">
           <header className="adm-topbar">
             <div className="adm-topbar__cluster">
-              <div className="adm-topbar__id">
-                <strong>{displayName}</strong>
-                <span>{roleLabel}</span>
+              <div className="adm-profile-menu" ref={profileRef}>
+                <button
+                  className={cn("adm-profile-menu__trigger", profileOpen && "adm-profile-menu__trigger--open")}
+                  type="button"
+                  aria-haspopup="menu"
+                  aria-expanded={profileOpen}
+                  onClick={() => setProfileOpen((value) => !value)}
+                >
+                  <span className="adm-topbar__id">
+                    <strong>{displayName}</strong>
+                    <span>{roleLabel}</span>
+                  </span>
+                  <span className="adm-topbar__photo">
+                    <Image
+                      src="/images/admin/thomas-roman-avatar.png"
+                      alt=""
+                      width={34}
+                      height={34}
+                      priority={referenceMode}
+                    />
+                    <i aria-hidden="true" />
+                  </span>
+                  <ChevronDown aria-hidden="true" size={14} />
+                </button>
+                <div
+                  className={cn("adm-profile-menu__dropdown", profileOpen && "adm-profile-menu__dropdown--open")}
+                  role="menu"
+                  aria-label="Profilmenü"
+                >
+                  <div className="adm-profile-menu__identity">
+                    <InitialsAvatar name={displayName} online />
+                    <div>
+                      <strong>{displayName}</strong>
+                      <span>{user.email}</span>
+                    </div>
+                  </div>
+                  <div className="adm-profile-menu__meta" aria-label="Sitzungsstatus">
+                    <span>
+                      <CheckCircle2 aria-hidden="true" size={14} />
+                      Aktive Sitzung
+                    </span>
+                    <strong>{permissionSummary}</strong>
+                  </div>
+                  <div className="adm-profile-menu__section" role="none">
+                    <Link href="/admin/account" role="menuitem" onClick={() => setProfileOpen(false)}>
+                      <UserRound aria-hidden="true" size={16} />
+                      Konto & Profil
+                    </Link>
+                    {canManageUsers ? (
+                      <Link href={`/admin/members/${user.userId}`} role="menuitem" onClick={() => setProfileOpen(false)}>
+                        <ShieldCheck aria-hidden="true" size={16} />
+                        Profil bearbeiten
+                      </Link>
+                    ) : null}
+                    <Link href="/admin/account#sicherheit" role="menuitem" onClick={() => setProfileOpen(false)}>
+                      <KeyRound aria-hidden="true" size={16} />
+                      Sicherheit
+                    </Link>
+                    {canManageSettings ? (
+                      <Link href="/admin/settings" role="menuitem" onClick={() => setProfileOpen(false)}>
+                        <Settings aria-hidden="true" size={16} />
+                        Einstellungen
+                      </Link>
+                    ) : null}
+                    <Link href="/" role="menuitem" onClick={() => setProfileOpen(false)}>
+                      <ExternalLink aria-hidden="true" size={16} />
+                      Website öffnen
+                    </Link>
+                  </div>
+                  <button className="adm-profile-menu__logout" type="button" role="menuitem" onClick={signOut}>
+                    <LogOut aria-hidden="true" size={16} />
+                    Abmelden
+                  </button>
+                </div>
               </div>
-              <span className="adm-topbar__photo">
-                <Image
-                  src="/images/admin/thomas-roman-avatar.png"
-                  alt=""
-                  width={34}
-                  height={34}
-                  priority={referenceMode}
-                />
-                <i aria-hidden="true" />
-              </span>
               <button className="adm-bell" type="button" aria-label="Benachrichtigungen">
                 <Bell aria-hidden="true" size={19} />
                 <span className="adm-bell__dot" aria-hidden="true" />

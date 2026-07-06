@@ -66,6 +66,7 @@ export function EventForm({ action, initial, gallery = [], heading, subheading }
   const [address, setAddress] = useState(initial?.address ?? "");
   const [ticketUrl, setTicketUrl] = useState(initial?.ticket_url ?? "");
   const [imagePath, setImagePath] = useState(initial?.image_path ?? "");
+  const [showInHero, setShowInHero] = useState(Boolean(initial?.show_in_hero));
 
   useEffect(() => {
     if (!state) {
@@ -373,7 +374,7 @@ export function EventForm({ action, initial, gallery = [], heading, subheading }
                     onChange={(event) => setImagePath(event.target.value)}
                     placeholder="/images/events/… oder Medien-URL"
                   />
-                  <span className="adm-field__hint">JPG, PNG oder WebP. Empfohlen: 16:9 (z. B. 1920×1080 px).</span>
+                  <span className="adm-field__hint">JPG, PNG oder WebP. Empfohlen für den Hero: 4:5 (z. B. 1200×1500 px).</span>
                 </div>
                 <div className="adm-field">
                   <label htmlFor="event-image-file">Neues Poster hochladen</label>
@@ -386,11 +387,23 @@ export function EventForm({ action, initial, gallery = [], heading, subheading }
                     </label>
                   ) : null}
                 </div>
+                <label className="adm-checkbox-line adm-checkbox-line--hero">
+                  <input
+                    type="checkbox"
+                    name="show_in_hero"
+                    checked={showInHero}
+                    onChange={(event) => setShowInHero(event.target.checked)}
+                  />
+                  <span>
+                    <strong>Im Hero anzeigen</strong>
+                    <small>Zeigt diesen Event-Flyer auf der Startseite. Wenn aktiviert, werden andere Hero-Events automatisch deaktiviert.</small>
+                  </span>
+                </label>
                 <AdminImagePreview
                   src={imagePath}
                   alt="Event-Poster Vorschau"
                   fallback="Poster wird hier angezeigt"
-                  aspectRatio="16 / 9"
+                  aspectRatio="4 / 5"
                   sizes="360px"
                   className="adm-image-preview--field"
                 />
@@ -457,7 +470,7 @@ export function EventForm({ action, initial, gallery = [], heading, subheading }
                   src={imagePath}
                   alt={`${name || "Event"} Poster`}
                   fallback="Poster wird hier angezeigt"
-                  aspectRatio="16 / 9"
+                  aspectRatio="4 / 5"
                   sizes="380px"
                   className="adm-preview__img"
                 />
@@ -465,6 +478,11 @@ export function EventForm({ action, initial, gallery = [], heading, subheading }
                   <Badge tone={statusMeta[status].tone} uppercase>
                     {statusMeta[status].label}
                   </Badge>
+                  {showInHero ? (
+                    <Badge tone={imagePath ? "orange" : "gray"} uppercase>
+                      Hero-Flyer {imagePath ? "aktiv" : "ohne Bild"}
+                    </Badge>
+                  ) : null}
                   <h3>{name || "Event-Name"}</h3>
                   {subtitle ? <p className="adm-preview__sub">{subtitle}</p> : null}
                   <div className="adm-preview__meta">

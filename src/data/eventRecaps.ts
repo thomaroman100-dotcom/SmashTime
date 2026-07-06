@@ -1,4 +1,5 @@
 import { upcomingEvent } from "@/data/events";
+import { fightcards } from "@/data/fightcards";
 
 export type EventResult = {
   id: string;
@@ -49,13 +50,13 @@ export const eventRecaps: EventRecap[] = [
     stats: [
       { value: "17.10.", label: "Veranstaltungsdatum", icon: "calendar" },
       { value: "18:00", label: "Beginn", icon: "clock" },
-      { value: "4", label: "Disziplinen", icon: "fighter" },
-      { value: "Bald", label: "Fightcard", icon: "list" }
+      { value: upcomingEvent.disciplines.length.toString(), label: "Disziplinen", icon: "fighter" },
+      { value: fightcards.filter((fight) => fight.eventId === upcomingEvent.id && fight.visible).length.toString(), label: "Bestätigte Paarung", icon: "list" }
     ],
     description: [
       "SmashTime 3 findet am 17. Oktober 2026 in der Jahnturnhalle St. Pölten statt. Einlass ist um 17:00 Uhr, Beginn um 18:00 Uhr.",
       "Die Veranstaltung steht unter dem Motto \"Respekt steigt in den Ring\" und setzt ein klares Zeichen für Respekt, Stärke und Zusammenhalt gegen Mobbing.",
-      "Die Fightcard wird erst veröffentlicht, sobald Paarungen offiziell bestätigt sind. Bis dahin bleiben Ergebnisse und Rückblick bewusst vorbereitet, ohne Namen zu erfinden."
+      "Die erste bestätigte Paarung ist Just Rob vs. Karl-Heinz unter Influenza Kämpfe. Weitere Paarungen werden ergänzt, sobald sie offiziell feststehen."
     ],
     results: [],
     quote: {

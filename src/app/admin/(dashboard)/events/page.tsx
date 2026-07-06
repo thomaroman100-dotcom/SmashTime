@@ -263,6 +263,11 @@ export default async function AdminEventsPage({ searchParams }: PageProps) {
                   </div>
                   <span>
                     <Badge tone={statusMeta[event.status].tone}>{statusMeta[event.status].label}</Badge>
+                    {event.show_in_hero ? (
+                      <span style={{ display: "block", marginTop: 6 }}>
+                        <Badge tone={event.image_path ? "orange" : "gray"}>Hero</Badge>
+                      </span>
+                    ) : null}
                   </span>
                   <div className="adm-row-actions">
                     <Link className="adm-icon-btn" href={`/admin/events/${event.id}`} aria-label={`${event.name} bearbeiten`}>

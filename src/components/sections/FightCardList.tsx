@@ -1,5 +1,6 @@
 import type { FightCardEntry } from "@/data/fightcards";
 import { BrushLabel } from "@/components/ui/BrushLabel";
+import { FightBoutCard } from "@/components/sections/FightBoutCard";
 
 type FightCardListProps = {
   fights: FightCardEntry[];
@@ -15,18 +16,12 @@ export function FightCardList({ fights }: FightCardListProps) {
       {visibleFights.length === 0 ? (
         <p className="fightcard-list__empty">Fightcard wird bald veröffentlicht.</p>
       ) : (
-        <ol>
+        <ol className="fightcard-list__rows">
           {visibleFights
             .sort((a, b) => a.order - b.order)
             .map((fight) => (
               <li key={fight.id}>
-                <span>{fight.label}</span>
-                <strong>
-                  {fight.fighterA} <em>vs.</em> {fight.fighterB}
-                </strong>
-                <small>
-                  {fight.weightClass} · {fight.discipline}
-                </small>
+                <FightBoutCard fight={fight} />
               </li>
             ))}
         </ol>

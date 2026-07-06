@@ -2,7 +2,23 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { ChevronDown, LogIn, LogOut, Menu, Shield, Ticket, UserCircle, UserPlus, X } from "lucide-react";
+import {
+  BadgeCheck,
+  Bell,
+  ChevronDown,
+  CheckCircle2,
+  KeyRound,
+  LogIn,
+  LogOut,
+  Menu,
+  Search,
+  Shield,
+  Ticket,
+  UserCircle,
+  UserCog,
+  UserPlus,
+  X
+} from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import type { NavigationItem } from "@/data/site";
@@ -16,6 +32,30 @@ type HeaderProps = {
   siteContent?: PublicSiteContent;
   sessionProfile?: SessionProfile | null;
 };
+
+function profileInitials(name: string) {
+  return (
+    name
+      .split(" ")
+      .filter(Boolean)
+      .slice(0, 2)
+      .map((part) => part[0])
+      .join("")
+      .toUpperCase() || "ST"
+  );
+}
+
+function safeAvatarBackground(avatarUrl: string | null | undefined) {
+  if (!avatarUrl) return undefined;
+
+  try {
+    const url = new URL(avatarUrl);
+    if (url.protocol !== "https:") return undefined;
+    return { backgroundImage: `url("${url.href.replace(/"/g, "%22")}")` };
+  } catch {
+    return undefined;
+  }
+}
 
 export function Header({ siteContent = defaultSite, sessionProfile = null }: HeaderProps) {
   const site = siteContent;
@@ -58,6 +98,18 @@ export function Header({ siteContent = defaultSite, sessionProfile = null }: Hea
     router.push("/");
     router.refresh();
   };
+
+  const profileStatusLabel =
+    sessionProfile?.status === "active"
+      ? "Aktiv"
+      : sessionProfile?.status === "suspended"
+        ? "Gesperrt"
+        : "Wartet auf Freigabe";
+  const profileAttentionCount = sessionProfile
+    ? Number(sessionProfile.status !== "active") +
+      Number(sessionProfile.profileType === "fighter" && !sessionProfile.fighter?.isVerified)
+    : 0;
+  const profileAvatarStyle = safeAvatarBackground(sessionProfile?.avatarUrl);
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
@@ -147,6 +199,19 @@ export function Header({ siteContent = defaultSite, sessionProfile = null }: Hea
         </nav>
 
         <div className="site-header__actions">
+          {sessionProfile ? (
+            <div className="site-header__utility" aria-label="Profil-Schnellzugriff">
+              <Link href="/neuigkeiten" className="site-header__icon-link" aria-label="Neuigkeiten öffnen">
+                <Search aria-hidden="true" size={19} />
+              </Link>
+              <Link href="/account#benachrichtigungen" className="site-header__icon-link" aria-label="Profilhinweise öffnen">
+                <Bell aria-hidden="true" size={19} />
+                {profileAttentionCount > 0 ? (
+                  <span className="site-header__icon-badge">{profileAttentionCount}</span>
+                ) : null}
+              </Link>
+            </div>
+          ) : null}
           <div className="site-profile-menu" ref={profileRef}>
             <button
               className={cn("site-profile-menu__trigger", sessionProfile && "site-profile-menu__trigger--active")}
@@ -155,35 +220,73 @@ export function Header({ siteContent = defaultSite, sessionProfile = null }: Hea
               aria-expanded={profileOpen}
               onClick={() => setProfileOpen((value) => !value)}
             >
-              <UserCircle aria-hidden="true" size={20} />
-              <span>{sessionProfile ? sessionProfile.displayName : "Login"}</span>
+              {sessionProfile ? (
+                <span
+                  aria-hidden="true"
+                  className={cn("site-profile-menu__avatar", profileAvatarStyle && "site-profile-menu__avatar--image")}
+                  style={profileAvatarStyle}
+                >
+                  {profileAvatarStyle ? null : profileInitials(sessionProfile.displayName)}
+                </span>
+              ) : (
+                <UserCircle aria-hidden="true" size={20} />
+              )}
+              <span className="site-profile-menu__trigger-text">
+                <strong>{sessionProfile ? sessionProfile.displayName : "Login"}</strong>
+                {sessionProfile ? <small>{sessionProfile.roleLabel}</small> : null}
+              </span>
               <ChevronDown aria-hidden="true" size={13} />
             </button>
-            <div className={cn("site-profile-menu__dropdown", profileOpen && "site-profile-menu__dropdown--open")}>
+            <div
+              className={cn("site-profile-menu__dropdown", profileOpen && "site-profile-menu__dropdown--open")}
+              role="menu"
+              aria-label="Profilmenü"
+            >
               {sessionProfile ? (
                 <>
                   <div className="site-profile-menu__identity">
                     <strong>{sessionProfile.displayName}</strong>
-                    <span>{sessionProfile.roleLabel} · {sessionProfile.status}</span>
+                    <span>{sessionProfile.email}</span>
                   </div>
-                  <Link href="/account" onClick={() => setProfileOpen(false)}>
-                    <UserCircle aria-hidden="true" size={16} /> Mein Profil
-                  </Link>
-                  {sessionProfile.canAccessAdmin ? (
-                    <Link href="/admin" onClick={() => setProfileOpen(false)}>
-                      <Shield aria-hidden="true" size={16} /> Adminbereich
+                  <div className="site-profile-menu__meta">
+                    <span>
+                      <CheckCircle2 aria-hidden="true" size={14} />
+                      {profileStatusLabel}
+                    </span>
+                    <strong>{sessionProfile.roleLabel}</strong>
+                  </div>
+                  <div className="site-profile-menu__section" role="none">
+                    <Link href="/account" role="menuitem" onClick={() => setProfileOpen(false)}>
+                      <UserCircle aria-hidden="true" size={16} /> Profilübersicht
                     </Link>
-                  ) : null}
-                  <button type="button" onClick={signOut}>
+                    <Link href="/profil/bearbeiten" role="menuitem" onClick={() => setProfileOpen(false)}>
+                      <UserCog aria-hidden="true" size={16} /> Profil bearbeiten
+                    </Link>
+                    <Link href="/account#sicherheit" role="menuitem" onClick={() => setProfileOpen(false)}>
+                      <KeyRound aria-hidden="true" size={16} /> Sicherheit
+                    </Link>
+                    {sessionProfile.canAccessAdmin ? (
+                      <Link href="/admin" role="menuitem" onClick={() => setProfileOpen(false)}>
+                        <Shield aria-hidden="true" size={16} /> Adminbereich
+                      </Link>
+                    ) : null}
+                    {sessionProfile.profileType === "fighter" ? (
+                      <span className="site-profile-menu__status">
+                        <BadgeCheck aria-hidden="true" size={15} />
+                        {sessionProfile.fighter?.isVerified ? "Kämpfer verifiziert" : "Kämpferprüfung offen"}
+                      </span>
+                    ) : null}
+                  </div>
+                  <button type="button" role="menuitem" onClick={signOut}>
                     <LogOut aria-hidden="true" size={16} /> Abmelden
                   </button>
                 </>
               ) : (
                 <>
-                  <Link href="/login" onClick={() => setProfileOpen(false)}>
+                  <Link href="/login" role="menuitem" onClick={() => setProfileOpen(false)}>
                     <LogIn aria-hidden="true" size={16} /> Einloggen
                   </Link>
-                  <Link href="/register" onClick={() => setProfileOpen(false)}>
+                  <Link href="/register" role="menuitem" onClick={() => setProfileOpen(false)}>
                     <UserPlus aria-hidden="true" size={16} /> Registrieren
                   </Link>
                 </>
@@ -260,6 +363,9 @@ export function Header({ siteContent = defaultSite, sessionProfile = null }: Hea
             <>
               <Link href="/account" className="mobile-panel__login" onClick={closeMobileMenu}>
                 Mein Profil · {sessionProfile.displayName}
+              </Link>
+              <Link href="/profil/bearbeiten" className="mobile-panel__login" onClick={closeMobileMenu}>
+                Profil bearbeiten
               </Link>
               {sessionProfile.canAccessAdmin ? (
                 <Link href="/admin" className="mobile-panel__login" onClick={closeMobileMenu}>

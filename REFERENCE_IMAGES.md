@@ -75,6 +75,30 @@ Referenzbilder/Public/Desktop/kontakt.png
 Referenzbilder/Public/Mobile/*.png
 ```
 
+## Public Profil- und Konto-Referenzen
+
+Neue Referenzen vom 06.07.2026 fuer den oeffentlichen Profilbereich liegen sortiert unter:
+
+```text
+Referenzbilder/Public/Profile/01-mitglied-profil-uebersicht.png           -> /account Uebersicht fuer normales Mitglied
+Referenzbilder/Public/Profile/02-kaempfer-profil-uebersicht.png           -> /account Uebersicht fuer Kaempfer mit Fighter-Daten
+Referenzbilder/Public/Profile/03-admin-profil-uebersicht.png              -> /account Uebersicht fuer Admin/Mitarbeiter mit Adminzugriff
+Referenzbilder/Public/Profile/04-mitglied-profil-bearbeiten.png           -> /account#profil-bearbeiten Basis-Bearbeitung fuer Mitglied
+Referenzbilder/Public/Profile/05-admin-profil-bearbeiten.png              -> /account#profil-bearbeiten Admin-/Mitarbeiter-Variante
+Referenzbilder/Public/Profile/06-kaempfer-profil-bearbeiten-erweitert.png -> spaetere erweiterte Kaempfer-Bearbeitung
+```
+
+Alle sechs Profil-Referenzen sind Desktop-Screens mit `1672x941px`.
+
+Umsetzungsentscheidung:
+
+- Verbindlich fuer v1: gemeinsamer Topbar-Aufbau rechts mit Profil-Trigger, Rollenlabel, Dropdown, Status und echten Zielen.
+- Verbindlich fuer v1: Profil-Hero mit Avatar/Initialen, Name, Rolle, Status, Bearbeiten-CTA und realen Sessiondaten.
+- Verbindlich fuer v1: Uebersichtskarten fuer Konto, Rolle, Kontakt/Sicherheit und naechste sinnvolle Aktion.
+- Verbindlich fuer v1: Profilbearbeitung als echtes Formular fuer eigene harmlose Profildaten.
+- Sekundaer/future: Fake-Eventlisten, Aktivitaetszahlen, Sponsoren, Video-Highlights, vollstaendige Kampfstatistiken und Social-Media-Listen, solange keine echten Datenquellen existieren.
+- Nicht uebernehmen: Beispielpersonen, Beispielorte, Eventnummern, Tickets, Statistiken, Sponsorlogos und eingebrannte Bildinhalte.
+
 Mapping zur neuen Route-Struktur:
 
 ```text

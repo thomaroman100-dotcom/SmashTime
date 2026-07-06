@@ -17,8 +17,18 @@ export function RankingPreview({ entries, fallback }: RankingPreviewProps) {
   if (entries.length === 0) {
     return (
       <div className="ranking-board ranking-board--empty">
-        <h3>{fallback.title}</h3>
-        <p>{fallback.text}</p>
+        <div className="ranking-board__empty-copy">
+          <h3>{fallback.title}</h3>
+          <p>{fallback.text}</p>
+        </div>
+        <div className="ranking-board__slots" aria-hidden="true">
+          {Array.from({ length: 5 }, (_, index) => (
+            <span className="ranking-board__slot" key={index}>
+              <strong>{String(index + 1).padStart(2, "0")}</strong>
+              <small>Wird bald bekanntgegeben</small>
+            </span>
+          ))}
+        </div>
         <Link href={fallback.ctaHref} className="btn btn--outline">
           <span>{fallback.ctaLabel}</span>
           <ArrowRight aria-hidden="true" size={16} strokeWidth={2.4} />

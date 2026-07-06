@@ -39,6 +39,7 @@ export type EventRow = {
   image_path: string | null;
   ticket_url: string | null;
   status: EventStatus;
+  show_in_hero: boolean;
   updated_at: string;
 };
 
@@ -100,7 +101,8 @@ function eventPayload(formData: FormData) {
       gastro: fieldTextOrNull(formData, "gastro"),
       image_path: fieldBool(formData, "clear_image_path") ? null : fieldTextOrNull(formData, "image_path"),
       ticket_url: fieldHrefOrNull(formData, "ticket_url"),
-      status: status as EventStatus
+      status: status as EventStatus,
+      show_in_hero: fieldBool(formData, "show_in_hero")
     }
   };
 }
@@ -149,6 +151,21 @@ async function applyEventPosterUpload({
   }
 
   payload.image_path = uploaded.publicUrl;
+  return { ok: true as const };
+}
+
+async function clearOtherHeroEvents(supabase: AdminSupabaseClient, currentId?: number) {
+  let query = supabase.from("events").update({ show_in_hero: false }).eq("show_in_hero", true);
+
+  if (currentId) {
+    query = query.neq("id", currentId);
+  }
+
+  const { error } = await query;
+  if (error) {
+    return { ok: false as const, error: supabaseErrorMessage(error) };
+  }
+
   return { ok: true as const };
 }
 
@@ -234,6 +251,13 @@ export async function createEventAction(
     return { ok: false, error: posterUpload.error };
   }
 
+  if (result.payload.show_in_hero) {
+    const cleared = await clearOtherHeroEvents(admin.supabase);
+    if (!cleared.ok) {
+      return { ok: false, error: cleared.error };
+    }
+  }
+
   const { data, error } = await admin.supabase.from("events").insert(result.payload).select("id").maybeSingle();
   if (error) {
     return { ok: false, error: supabaseErrorMessage(error) };
@@ -279,6 +303,13 @@ export async function updateEventAction(
   });
   if (!posterUpload.ok) {
     return { ok: false, error: posterUpload.error };
+  }
+
+  if (result.payload.show_in_hero) {
+    const cleared = await clearOtherHeroEvents(admin.supabase, id);
+    if (!cleared.ok) {
+      return { ok: false, error: cleared.error };
+    }
   }
 
   const { error } = await admin.supabase.from("events").update(result.payload).eq("id", id);

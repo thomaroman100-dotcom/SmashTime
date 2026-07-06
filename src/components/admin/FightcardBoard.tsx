@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { type ReactNode, useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import {
@@ -293,7 +294,7 @@ export function FightcardBoard({ events, activeEventId, fights, fighterOptions }
                     <GripVertical aria-hidden="true" size={17} />
                   </button>
                   <div className="adm-fight__fighter">
-                    <InitialsAvatar name={fight.fighter_a ?? "T B A"} />
+                    <InitialsAvatar name={fight.fighter_a ?? "T B A"} src={fight.fighter_a_image_path} />
                     <div style={{ minWidth: 0 }}>
                       <strong>{fight.fighter_a ?? "Wird bekanntgegeben"}</strong>
                       <span>{fight.fighter_a_is_tba ? "TBA" : FIGHT_STATUS_LABELS[fight.status]}</span>
@@ -310,7 +311,7 @@ export function FightcardBoard({ events, activeEventId, fights, fighterOptions }
                     ) : null}
                   </div>
                   <div className="adm-fight__fighter adm-fight__fighter--right">
-                    <InitialsAvatar name={fight.fighter_b ?? "T B A"} />
+                    <InitialsAvatar name={fight.fighter_b ?? "T B A"} src={fight.fighter_b_image_path} />
                     <div style={{ minWidth: 0 }}>
                       <strong>{fight.fighter_b ?? "Wird bekanntgegeben"}</strong>
                       <span>{fight.fighter_b_is_tba ? "TBA" : sectionOf(fight)}</span>
@@ -385,6 +386,10 @@ function FightModal({ eventId, eventName, fighterOptions, initial, initialSectio
   const [section, setSection] = useState<Section>(initial ? sectionOf(initial) : initialSection ?? "Main Event");
   const [fighterAUserId, setFighterAUserId] = useState(initial?.fighter_a_user_id ?? "");
   const [fighterBUserId, setFighterBUserId] = useState(initial?.fighter_b_user_id ?? "");
+  const [manualFighterA, setManualFighterA] = useState(initial?.fighter_a ?? "");
+  const [manualFighterB, setManualFighterB] = useState(initial?.fighter_b ?? "");
+  const [manualFighterAImage, setManualFighterAImage] = useState(initial?.fighter_a_image_path ?? "");
+  const [manualFighterBImage, setManualFighterBImage] = useState(initial?.fighter_b_image_path ?? "");
   const [weightClass, setWeightClass] = useState(initial?.weight_class ?? "");
   const [discipline, setDiscipline] = useState(initial?.discipline ?? "");
   const [status, setStatus] = useState(initial?.status ?? "planned");
@@ -392,8 +397,12 @@ function FightModal({ eventId, eventName, fighterOptions, initial, initialSectio
   const [sortOrder, setSortOrder] = useState(initial?.sort_order ?? nextSortOrder);
   const [notes, setNotes] = useState(initial?.notes ?? "");
   const fighterOptionById = useMemo(() => new Map(fighterOptions.map((option) => [option.userId, option])), [fighterOptions]);
-  const fighterA = fighterOptionById.get(fighterAUserId)?.name ?? initial?.fighter_a ?? "";
-  const fighterB = fighterOptionById.get(fighterBUserId)?.name ?? initial?.fighter_b ?? "";
+  const selectedFighterA = fighterOptionById.get(fighterAUserId);
+  const selectedFighterB = fighterOptionById.get(fighterBUserId);
+  const fighterA = selectedFighterA?.name ?? manualFighterA;
+  const fighterB = selectedFighterB?.name ?? manualFighterB;
+  const fighterAImage = selectedFighterA?.imagePath ?? manualFighterAImage;
+  const fighterBImage = selectedFighterB?.imagePath ?? manualFighterBImage;
 
   const submit = () => {
     const formData = new FormData();
@@ -401,12 +410,14 @@ function FightModal({ eventId, eventName, fighterOptions, initial, initialSectio
     formData.set("label", section);
     formData.set("fighter_a_user_id", fighterAUserId);
     formData.set("fighter_b_user_id", fighterBUserId);
-    if (!fighterAUserId && initial?.fighter_a) {
-      formData.set("fighter_a", initial.fighter_a);
+    if (!fighterAUserId) {
+      formData.set("fighter_a", manualFighterA);
     }
-    if (!fighterBUserId && initial?.fighter_b) {
-      formData.set("fighter_b", initial.fighter_b);
+    if (!fighterBUserId) {
+      formData.set("fighter_b", manualFighterB);
     }
+    formData.set("fighter_a_image_path", fighterAImage);
+    formData.set("fighter_b_image_path", fighterBImage);
     formData.set("weight_class", weightClass);
     formData.set("discipline", discipline);
     formData.set("status", status);
@@ -501,6 +512,24 @@ function FightModal({ eventId, eventName, fighterOptions, initial, initialSectio
                       corner="red"
                       onSelectionChange={(option) => setFighterAUserId(option?.userId ?? "")}
                     />
+                    <div className="adm-manual-fighter">
+                      <label htmlFor="manual-fighter-a">Manueller Name</label>
+                      <input
+                        id="manual-fighter-a"
+                        value={manualFighterA}
+                        onChange={(event) => setManualFighterA(event.target.value)}
+                        placeholder="z. B. Just Rob"
+                        disabled={Boolean(fighterAUserId)}
+                      />
+                      <label htmlFor="manual-fighter-a-image">Portrait-URL optional</label>
+                      <input
+                        id="manual-fighter-a-image"
+                        value={manualFighterAImage}
+                        onChange={(event) => setManualFighterAImage(event.target.value)}
+                        placeholder="/images/fightcards/..."
+                        disabled={Boolean(fighterAUserId)}
+                      />
+                    </div>
                   </div>
                   <span className="adm-vs-hex adm-fight-modal__vs">VS.</span>
                   <div className="adm-field adm-fighter-picker adm-fighter-picker--blue">
@@ -514,6 +543,24 @@ function FightModal({ eventId, eventName, fighterOptions, initial, initialSectio
                       corner="blue"
                       onSelectionChange={(option) => setFighterBUserId(option?.userId ?? "")}
                     />
+                    <div className="adm-manual-fighter">
+                      <label htmlFor="manual-fighter-b">Manueller Name</label>
+                      <input
+                        id="manual-fighter-b"
+                        value={manualFighterB}
+                        onChange={(event) => setManualFighterB(event.target.value)}
+                        placeholder="z. B. Karl-Heinz"
+                        disabled={Boolean(fighterBUserId)}
+                      />
+                      <label htmlFor="manual-fighter-b-image">Portrait-URL optional</label>
+                      <input
+                        id="manual-fighter-b-image"
+                        value={manualFighterBImage}
+                        onChange={(event) => setManualFighterBImage(event.target.value)}
+                        placeholder="/images/fightcards/..."
+                        disabled={Boolean(fighterBUserId)}
+                      />
+                    </div>
                   </div>
                 </div>
             </ModalSection>
@@ -526,7 +573,15 @@ function FightModal({ eventId, eventName, fighterOptions, initial, initialSectio
             >
                 <div className="adm-fight-preview-card">
                   <div className="adm-fight-preview-card__fighter">
-                    <span className="adm-fight-preview-card__avatar">{fighterA ? fighterA.slice(0, 2).toUpperCase() : "TB"}</span>
+                    <span className="adm-fight-preview-card__avatar">
+                      {fighterAImage ? (
+                        <Image src={fighterAImage} alt="" fill sizes="42px" />
+                      ) : fighterA ? (
+                        fighterA.slice(0, 2).toUpperCase()
+                      ) : (
+                        "TB"
+                      )}
+                    </span>
                     <div>
                       <strong>{fighterA || "Kämpfer A"}</strong>
                       <span>{weightClass || "Gewichtsklasse"}</span>
@@ -534,7 +589,15 @@ function FightModal({ eventId, eventName, fighterOptions, initial, initialSectio
                   </div>
                   <span className="adm-fight-preview-card__vs">vs.</span>
                   <div className="adm-fight-preview-card__fighter adm-fight-preview-card__fighter--right">
-                    <span className="adm-fight-preview-card__avatar">{fighterB ? fighterB.slice(0, 2).toUpperCase() : "TB"}</span>
+                    <span className="adm-fight-preview-card__avatar">
+                      {fighterBImage ? (
+                        <Image src={fighterBImage} alt="" fill sizes="42px" />
+                      ) : fighterB ? (
+                        fighterB.slice(0, 2).toUpperCase()
+                      ) : (
+                        "TB"
+                      )}
+                    </span>
                     <div>
                       <strong>{fighterB || "Kämpfer B"}</strong>
                       <span>{discipline || "Disziplin"}</span>

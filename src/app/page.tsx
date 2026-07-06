@@ -12,13 +12,15 @@ import { upcomingEvent } from "@/data/events";
 import {
   homeEventPoster,
   homeSections,
-  mainFight,
   mainFightFallback,
   nextEvent
 } from "@/data/homepage";
+import type { HomeEventPoster } from "@/data/homepage";
 import { newsItems } from "@/data/news";
 import { rankings, rankingsFallback } from "@/data/rankings";
 import { sponsorLogos } from "@/data/sponsors";
+import { getPublicHeroEvent, type PublicHomeEvent } from "@/lib/public-events";
+import { getPublicFightcardsForEvent, pickFeaturedFight } from "@/lib/public-fightcards";
 import { getPublicSiteSettings } from "@/lib/site-settings";
 
 function SectionHead({
@@ -47,27 +49,50 @@ function SectionHead({
   );
 }
 
+function eventNumberFromShortName(shortName: string) {
+  return (/\d+/.exec(shortName)?.[0] ?? shortName.replace(/smashtime/i, "").trim()) || "ST";
+}
+
+function posterFromEvent(event: PublicHomeEvent | typeof upcomingEvent, showInHero: boolean): HomeEventPoster {
+  return {
+    eventNumber: eventNumberFromShortName(event.shortName),
+    eventTitle: event.subtitle,
+    dateLabel: event.dateLabel,
+    venueLabel: event.location,
+    image: event.image,
+    imageAlt: `${event.name} Eventposter`,
+    showInHero
+  };
+}
+
 export default async function Home() {
-  const publicSettings = await getPublicSiteSettings();
+  const [publicSettings, heroEvent] = await Promise.all([
+    getPublicSiteSettings(),
+    getPublicHeroEvent()
+  ]);
   const configuredHome = publicSettings.home;
-  const upcomingEvents = [upcomingEvent];
+  const homepageEvent = heroEvent ?? nextEvent;
+  const heroPoster = heroEvent ? posterFromEvent(heroEvent, heroEvent.showInHero) : { ...homeEventPoster, showInHero: false };
+  const upcomingEvents = [homepageEvent];
   const configuredSite = publicSettings.site;
+  const homepageFightcard = await getPublicFightcardsForEvent(homepageEvent.id);
+  const featuredFight = pickFeaturedFight(homepageFightcard);
 
   return (
     <div className="home-page home-page--poster">
-      <HeroSection hero={configuredHome.hero} poster={homeEventPoster} />
+      <HeroSection hero={configuredHome.hero} poster={heroPoster} />
 
       {configuredHome.countdown.enabled ? (
         <CountdownBar
           label={configuredHome.countdown.label}
-          targetDate={configuredHome.countdown.targetDate}
+          targetDate={heroEvent?.date || configuredHome.countdown.targetDate}
           ctaLabel={configuredHome.countdown.ctaLabel}
           ctaHref={configuredHome.countdown.ctaHref}
           fallback={configuredHome.countdown.fallback}
         />
       ) : null}
 
-      <MainFightBanner event={nextEvent} fight={mainFight} fallback={mainFightFallback} />
+      <MainFightBanner event={homepageEvent} fight={featuredFight} fights={homepageFightcard} fallback={mainFightFallback} />
 
       {configuredHome.sections.champions.enabled ? (
         <section className="home-champions" aria-label={configuredHome.sections.champions.title}>

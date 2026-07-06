@@ -22,28 +22,45 @@ export type AdminUser = {
 export type SessionProfile = {
   userId: string;
   email: string;
+  emailVerified: boolean;
   displayName: string;
   profileType: "fighter" | "staff";
   status: string;
   avatarUrl: string | null;
+  createdAt: string | null;
   roleLabel: string;
   canAccessAdmin: boolean;
+  fighter: {
+    nickname: string | null;
+    origin: string | null;
+    publicBio: string | null;
+    isVerified: boolean;
+  } | null;
 };
 
 type AdminProfileRow = {
   display_name: string | null;
   role: string | null;
   is_active: boolean | null;
+  created_at?: string | null;
 };
 
 type ProfileRow = {
   display_name: string | null;
   profile_type: string | null;
   status: string | null;
+  created_at?: string | null;
 };
 
 type PermissionRow = {
   permission: string | null;
+};
+
+type FighterProfileRow = {
+  nickname: string | null;
+  origin: string | null;
+  public_bio: string | null;
+  is_verified: boolean | null;
 };
 
 export type AdminSessionState =
@@ -176,37 +193,55 @@ export async function getSessionProfile(): Promise<SessionProfile | null> {
     return null;
   }
 
-  const [{ data: profileData }, { data: adminData }, { data: permissionsData }] = await Promise.all([
+  const [{ data: profileData }, { data: adminData }, { data: permissionsData }, { data: fighterData }] = await Promise.all([
     supabase
       .from("profiles")
-      .select("display_name, profile_type, status, avatar_url")
+      .select("display_name, profile_type, status, avatar_url, created_at")
       .eq("user_id", user.id)
       .maybeSingle(),
     supabase
       .from("admin_profiles")
-      .select("display_name, role, is_active")
+      .select("display_name, role, is_active, created_at")
       .eq("user_id", user.id)
       .maybeSingle(),
     supabase
       .from("staff_permissions")
       .select("permission")
+      .eq("user_id", user.id),
+    supabase
+      .from("fighter_profiles")
+      .select("nickname, origin, public_bio, is_verified")
       .eq("user_id", user.id)
+      .maybeSingle()
   ]);
 
-  const profile = profileData as (ProfileRow & { avatar_url: string | null }) | null;
+  const profile = profileData as (ProfileRow & { avatar_url: string | null; created_at: string | null }) | null;
   const admin = adminData as AdminProfileRow | null;
+  const fighter = fighterData as FighterProfileRow | null;
   const permissions = normalizePermissions(permissionsData as PermissionRow[] | null);
   const isAdmin = Boolean(admin?.is_active && admin.role === "admin");
   const isActiveStaff = profile?.profile_type === "staff" && profile.status === "active" && permissions.length > 0;
+  const profileType = profile?.profile_type === "staff" ? "staff" : "fighter";
 
   return {
     userId: user.id,
     email: user.email ?? "",
+    emailVerified: Boolean(user.email_confirmed_at ?? user.confirmed_at),
     displayName: profile?.display_name ?? admin?.display_name ?? user.email ?? "Mitglied",
-    profileType: profile?.profile_type === "staff" ? "staff" : "fighter",
+    profileType,
     status: profile?.status ?? (admin?.is_active ? "active" : "pending"),
     avatarUrl: profile?.avatar_url ?? null,
+    createdAt: profile?.created_at ?? admin?.created_at ?? user.created_at ?? null,
     roleLabel: isAdmin ? "Administrator" : profile?.profile_type === "staff" ? "Mitarbeiter" : "Kämpfer",
-    canAccessAdmin: isAdmin || isActiveStaff
+    canAccessAdmin: isAdmin || isActiveStaff,
+    fighter:
+      profileType === "fighter"
+        ? {
+            nickname: fighter?.nickname ?? null,
+            origin: fighter?.origin ?? null,
+            publicBio: fighter?.public_bio ?? null,
+            isVerified: Boolean(fighter?.is_verified)
+          }
+        : null
   };
 }

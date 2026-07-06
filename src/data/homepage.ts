@@ -1,5 +1,5 @@
 import { upcomingEvent, type SmashEvent } from "@/data/events";
-import { fightcards, type FightCardEntry } from "@/data/fightcards";
+import type { FightCardEntry } from "@/data/fightcards";
 
 // Zentrale, austauschbare Inhalte der Startseite. Alles, was sich mit einem
 // neuen Event ändert (Eventnummer, Name, Datum, Ort, Countdown-Ziel, Poster,
@@ -23,6 +23,9 @@ export type HomeEventPoster = {
   eventTitle: string;
   dateLabel: string;
   venueLabel: string;
+  image?: string | null;
+  imageAlt?: string;
+  showInHero: boolean;
 };
 
 export const nextEvent: SmashEvent = upcomingEvent;
@@ -32,8 +35,8 @@ export const homeHero: HomeHero = {
   claimLines: ["Keine Regeln.", "Nur Respekt."],
   brandLine: "SmashTime.",
   tagline: "Kämpfe. Ehre. Vermächtnis.",
-  backgroundImage: "/images/backgrounds/atmosphere-fight-action-grunge-wide.png",
-  backgroundPosition: "center 30%",
+  backgroundImage: "/images/backgrounds/hero-smash-cage-arena-wide.png",
+  backgroundPosition: "center center",
   primaryCta: { label: "Tickets sichern", href: "/tickets" },
   secondaryCta: {
     label: "Details ansehen",
@@ -45,7 +48,10 @@ export const homeEventPoster: HomeEventPoster = {
   eventNumber: "3",
   eventTitle: nextEvent.subtitle,
   dateLabel: nextEvent.dateLabel,
-  venueLabel: nextEvent.location
+  venueLabel: nextEvent.location,
+  image: nextEvent.image,
+  imageAlt: `${nextEvent.name} Eventposter`,
+  showInHero: true
 };
 
 export const homeCountdown = {
@@ -56,19 +62,14 @@ export const homeCountdown = {
   fallback: "Nächste Veranstaltung wird bald bekanntgegeben"
 };
 
-// Main Fight aus der kanonischen Fightcard-Datenquelle ableiten. Solange keine
-// bestätigten Paarungen existieren, greift der ehrliche Fallback – es werden
-// keine Kämpfe oder Namen erfunden.
-export const mainFight: FightCardEntry | undefined = [...fightcards]
-  .filter((fight) => fight.visible && fight.eventId === nextEvent.id)
-  .sort((a, b) => a.order - b.order)[0];
+export const mainFight: FightCardEntry | undefined = undefined;
 
 export const mainFightFallback = {
-  label: "Main Event",
+  label: "Fightcard",
   title: "Fightcard wird bald veröffentlicht",
   text: "Die Kampfpaarungen für den nächsten Kampfabend werden offiziell bestätigt und danach hier angekündigt.",
-  ctaLabel: "Details ansehen",
-  ctaHref: nextEvent.detailHref ?? "/veranstaltungen"
+  ctaLabel: "Fightcard ansehen",
+  ctaHref: "/fight-night#fightcard"
 };
 
 export const homeSections = {

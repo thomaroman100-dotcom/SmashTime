@@ -109,7 +109,7 @@ const defaultValues: Record<string, string> = {
   "countdown.label": "Der Kampf beginnt in",
   "homepage.hero.title": "SmashTime 3",
   "homepage.hero.subtitle": "Respekt steigt in den Ring. Gemeinsam gegen Mobbing.",
-  "homepage.hero.backgroundImageUrl": "/images/backgrounds/atmosphere-fighters-faceoff-wide.png",
+  "homepage.hero.backgroundImageUrl": "/images/backgrounds/hero-smash-cage-arena-wide.png",
   "homepage.cta.primaryLabel": "Tickets sichern",
   "homepage.cta.primaryUrl": "/tickets",
   "homepage.cta.secondaryLabel": "Fightcard ansehen",

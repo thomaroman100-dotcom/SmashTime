@@ -51,6 +51,7 @@ export function FightForm({ action, events, fighterOptions, initial, defaultEven
       </div>
       <div className="admin-form__grid">
         <div>
+          <input type="hidden" name="fighter_a_image_path" value={initial?.fighter_a_image_path ?? ""} />
           <FighterProfilePicker
             name="fighter_a_user_id"
             label="Rote Ecke"
@@ -62,6 +63,7 @@ export function FightForm({ action, events, fighterOptions, initial, defaultEven
           />
         </div>
         <div>
+          <input type="hidden" name="fighter_b_image_path" value={initial?.fighter_b_image_path ?? ""} />
           <FighterProfilePicker
             name="fighter_b_user_id"
             label="Blaue Ecke"

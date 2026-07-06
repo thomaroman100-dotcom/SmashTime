@@ -5,6 +5,7 @@ import {
   type ActionResult,
   type AdminClientResult,
   fieldBool,
+  fieldHrefOrNull,
   fieldInt,
   fieldText,
   fieldTextOrNull,
@@ -25,6 +26,8 @@ export type FightRow = {
   fighter_b_user_id: string | null;
   fighter_a: string | null;
   fighter_b: string | null;
+  fighter_a_image_path: string | null;
+  fighter_b_image_path: string | null;
   fighter_a_is_tba: boolean;
   fighter_b_is_tba: boolean;
   weight_class: string | null;
@@ -42,7 +45,7 @@ async function verifiedFighterSnapshot(supabase: AdminSupabaseClient, userId: st
 
   const { data, error } = await supabase
     .from("fighter_profiles")
-    .select("user_id, nickname, weight_class, profiles!inner(display_name, profile_type, status)")
+    .select("user_id, nickname, weight_class, image_path, profiles!inner(display_name, profile_type, status)")
     .eq("user_id", userId)
     .eq("is_verified", true)
     .maybeSingle();
@@ -55,6 +58,7 @@ async function verifiedFighterSnapshot(supabase: AdminSupabaseClient, userId: st
     user_id: string;
     nickname: string | null;
     weight_class: string | null;
+    image_path: string | null;
     profiles: { display_name: string | null; profile_type: string | null; status: string | null } | null;
   };
 
@@ -66,7 +70,8 @@ async function verifiedFighterSnapshot(supabase: AdminSupabaseClient, userId: st
     ok: true as const,
     userId: row.user_id,
     name: row.nickname || row.profiles.display_name || "Kämpfer",
-    weightClass: row.weight_class
+    weightClass: row.weight_class,
+    imagePath: row.image_path
   };
 }
 
@@ -110,6 +115,8 @@ async function fightPayload(supabase: AdminSupabaseClient, formData: FormData) {
       fighter_b_user_id: fighterBResult?.ok ? fighterBResult.userId : null,
       fighter_a: fighterA,
       fighter_b: fighterB,
+      fighter_a_image_path: fighterAResult?.ok ? fighterAResult.imagePath : fieldHrefOrNull(formData, "fighter_a_image_path"),
+      fighter_b_image_path: fighterBResult?.ok ? fighterBResult.imagePath : fieldHrefOrNull(formData, "fighter_b_image_path"),
       fighter_a_is_tba: !fighterA,
       fighter_b_is_tba: !fighterB,
       weight_class:
@@ -126,10 +133,53 @@ async function fightPayload(supabase: AdminSupabaseClient, formData: FormData) {
   } as const;
 }
 
+function normalizedFightName(value: string | null) {
+  return value?.trim().replace(/\s+/g, " ").toLowerCase() ?? "";
+}
+
+async function duplicateFightError(
+  supabase: AdminSupabaseClient,
+  payload: { event_id: number; fighter_a: string | null; fighter_b: string | null },
+  ignoreId?: number
+) {
+  const fighterA = normalizedFightName(payload.fighter_a);
+  const fighterB = normalizedFightName(payload.fighter_b);
+
+  if (!fighterA || !fighterB) {
+    return null;
+  }
+
+  const { data, error } = await supabase
+    .from("fight_cards")
+    .select("id, fighter_a, fighter_b")
+    .eq("event_id", payload.event_id);
+
+  if (error) {
+    return `Doppelungsprüfung fehlgeschlagen: ${supabaseErrorMessage(error)}`;
+  }
+
+  const duplicate = (data ?? []).find((row) => {
+    const fight = row as Pick<FightRow, "id" | "fighter_a" | "fighter_b">;
+    if (ignoreId && fight.id === ignoreId) {
+      return false;
+    }
+
+    const existingA = normalizedFightName(fight.fighter_a);
+    const existingB = normalizedFightName(fight.fighter_b);
+    return (
+      (existingA === fighterA && existingB === fighterB) ||
+      (existingA === fighterB && existingB === fighterA)
+    );
+  });
+
+  return duplicate ? "Diese Paarung existiert für das ausgewählte Event bereits." : null;
+}
+
 function revalidateFightcards() {
   revalidatePath("/admin/fightcards");
   revalidatePath("/fight-night");
   revalidatePath("/veranstaltungen");
+  revalidatePath("/veranstaltungen/[slug]", "page");
   revalidatePath("/");
 }
 
@@ -145,6 +195,11 @@ export async function createFightAction(
   const result = await fightPayload(admin.supabase, formData);
   if ("error" in result) {
     return { ok: false, error: result.error ?? "Kampfdaten sind unvollständig." };
+  }
+
+  const duplicateError = await duplicateFightError(admin.supabase, result.payload);
+  if (duplicateError) {
+    return { ok: false, error: duplicateError };
   }
 
   const { error } = await admin.supabase.from("fight_cards").insert(result.payload);
@@ -169,6 +224,11 @@ export async function updateFightAction(
   const result = await fightPayload(admin.supabase, formData);
   if ("error" in result) {
     return { ok: false, error: result.error ?? "Kampfdaten sind unvollständig." };
+  }
+
+  const duplicateError = await duplicateFightError(admin.supabase, result.payload, id);
+  if (duplicateError) {
+    return { ok: false, error: duplicateError };
   }
 
   const { error } = await admin.supabase.from("fight_cards").update(result.payload).eq("id", id);

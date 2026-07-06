@@ -84,14 +84,12 @@ export const site = {
   eventHref: "/veranstaltungen/smashtime-3-respekt-steigt-in-den-ring",
   fightNightHref: "/fight-night#fightcard",
   socialLinks: [
-    { label: "Instagram", href: "#" },
-    { label: "Facebook", href: "#" },
-    { label: "YouTube", href: "#" },
-    { label: "TikTok", href: "#" }
+    { label: "Instagram", href: "https://www.instagram.com/smash_time_st/" },
+    { label: "YouTube", href: "https://www.youtube.com/@Smashtimestp" }
   ],
   contact: {
-    email: "Kontakt-E-Mail wird ergänzt",
-    instagram: "Instagram wird ergänzt"
+    email: "",
+    instagram: "@smash_time_st"
   }
 };
 

@@ -4,10 +4,12 @@ import { notFound } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import { CallToActionBand } from "@/components/sections/CallToActionBand";
 import { SponsorStrip } from "@/components/sections/SponsorStrip";
+import { FightBoutCard } from "@/components/sections/FightBoutCard";
 import { CTAButton } from "@/components/ui/CTAButton";
 import { IconBadge } from "@/components/ui/IconBadge";
 import { eventRecaps, getEventRecap } from "@/data/eventRecaps";
 import { site } from "@/data/site";
+import { getPublicFightcardsForEvent } from "@/lib/public-fightcards";
 
 type EventDetailPageProps = {
   params: Promise<{ slug: string }>;
@@ -33,6 +35,8 @@ export default async function EventDetailPage({ params }: EventDetailPageProps) 
   if (!event) {
     notFound();
   }
+
+  const visibleFights = await getPublicFightcardsForEvent(event.slug);
 
   return (
     <>
@@ -100,28 +104,23 @@ export default async function EventDetailPage({ params }: EventDetailPageProps) 
 
             <div className="event-results card-grunge">
               <div className="event-results__head">
-                <h2>Ergebnisse</h2>
+                <h2>Bestätigte Paarungen</h2>
                 <CTAButton href={site.fightNightHref} variant="outline">
                   Fightcard ansehen
                 </CTAButton>
               </div>
-              {event.results.length === 0 ? (
-                <p className="event-results__empty">Ergebnisse werden nach der Veranstaltung veröffentlicht.</p>
+              {visibleFights.length === 0 ? (
+                <p className="event-results__empty">Paarungen werden veröffentlicht, sobald sie offiziell bestätigt sind.</p>
               ) : (
-                <div className="event-results__grid">
-                  {event.results.map((result) => (
-                    <article key={result.id}>
-                      <span>{result.label}</span>
-                      <strong>
-                        {result.fighterA} <em>vs.</em> {result.fighterB}
-                      </strong>
-                      <small>
-                        {result.winner ? `Sieger: ${result.winner}` : "Sieger wird ergänzt"} · {result.method}
-                      </small>
-                    </article>
+                <div className="event-results__grid event-results__grid--fights">
+                  {visibleFights.map((fight) => (
+                    <FightBoutCard key={fight.id} fight={fight} variant="compact" />
                   ))}
                 </div>
               )}
+              {event.results.length === 0 ? (
+                <p className="event-results__empty">Ergebnisse werden nach der Veranstaltung veröffentlicht.</p>
+              ) : null}
             </div>
           </section>
 

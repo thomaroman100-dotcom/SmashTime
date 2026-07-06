@@ -3,13 +3,14 @@ import { CallToActionBand } from "@/components/sections/CallToActionBand";
 import { Countdown } from "@/components/sections/Countdown";
 import { PageHero } from "@/components/sections/PageHero";
 import { SponsorStrip } from "@/components/sections/SponsorStrip";
+import { FightBoutCard } from "@/components/sections/FightBoutCard";
 import { CTAButton } from "@/components/ui/CTAButton";
 import { IconBadge, type IconName } from "@/components/ui/IconBadge";
 import { upcomingEvent } from "@/data/events";
-import { fightcards } from "@/data/fightcards";
 import { fightNight, fightNightHighlights, fightNightRules } from "@/data/fightNight";
 import { pageHeroes } from "@/data/heroes";
 import { site } from "@/data/site";
+import { getPublicFightcardsForEvent } from "@/lib/public-fightcards";
 
 export const metadata = {
   title: "Kampfabend | SmashTime"
@@ -19,11 +20,12 @@ const disciplineIconNames: Record<string, IconName> = {
   MMA: "fighter",
   K1: "target",
   "Xtreme Boxen": "flame",
-  Boxen: "shield"
+  Boxen: "shield",
+  "Influenza Kämpfe": "users"
 };
 
-export default function FightNightPage() {
-  const visibleFights = fightcards.filter((fight) => fight.visible).sort((a, b) => a.order - b.order);
+export default async function FightNightPage() {
+  const visibleFights = await getPublicFightcardsForEvent(upcomingEvent.id);
 
   return (
     <>
@@ -71,15 +73,7 @@ export default function FightNightPage() {
             ) : (
               <div className="fight-table__rows">
                 {visibleFights.map((fight) => (
-                  <article key={fight.id}>
-                    <span>{fight.label}</span>
-                    <strong>
-                      {fight.fighterA} <em>vs.</em> {fight.fighterB}
-                    </strong>
-                    <small>
-                      {fight.weightClass} · {fight.discipline}
-                    </small>
-                  </article>
+                  <FightBoutCard key={fight.id} fight={fight} variant="compact" />
                 ))}
               </div>
             )}

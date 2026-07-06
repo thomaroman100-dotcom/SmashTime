@@ -78,6 +78,16 @@ function normalizePath(path: string) {
   return normalizePublicHref(path);
 }
 
+const legacyHomeHeroBackgroundImages = new Set([
+  "/images/backgrounds/atmosphere-fight-action-grunge-wide.png",
+  "/images/backgrounds/atmosphere-fighters-faceoff-wide.png"
+]);
+
+function homeHeroBackgroundImage(rows: Record<string, string>) {
+  const configuredImage = setting(rows, "homepage.hero.backgroundImageUrl", homeHero.backgroundImage);
+  return legacyHomeHeroBackgroundImages.has(configuredImage) ? homeHero.backgroundImage : configuredImage;
+}
+
 function parseNavigation(rows: Record<string, string>) {
   const raw = rows["navigation.items"];
   let parsed: StoredNavigationItem[] = [];
@@ -197,7 +207,7 @@ export const getPublicSiteSettings = cache(async (): Promise<PublicSettings> => 
         ...homeHero,
         title: heroTitle,
         subtitle: heroSubtitle,
-        backgroundImage: setting(rows, "homepage.hero.backgroundImageUrl", homeHero.backgroundImage),
+        backgroundImage: homeHeroBackgroundImage(rows),
         primaryCta: { label: ticketLabel, href: ticketHref },
         secondaryCta: { label: secondaryLabel, href: secondaryHref }
       },

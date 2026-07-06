@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import type { LucideIcon } from "lucide-react";
 import { ArrowDownRight, ArrowUpRight, ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -106,10 +107,12 @@ export function Badge({
 
 export function InitialsAvatar({
   name,
+  src,
   size = "md",
   online = false
 }: {
   name: string;
+  src?: string | null;
   size?: "sm" | "md";
   online?: boolean;
 }) {
@@ -127,7 +130,7 @@ export function InitialsAvatar({
       className={cn("adm-avatar", size === "sm" && "adm-avatar--sm", online && "adm-avatar--online")}
       aria-hidden="true"
     >
-      {initials}
+      {src ? <Image src={src} alt="" fill sizes={size === "sm" ? "30px" : "38px"} /> : initials}
     </span>
   );
 }

@@ -33,7 +33,7 @@ export default async function AdminFightEditPage({ params }: AdminFightEditPageP
   const [{ data: fightData }, { data: eventData }, fighterOptionsResult] = await Promise.all([
     supabase
       .from("fight_cards")
-      .select("id, event_id, sort_order, label, fighter_a_user_id, fighter_b_user_id, fighter_a, fighter_b, fighter_a_is_tba, fighter_b_is_tba, weight_class, discipline, is_main_event, is_visible, status, notes")
+      .select("id, event_id, sort_order, label, fighter_a_user_id, fighter_b_user_id, fighter_a, fighter_b, fighter_a_image_path, fighter_b_image_path, fighter_a_is_tba, fighter_b_is_tba, weight_class, discipline, is_main_event, is_visible, status, notes")
       .eq("id", fightId)
       .maybeSingle(),
     supabase.from("events").select("id, name").order("event_date", { ascending: false, nullsFirst: false }),

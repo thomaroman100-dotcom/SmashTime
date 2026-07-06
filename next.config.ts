@@ -31,6 +31,7 @@ const publicAssetCacheHeaders = [
 
 const nextConfig: NextConfig = {
   poweredByHeader: false,
+  devIndicators: false,
   images: {
     formats: ["image/avif", "image/webp"],
     localPatterns: [{ pathname: "/images/**" }],
