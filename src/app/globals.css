@@ -5165,6 +5165,10 @@ body.is-admin-page::after {
   background: rgba(0, 0, 0, 0.28);
 }
 
+.settings-image-preview-wrap {
+  position: relative;
+}
+
 .settings-image-preview img {
   object-fit: contain;
   padding: 12px;
@@ -5185,6 +5189,7 @@ body.is-admin-page::after {
   padding: 8px;
 }
 
+.settings-image-preview-wrap > button:not(.settings-image-preview),
 .settings-image-preview button {
   position: absolute;
   top: -1px;

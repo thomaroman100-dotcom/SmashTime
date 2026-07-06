@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { useActionState, useEffect, useRef, useState } from "react";
 import {
@@ -10,7 +9,6 @@ import {
   ExternalLink,
   Eye,
   FileText,
-  Image as ImageIcon,
   Loader2,
   MapPin,
   Rocket,
@@ -21,6 +19,7 @@ import { slugify } from "@/lib/slug";
 import type { EventGalleryRow, EventRow, EventStatus } from "@/lib/admin/actions/events";
 import { EVENT_DISCIPLINES } from "@/lib/admin/resource-shared";
 import { useAdminUi } from "@/components/admin/ui/AdminUiProvider";
+import { AdminImagePreview } from "@/components/admin/ui/AdminImagePreview";
 import { Badge, type BadgeTone } from "@/components/admin/ui/primitives";
 
 type EventFormProps = {
@@ -387,22 +386,14 @@ export function EventForm({ action, initial, gallery = [], heading, subheading }
                     </label>
                   ) : null}
                 </div>
-                <div className="adm-thumb" style={{ width: "100%", height: 120 }}>
-                  {imagePath ? (
-                    <Image
-                      src={imagePath}
-                      alt="Poster-Vorschau"
-                      width={220}
-                      height={120}
-                      style={{ width: "100%", height: "100%", objectFit: "cover" }}
-                      unoptimized
-                    />
-                  ) : (
-                    <span className="adm-thumb--empty" style={{ display: "flex", width: "100%", height: "100%" }}>
-                      <ImageIcon aria-hidden="true" size={22} />
-                    </span>
-                  )}
-                </div>
+                <AdminImagePreview
+                  src={imagePath}
+                  alt="Event-Poster Vorschau"
+                  fallback="Poster wird hier angezeigt"
+                  aspectRatio="16 / 9"
+                  sizes="360px"
+                  className="adm-image-preview--field"
+                />
               </div>
             </div>
           </section>
@@ -428,19 +419,20 @@ export function EventForm({ action, initial, gallery = [], heading, subheading }
               {gallery.length > 0 ? (
                 <div className="adm-gallery-admin" aria-label="Aktuelle Event-Galerie">
                   {gallery.map((image) => (
-                    <label className="adm-gallery-admin__item" key={image.id}>
-                      <span>
-                        {image.image_path ? (
-                          <Image src={image.image_path} alt={image.alt_text ?? ""} fill sizes="160px" style={{ objectFit: "cover" }} unoptimized />
-                        ) : (
-                          <span className="adm-thumb--empty">
-                            <ImageIcon aria-hidden="true" size={18} />
-                          </span>
-                        )}
-                      </span>
-                      <input type="checkbox" name="remove_gallery_ids" value={image.id} />
-                      <em>Beim Speichern entfernen</em>
-                    </label>
+                    <article className="adm-gallery-admin__item" key={image.id}>
+                      <AdminImagePreview
+                        src={image.image_path}
+                        alt={image.alt_text ?? "Event-Galeriebild"}
+                        fallback="Galeriebild"
+                        aspectRatio="16 / 10"
+                        sizes="180px"
+                        className="adm-image-preview--gallery"
+                      />
+                      <label className="adm-gallery-admin__remove">
+                        <input type="checkbox" name="remove_gallery_ids" value={image.id} />
+                        <span>Beim Speichern entfernen</span>
+                      </label>
+                    </article>
                   ))}
                 </div>
               ) : (
@@ -461,19 +453,14 @@ export function EventForm({ action, initial, gallery = [], heading, subheading }
             </div>
             <div className="adm-panel__body">
               <div className="adm-preview">
-                <div className="adm-preview__img">
-                  {imagePath ? (
-                    <Image src={imagePath} alt="" fill sizes="380px" style={{ objectFit: "cover" }} unoptimized />
-                  ) : (
-                    <span
-                      className="adm-thumb--empty"
-                      style={{ display: "flex", height: "100%", flexDirection: "column", gap: 8 }}
-                    >
-                      <ImageIcon aria-hidden="true" size={26} />
-                      Poster wird hier angezeigt
-                    </span>
-                  )}
-                </div>
+                <AdminImagePreview
+                  src={imagePath}
+                  alt={`${name || "Event"} Poster`}
+                  fallback="Poster wird hier angezeigt"
+                  aspectRatio="16 / 9"
+                  sizes="380px"
+                  className="adm-preview__img"
+                />
                 <div className="adm-preview__body">
                   <Badge tone={statusMeta[status].tone} uppercase>
                     {statusMeta[status].label}

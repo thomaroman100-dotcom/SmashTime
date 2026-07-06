@@ -1,13 +1,11 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { useActionState, useEffect, useState } from "react";
 import {
   ArrowLeft,
   Award,
   FileText,
-  Image as ImageIcon,
   Loader2,
   Save,
   Settings2,
@@ -16,6 +14,7 @@ import {
 import type { ActionResult } from "@/lib/admin/action-helpers";
 import type { ChampionRow } from "@/lib/admin/actions/champions";
 import { useAdminUi } from "@/components/admin/ui/AdminUiProvider";
+import { AdminImagePreview } from "@/components/admin/ui/AdminImagePreview";
 import { Badge } from "@/components/admin/ui/primitives";
 import { FighterProfilePicker, type FighterProfileOption } from "@/components/admin/FighterProfilePicker";
 
@@ -266,19 +265,14 @@ export function ChampionForm({ action, initial, heading, subheading, fighterOpti
             </div>
             <div className="adm-panel__body">
               <div className="adm-preview">
-                <div className="adm-preview__img" style={{ aspectRatio: "4 / 5" }}>
-                  {imagePath ? (
-                    <Image src={imagePath} alt="" fill sizes="380px" style={{ objectFit: "cover" }} unoptimized />
-                  ) : (
-                    <span
-                      className="adm-thumb--empty"
-                      style={{ display: "flex", height: "100%", flexDirection: "column", gap: 8 }}
-                    >
-                      <ImageIcon aria-hidden="true" size={26} />
-                      Foto wird hier angezeigt
-                    </span>
-                  )}
-                </div>
+                <AdminImagePreview
+                  src={imagePath}
+                  alt={`${name || "Champion"} Foto`}
+                  fallback="Foto wird hier angezeigt"
+                  aspectRatio="4 / 5"
+                  sizes="380px"
+                  className="adm-preview__img"
+                />
                 <div className="adm-preview__body">
                   <span className="adm-preview__kicker">{weightClass || "Gewichtsklasse"}</span>
                   <h3>{name || "Champion Name"}</h3>

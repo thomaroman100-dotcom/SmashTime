@@ -1,9 +1,9 @@
-import Image from "next/image";
 import Link from "next/link";
 import { Archive, FileText, Image as ImageIcon, Newspaper, Pencil, Plus, Search, Send } from "lucide-react";
 import { type NewsRow, deleteNewsAction, setNewsStatusAction } from "@/lib/admin/actions/news";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { formatDate } from "@/lib/admin/format";
+import { AdminImagePreview } from "@/components/admin/ui/AdminImagePreview";
 import { Badge, EmptyState, Pagination, StatCard } from "@/components/admin/ui/primitives";
 import { RowMenu } from "@/components/admin/ui/RowMenu";
 
@@ -156,22 +156,14 @@ export default async function AdminNewsPage({ searchParams }: PageProps) {
             {pageRows.map((item) => (
               <div className="adm-table__row" key={item.id} style={{ gridTemplateColumns: tableColumns }}>
                 <div style={{ display: "flex", gap: 12, alignItems: "center", minWidth: 0 }}>
-                  <span className="adm-thumb">
-                    {item.image_path || item.hero_image_path ? (
-                      <Image
-                        src={item.image_path || item.hero_image_path || ""}
-                        alt=""
-                        width={76}
-                        height={44}
-                        style={{ width: "100%", height: "100%", objectFit: "cover" }}
-                        unoptimized
-                      />
-                    ) : (
-                      <span className="adm-thumb--empty" style={{ display: "flex", width: "100%", height: "100%" }}>
-                        <ImageIcon aria-hidden="true" size={16} />
-                      </span>
-                    )}
-                  </span>
+                  <AdminImagePreview
+                    src={item.image_path || item.hero_image_path}
+                    alt={`${item.title} Beitragsbild`}
+                    fallback="Kein Bild"
+                    aspectRatio="76 / 44"
+                    sizes="76px"
+                    className="adm-thumb"
+                  />
                   <div style={{ minWidth: 0 }}>
                     <strong>{item.title}</strong>
                     <span className="adm-cell-sub">{item.slug}</span>

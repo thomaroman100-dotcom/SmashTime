@@ -1,13 +1,13 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { useActionState, useEffect, useState } from "react";
-import { ArrowLeft, Eye, Image as ImageIcon, Loader2, Save } from "lucide-react";
+import { ArrowLeft, Eye, Loader2, Save } from "lucide-react";
 import type { ActionResult } from "@/lib/admin/action-helpers";
 import type { SponsorRow } from "@/lib/admin/actions/sponsors";
 import { SPONSOR_PACKAGES } from "@/lib/admin/resource-shared";
 import { useAdminUi } from "@/components/admin/ui/AdminUiProvider";
+import { AdminImagePreview } from "@/components/admin/ui/AdminImagePreview";
 import { Badge } from "@/components/admin/ui/primitives";
 
 type SponsorFormProps = {
@@ -176,16 +176,14 @@ export function SponsorForm({ action, initial, heading, subheading }: SponsorFor
             </div>
             <div className="adm-panel__body">
               <div className="adm-preview">
-                <div className="adm-preview__img" style={{ aspectRatio: "16 / 9" }}>
-                  {logoPath ? (
-                    <Image src={logoPath} alt="" fill sizes="380px" style={{ objectFit: "contain", padding: 28 }} unoptimized />
-                  ) : (
-                    <span className="adm-thumb--empty" style={{ display: "flex", height: "100%", flexDirection: "column", gap: 8 }}>
-                      <ImageIcon aria-hidden="true" size={26} />
-                      Logo fehlt
-                    </span>
-                  )}
-                </div>
+                <AdminImagePreview
+                  src={logoPath}
+                  alt={`${name || "Sponsor"} Logo`}
+                  fallback="Logo fehlt"
+                  aspectRatio="16 / 9"
+                  sizes="380px"
+                  className="adm-preview__img"
+                />
                 <div className="adm-preview__body">
                   <Badge tone={isActive ? "green" : "gray"} uppercase>
                     {isActive ? "Aktiv" : "Inaktiv"}

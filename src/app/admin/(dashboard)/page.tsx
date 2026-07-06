@@ -1,4 +1,3 @@
-import Image from "next/image";
 import Link from "next/link";
 import {
   CalendarDays,
@@ -25,6 +24,7 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { eventSelectColumns } from "@/lib/admin/resource-shared";
 import type { EventRow } from "@/lib/admin/actions/events";
 import { getAdminSession, hasAdminPermission, type AdminPermission, type AdminUser } from "@/lib/admin/auth";
+import { AdminImagePreview } from "@/components/admin/ui/AdminImagePreview";
 
 export const metadata = {
   title: "Übersicht | SmashTime Admin"
@@ -380,16 +380,15 @@ export default async function AdminDashboardPage({
         <DashboardPanel className="adm-dashboard__event-panel" icon={Shield} title="Aktuelles Event">
           {model.nextEvent ? (
             <div className="adm-next-event">
-              <div className="adm-next-event__poster">
-                {model.nextEvent.imagePath ? (
-                  <Image src={model.nextEvent.imagePath} alt={model.nextEvent.name} fill sizes="296px" priority unoptimized />
-                ) : (
-                  <span className="adm-thumb--empty">
-                    <ImageIcon aria-hidden="true" size={26} />
-                    Kein Eventbild hinterlegt
-                  </span>
-                )}
-              </div>
+              <AdminImagePreview
+                src={model.nextEvent.imagePath}
+                alt={`${model.nextEvent.name} Eventbild`}
+                fallback="Kein Eventbild hinterlegt"
+                aspectRatio="296 / 215"
+                sizes="296px"
+                priority
+                className="adm-next-event__poster"
+              />
               <div className="adm-next-event__body">
                 <h2>{model.nextEvent.name}</h2>
                 {model.nextEvent.subtitle ? <p className="adm-next-event__subtitle">{model.nextEvent.subtitle}</p> : null}

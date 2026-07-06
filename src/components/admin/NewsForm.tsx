@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { useActionState, useEffect, useState } from "react";
 import { ArrowLeft, Eye, Image as ImageIcon, Loader2, Rocket, Save } from "lucide-react";
@@ -9,6 +8,7 @@ import type { NewsRow, NewsStatus } from "@/lib/admin/actions/news";
 import { NEWS_CATEGORIES } from "@/lib/admin/resource-shared";
 import { slugify } from "@/lib/slug";
 import { useAdminUi } from "@/components/admin/ui/AdminUiProvider";
+import { AdminImagePreview } from "@/components/admin/ui/AdminImagePreview";
 import { Badge } from "@/components/admin/ui/primitives";
 
 type NewsFormProps = {
@@ -256,16 +256,14 @@ export function NewsForm({ action, initial, heading, subheading }: NewsFormProps
             </div>
             <div className="adm-panel__body">
               <div className="adm-preview">
-                <div className="adm-preview__img">
-                  {imagePath || heroImagePath ? (
-                    <Image src={heroImagePath || imagePath} alt="" fill sizes="380px" style={{ objectFit: "cover" }} unoptimized />
-                  ) : (
-                    <span className="adm-thumb--empty" style={{ display: "flex", height: "100%", flexDirection: "column", gap: 8 }}>
-                      <ImageIcon aria-hidden="true" size={26} />
-                      Titelbild fehlt
-                    </span>
-                  )}
-                </div>
+                <AdminImagePreview
+                  src={heroImagePath || imagePath}
+                  alt={`${title || "Neuigkeit"} Titelbild`}
+                  fallback="Titelbild fehlt"
+                  aspectRatio="16 / 9"
+                  sizes="380px"
+                  className="adm-preview__img"
+                />
                 <div className="adm-preview__body">
                   <Badge tone={statusMeta[status].tone} uppercase>
                     {statusMeta[status].label}

@@ -1249,7 +1249,7 @@
 .adm-thumb img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
 }
 
 .adm-thumb--square {
@@ -1267,6 +1267,139 @@
   align-items: center;
   justify-content: center;
   color: var(--adm-faint);
+}
+
+/* ---------- Einheitliche Bild-Vorschauen ---------- */
+
+.adm-image-preview {
+  position: relative;
+  display: grid;
+  aspect-ratio: var(--adm-image-preview-ratio, 16 / 9);
+  place-items: center;
+  min-width: 0;
+  overflow: hidden;
+  padding: 0;
+  border: 1px solid var(--adm-border);
+  border-radius: 8px;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.035), transparent 34%),
+    var(--adm-inset);
+  color: var(--adm-muted);
+  cursor: zoom-in;
+  font: inherit;
+  text-align: center;
+}
+
+.adm-image-preview:not(.adm-thumb):not(.adm-next-event__poster) {
+  width: 100%;
+}
+
+.adm-image-preview:disabled {
+  cursor: default;
+}
+
+.adm-image-preview:focus-visible {
+  outline: 2px solid rgba(225, 6, 0, 0.95);
+  outline-offset: 3px;
+}
+
+.adm-image-preview__image {
+  width: 100%;
+  height: 100%;
+  object-position: center;
+}
+
+.adm-image-preview__empty {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+  color: var(--adm-faint);
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.adm-image-preview__open {
+  position: absolute;
+  right: 8px;
+  bottom: 8px;
+  display: inline-flex;
+  gap: 5px;
+  align-items: center;
+  max-width: calc(100% - 16px);
+  min-height: 26px;
+  padding: 5px 8px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.74);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 800;
+  line-height: 1;
+  opacity: 0;
+  pointer-events: none;
+  text-transform: uppercase;
+  transform: translateY(4px);
+  transition:
+    opacity 0.15s ease,
+    transform 0.15s ease;
+}
+
+.adm-image-preview:hover .adm-image-preview__open,
+.adm-image-preview:focus-visible .adm-image-preview__open {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.adm-thumb.adm-image-preview {
+  flex-shrink: 0;
+  border-radius: 8px;
+}
+
+.adm-thumb.adm-image-preview .adm-image-preview__open {
+  inset: auto 3px 3px auto;
+  min-height: 18px;
+  padding: 3px;
+  font-size: 0;
+}
+
+.adm-image-preview--field {
+  min-height: 120px;
+}
+
+.adm-image-lightbox {
+  z-index: 130;
+  align-items: center;
+  padding: 28px;
+}
+
+.adm-image-lightbox__modal {
+  max-width: min(1180px, calc(100vw - 42px));
+  max-height: calc(100vh - 56px);
+  overflow: hidden;
+}
+
+.adm-image-lightbox__body {
+  padding: 14px;
+}
+
+.adm-image-lightbox__stage {
+  position: relative;
+  min-height: min(72vh, 760px);
+  border: 1px solid var(--adm-border-soft);
+  border-radius: 10px;
+  background:
+    radial-gradient(circle at 50% 0, rgba(255, 255, 255, 0.05), transparent 34%),
+    #080809;
+}
+
+.adm-image-lightbox__stage img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }
 
 /* ---------- Pagination ---------- */
@@ -2140,13 +2273,15 @@
   position: relative;
   aspect-ratio: 16 / 10;
   overflow: hidden;
+  border: 0;
+  border-radius: 0;
   background: var(--adm-inset);
 }
 
 .adm-media-card__img img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
 }
 
 .adm-media-card__body {
@@ -2355,13 +2490,16 @@
 .adm-preview__img {
   position: relative;
   aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border: 0;
+  border-radius: 0;
   background: var(--adm-inset);
 }
 
 .adm-preview__img img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
 }
 
 .adm-preview__body {
@@ -3047,24 +3185,25 @@
   font-size: 11.5px;
 }
 
-.adm-gallery-admin__item > span {
-  position: relative;
-  display: block;
-  overflow: hidden;
-  aspect-ratio: 16 / 10;
-  border: 1px solid var(--adm-border-soft);
-  border-radius: 4px;
-  background: var(--adm-inset);
+.adm-gallery-admin__item .adm-image-preview {
+  border-radius: 5px;
 }
 
-.adm-gallery-admin__item input {
+.adm-gallery-admin__remove {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  min-height: 28px;
+}
+
+.adm-gallery-admin__remove input {
   width: 16px;
   height: 16px;
   accent-color: var(--adm-red);
 }
 
-.adm-gallery-admin__item em {
-  font-style: normal;
+.adm-gallery-admin__remove span {
+  line-height: 1.3;
 }
 
 .adm-message-box {
@@ -3210,12 +3349,13 @@
   overflow: hidden;
   width: 296px;
   height: 215px;
+  border: 0;
   border-radius: 2px;
   background: #09090a;
 }
 
 .adm-next-event__poster img {
-  object-fit: cover;
+  object-fit: contain;
 }
 
 .adm-next-event__body h2 {

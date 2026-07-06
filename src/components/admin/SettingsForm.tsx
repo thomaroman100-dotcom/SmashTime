@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { useActionState, useMemo, useState } from "react";
 import {
@@ -30,6 +29,7 @@ import {
 } from "lucide-react";
 import type { ActionResult } from "@/lib/admin/action-helpers";
 import { SETTING_FIELDS } from "@/lib/admin/resource-shared";
+import { AdminImagePreview } from "@/components/admin/ui/AdminImagePreview";
 import { cn } from "@/lib/utils";
 
 type SettingsFormProps = {
@@ -286,15 +286,15 @@ function ImageUploadField({
   return (
     <div className="settings-field">
       <span>{label}</span>
-      <div className={cn("settings-image-preview", compact && "settings-image-preview--compact")}>
-        {src.startsWith("blob:") ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={src} alt={label} />
-        ) : src ? (
-          <Image src={src} alt={label} fill sizes={compact ? "80px" : "360px"} unoptimized />
-        ) : (
-          <span className="settings-image-preview__empty">Bild wird bald ergänzt</span>
-        )}
+      <div className="settings-image-preview-wrap">
+        <AdminImagePreview
+          src={src}
+          alt={label}
+          fallback="Bild wird bald ergänzt"
+          aspectRatio={compact ? "1 / 1" : "16 / 9"}
+          sizes={compact ? "80px" : "360px"}
+          className={cn("settings-image-preview", compact && "settings-image-preview--compact")}
+        />
         <button type="button" aria-label={`${label} entfernen`} onClick={onRemove}>
           <X aria-hidden="true" size={14} />
         </button>
