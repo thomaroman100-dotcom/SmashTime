@@ -8,6 +8,7 @@ import {
   Bell,
   CalendarDays,
   Crown,
+  FileCheck2,
   Handshake,
   Images,
   LayoutDashboard,
@@ -17,31 +18,47 @@ import {
   Menu,
   Newspaper,
   Settings,
+  ShieldCheck,
+  UsersRound,
   X
 } from "lucide-react";
-import type { AdminUser } from "@/lib/admin/auth";
+import { hasAdminPermission, type AdminPermission } from "@/lib/admin/permissions";
 import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
 import { site } from "@/data/site";
 import { cn } from "@/lib/utils";
 import { AdminUiProvider } from "@/components/admin/ui/AdminUiProvider";
 import { InitialsAvatar } from "@/components/admin/ui/primitives";
 
+type AdminShellUser = {
+  displayName: string;
+  role: "admin" | "staff";
+  permissions: AdminPermission[];
+};
+
 type AdminShellProps = {
-  user: AdminUser;
+  user: AdminShellUser;
   children: React.ReactNode;
 };
 
 const adminNavigation = [
   { label: "Übersicht", href: "/admin", icon: LayoutDashboard },
-  { label: "Champions", href: "/admin/champions", icon: Crown },
-  { label: "Veranstaltungen", href: "/admin/events", icon: CalendarDays },
-  { label: "Fightcard", href: "/admin/fightcards", icon: ListOrdered },
-  { label: "Neuigkeiten", href: "/admin/news", icon: Newspaper },
-  { label: "Sponsoren", href: "/admin/sponsors", icon: Handshake },
-  { label: "Kontaktanfragen", href: "/admin/contact", icon: Mail },
-  { label: "Medien", href: "/admin/media", icon: Images },
-  { label: "Einstellungen", href: "/admin/settings", icon: Settings }
-];
+  { label: "Benutzer", href: "/admin/members", icon: UsersRound, permission: "users.manage" },
+  { label: "Rollen & Rechte", href: "/admin/members/roles", icon: ShieldCheck, permission: "users.manage" },
+  { label: "Verifizierungen", href: "/admin/members/verifications", icon: FileCheck2, permission: "users.manage" },
+  { label: "Champions", href: "/admin/champions", icon: Crown, permission: "champions.manage" },
+  { label: "Veranstaltungen", href: "/admin/events", icon: CalendarDays, permission: "events.manage" },
+  { label: "Fightcard", href: "/admin/fightcards", icon: ListOrdered, permission: "fightcards.manage" },
+  { label: "Neuigkeiten", href: "/admin/news", icon: Newspaper, permission: "news.manage" },
+  { label: "Sponsoren", href: "/admin/sponsors", icon: Handshake, permission: "sponsors.manage" },
+  { label: "Kontaktanfragen", href: "/admin/contact", icon: Mail, permission: "contact.manage" },
+  { label: "Medien", href: "/admin/media", icon: Images, permission: "media.manage" },
+  { label: "Einstellungen", href: "/admin/settings", icon: Settings, permission: "settings.manage" }
+] satisfies Array<{
+  label: string;
+  href: string;
+  icon: typeof LayoutDashboard;
+  permission?: AdminPermission;
+}>;
 
 export function AdminShell({ user, children }: AdminShellProps) {
   const pathname = usePathname();
@@ -58,7 +75,13 @@ export function AdminShell({ user, children }: AdminShellProps) {
 
   const referenceMode = process.env.NODE_ENV !== "production" && searchParams.get("reference") === "1";
   const displayName = referenceMode ? "Thomas Roman" : user.displayName;
-  const roleLabel = referenceMode ? "Administrator" : user.role === "admin" ? "Administrator" : "Redaktion";
+  const roleLabel = referenceMode ? "Administrator" : user.role === "admin" ? "Administrator" : "Mitarbeiter";
+  const visibleNavigation = adminNavigation.filter((item) => !item.permission || hasAdminPermission(user, item.permission));
+  const activeHref = visibleNavigation
+    .filter((item) =>
+      item.href === "/admin" ? pathname === "/admin" : pathname === item.href || pathname.startsWith(`${item.href}/`)
+    )
+    .sort((a, b) => b.href.length - a.href.length)[0]?.href;
 
   return (
     <AdminUiProvider>
@@ -87,12 +110,9 @@ export function AdminShell({ user, children }: AdminShellProps) {
           </Link>
 
           <nav aria-label="Admin Navigation">
-            {adminNavigation.map((item) => {
+            {visibleNavigation.map((item) => {
               const Icon = item.icon;
-              const active =
-                item.href === "/admin"
-                  ? pathname === "/admin" || referenceMode
-                  : pathname === item.href || pathname.startsWith(`${item.href}/`);
+              const active = referenceMode ? item.href === "/admin" : item.href === activeHref;
 
               return (
                 <Link

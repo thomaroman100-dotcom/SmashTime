@@ -17,15 +17,17 @@ import type { ActionResult } from "@/lib/admin/action-helpers";
 import type { ChampionRow } from "@/lib/admin/actions/champions";
 import { useAdminUi } from "@/components/admin/ui/AdminUiProvider";
 import { Badge } from "@/components/admin/ui/primitives";
+import { FighterProfilePicker, type FighterProfileOption } from "@/components/admin/FighterProfilePicker";
 
 type ChampionFormProps = {
   action: (prev: ActionResult | null, formData: FormData) => Promise<ActionResult>;
   initial?: ChampionRow | null;
   heading: string;
   subheading: string;
+  fighterOptions: FighterProfileOption[];
 };
 
-export function ChampionForm({ action, initial, heading, subheading }: ChampionFormProps) {
+export function ChampionForm({ action, initial, heading, subheading, fighterOptions }: ChampionFormProps) {
   const [state, formAction, pending] = useActionState(action, null);
   const ui = useAdminUi();
 
@@ -80,9 +82,17 @@ export function ChampionForm({ action, initial, heading, subheading }: ChampionF
           <section className="adm-fsection">
             <div className="adm-fsection__head">
               <span className="adm-num">1</span>
-              <h2>Basisdaten</h2>
+              <h2>Kämpferprofil &amp; Basisdaten</h2>
             </div>
             <div className="adm-fsection__body">
+              <FighterProfilePicker
+                name="fighter_user_id"
+                label="Registriertes Kämpferprofil"
+                options={fighterOptions}
+                initialUserId={initial?.fighter_user_id}
+                required={!initial}
+                emptyLabel="Kämpferprofil auswählen"
+              />
               <div className="adm-grid-2">
                 <div className="adm-field">
                   <label htmlFor="champion-name">

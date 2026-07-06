@@ -24,6 +24,7 @@ import type { ReactNode } from "react";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { eventSelectColumns } from "@/lib/admin/resource-shared";
 import type { EventRow } from "@/lib/admin/actions/events";
+import { getAdminSession, hasAdminPermission, type AdminPermission, type AdminUser } from "@/lib/admin/auth";
 
 export const metadata = {
   title: "Übersicht | SmashTime Admin"
@@ -138,6 +139,15 @@ const statusLabel: Record<EventRow["status"], string> = {
   archived: "Archiviert"
 };
 
+const quickLinkPermissions: Record<string, AdminPermission> = {
+  "/admin/events": "events.manage",
+  "/admin/fightcards": "fightcards.manage",
+  "/admin/news": "news.manage",
+  "/admin/sponsors": "sponsors.manage",
+  "/admin/contact": "contact.manage",
+  "/admin/media": "media.manage"
+};
+
 function formatDashboardDate(value: string | null) {
   if (!value) {
     return "Datum offen";
@@ -181,9 +191,41 @@ function emptyModel(loadError: string | null): DashboardViewModel {
   };
 }
 
-async function getDashboardModel(referenceMode: boolean): Promise<DashboardViewModel> {
+function filterModelForUser(model: DashboardViewModel, user: AdminUser): DashboardViewModel {
+  if (user.role === "admin") {
+    return model;
+  }
+
+  return {
+    ...model,
+    metrics: [],
+    nextEvent: null,
+    checklist: [],
+    quickLinks: model.quickLinks.filter((link) => {
+      const permission = quickLinkPermissions[link.href];
+      return permission ? hasAdminPermission(user, permission) : true;
+    }),
+    activities: [],
+    todos: [],
+    systemRows: [
+      {
+        label: "Mitarbeiterzugang",
+        detail: "Dein Dashboard zeigt nur freigegebene Bereiche.",
+        badge: `${user.permissions.length} Rechte`,
+        tone: "amber",
+        icon: Shield
+      }
+    ]
+  };
+}
+
+async function getDashboardModel(referenceMode: boolean, user: AdminUser): Promise<DashboardViewModel> {
   if (referenceMode) {
-    return referenceModel;
+    return filterModelForUser(referenceModel, user);
+  }
+
+  if (user.role !== "admin") {
+    return filterModelForUser(emptyModel(null), user);
   }
 
   const supabase = await createSupabaseServerClient();
@@ -309,7 +351,11 @@ export default async function AdminDashboardPage({
 }) {
   const params = await Promise.resolve(searchParams ?? {});
   const referenceMode = process.env.NODE_ENV !== "production" && params.reference === "1";
-  const model = await getDashboardModel(referenceMode);
+  const session = await getAdminSession();
+  if (session.status !== "authenticated") {
+    return null;
+  }
+  const model = await getDashboardModel(referenceMode, session.user);
 
   return (
     <main className="adm-dashboard" data-reference={referenceMode ? "true" : undefined}>

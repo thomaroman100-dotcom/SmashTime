@@ -1,4 +1,5 @@
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { type AdminAccessRequirement, getAdminSession } from "@/lib/admin/auth";
 
 export type ActionResult =
   | { ok: true; message: string }
@@ -13,30 +14,21 @@ export type AdminClientResult =
 export const ADMIN_MAX_UPLOAD_BYTES = 6 * 1024 * 1024;
 export const ADMIN_ALLOWED_IMAGE_MIME = ["image/png", "image/jpeg", "image/webp", "image/avif", "image/svg+xml"] as const;
 
-export async function getAdminClient(): Promise<AdminClientResult> {
+export async function getAdminClient(requirement: AdminAccessRequirement = "admin.access"): Promise<AdminClientResult> {
   const supabase = await createSupabaseServerClient();
 
   if (!supabase) {
     return { ok: false, error: "Supabase ist nicht konfiguriert. Admin-Aktionen sind gesperrt." };
   }
 
-  const {
-    data: { user },
-    error: userError
-  } = await supabase.auth.getUser();
-
-  if (userError || !user) {
-    return { ok: false, error: "Keine aktive Admin-Sitzung. Bitte melde dich neu an." };
-  }
-
-  const { data: profile } = await supabase
-    .from("admin_profiles")
-    .select("is_active")
-    .eq("user_id", user.id)
-    .maybeSingle();
-
-  if (!(profile as { is_active: boolean | null } | null)?.is_active) {
-    return { ok: false, error: "Dein Konto ist nicht als aktiver Admin freigeschaltet." };
+  const session = await getAdminSession(requirement);
+  if (session.status !== "authenticated") {
+    const errorByStatus: Record<typeof session.status, string> = {
+      "missing-config": "Supabase ist nicht konfiguriert. Admin-Aktionen sind gesperrt.",
+      unauthenticated: "Keine aktive Admin-Sitzung. Bitte melde dich neu an.",
+      forbidden: "Dir fehlt die Berechtigung für diese Aktion."
+    };
+    return { ok: false, error: errorByStatus[session.status] };
   }
 
   return { ok: true, supabase };

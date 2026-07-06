@@ -26,6 +26,7 @@ import {
 import { EVENT_DISCIPLINES, FIGHT_SECTIONS, FIGHT_STATUSES, FIGHT_STATUS_LABELS } from "@/lib/admin/resource-shared";
 import { useAdminUi } from "@/components/admin/ui/AdminUiProvider";
 import { InitialsAvatar } from "@/components/admin/ui/primitives";
+import { FighterProfilePicker, type FighterProfileOption } from "@/components/admin/FighterProfilePicker";
 
 type EventOption = {
   id: number;
@@ -38,7 +39,7 @@ type FightcardBoardProps = {
   events: EventOption[];
   activeEventId: number;
   fights: FightRow[];
-  championNames: string[];
+  fighterOptions: FighterProfileOption[];
 };
 
 type Section = (typeof FIGHT_SECTIONS)[number];
@@ -105,7 +106,7 @@ type ModalState =
   | { mode: "create"; section: Section }
   | { mode: "edit"; fight: FightRow };
 
-export function FightcardBoard({ events, activeEventId, fights, championNames }: FightcardBoardProps) {
+export function FightcardBoard({ events, activeEventId, fights, fighterOptions }: FightcardBoardProps) {
   const router = useRouter();
   const ui = useAdminUi();
   const [pending, startTransition] = useTransition();
@@ -355,7 +356,7 @@ export function FightcardBoard({ events, activeEventId, fights, championNames }:
           key={modal.mode === "edit" ? `edit-${modal.fight.id}` : `create-${modal.section}`}
           eventId={activeEventId}
           eventName={activeEvent?.name ?? ""}
-          championNames={championNames}
+          fighterOptions={fighterOptions}
           initial={modal.mode === "edit" ? modal.fight : null}
           initialSection={modal.mode === "create" ? modal.section : undefined}
           nextSortOrder={(fights.length + 1) * 10}
@@ -369,34 +370,43 @@ export function FightcardBoard({ events, activeEventId, fights, championNames }:
 type FightModalProps = {
   eventId: number;
   eventName: string;
-  championNames: string[];
+  fighterOptions: FighterProfileOption[];
   initial: FightRow | null;
   initialSection?: Section;
   nextSortOrder: number;
   onClose: () => void;
 };
 
-function FightModal({ eventId, eventName, championNames, initial, initialSection, nextSortOrder, onClose }: FightModalProps) {
+function FightModal({ eventId, eventName, fighterOptions, initial, initialSection, nextSortOrder, onClose }: FightModalProps) {
   const ui = useAdminUi();
   const router = useRouter();
   const [pending, startTransition] = useTransition();
 
   const [section, setSection] = useState<Section>(initial ? sectionOf(initial) : initialSection ?? "Main Event");
-  const [fighterA, setFighterA] = useState(initial?.fighter_a ?? "");
-  const [fighterB, setFighterB] = useState(initial?.fighter_b ?? "");
+  const [fighterAUserId, setFighterAUserId] = useState(initial?.fighter_a_user_id ?? "");
+  const [fighterBUserId, setFighterBUserId] = useState(initial?.fighter_b_user_id ?? "");
   const [weightClass, setWeightClass] = useState(initial?.weight_class ?? "");
   const [discipline, setDiscipline] = useState(initial?.discipline ?? "");
   const [status, setStatus] = useState(initial?.status ?? "planned");
   const [isVisible, setIsVisible] = useState(initial?.is_visible ?? false);
   const [sortOrder, setSortOrder] = useState(initial?.sort_order ?? nextSortOrder);
   const [notes, setNotes] = useState(initial?.notes ?? "");
+  const fighterOptionById = useMemo(() => new Map(fighterOptions.map((option) => [option.userId, option])), [fighterOptions]);
+  const fighterA = fighterOptionById.get(fighterAUserId)?.name ?? initial?.fighter_a ?? "";
+  const fighterB = fighterOptionById.get(fighterBUserId)?.name ?? initial?.fighter_b ?? "";
 
   const submit = () => {
     const formData = new FormData();
     formData.set("event_id", String(eventId));
     formData.set("label", section);
-    formData.set("fighter_a", fighterA);
-    formData.set("fighter_b", fighterB);
+    formData.set("fighter_a_user_id", fighterAUserId);
+    formData.set("fighter_b_user_id", fighterBUserId);
+    if (!fighterAUserId && initial?.fighter_a) {
+      formData.set("fighter_a", initial.fighter_a);
+    }
+    if (!fighterBUserId && initial?.fighter_b) {
+      formData.set("fighter_b", initial.fighter_b);
+    }
     formData.set("weight_class", weightClass);
     formData.set("discipline", discipline);
     formData.set("status", status);
@@ -481,35 +491,31 @@ function FightModal({ eventId, eventName, championNames, initial, initialSection
                     <label htmlFor="fight-fighter-a">
                       KÄMPFER A
                     </label>
-                    <input
-                      id="fight-fighter-a"
-                      list="fight-champion-names"
-                      value={fighterA}
-                      onChange={(event) => setFighterA(event.target.value)}
-                      placeholder="Kämpfer suchen…"
+                    <FighterProfilePicker
+                      name="fighter_a_user_id"
+                      label="KÄMPFER A"
+                      options={fighterOptions}
+                      initialUserId={fighterAUserId}
+                      legacyName={initial?.fighter_a}
+                      legacyFieldName="fighter_a"
+                      corner="red"
+                      onSelectionChange={(option) => setFighterAUserId(option?.userId ?? "")}
                     />
-                    <span className="adm-field__hint">Leer lassen = „Wird bekanntgegeben“ (TBA).</span>
                   </div>
                   <span className="adm-vs-hex adm-fight-modal__vs">VS.</span>
                   <div className="adm-field adm-fighter-picker adm-fighter-picker--blue">
-                    <label htmlFor="fight-fighter-b">
-                      KÄMPFER B
-                    </label>
-                    <input
-                      id="fight-fighter-b"
-                      list="fight-champion-names"
-                      value={fighterB}
-                      onChange={(event) => setFighterB(event.target.value)}
-                      placeholder="Kämpfer suchen…"
+                    <FighterProfilePicker
+                      name="fighter_b_user_id"
+                      label="KÄMPFER B"
+                      options={fighterOptions}
+                      initialUserId={fighterBUserId}
+                      legacyName={initial?.fighter_b}
+                      legacyFieldName="fighter_b"
+                      corner="blue"
+                      onSelectionChange={(option) => setFighterBUserId(option?.userId ?? "")}
                     />
-                    <span className="adm-field__hint">Leer lassen = „Wird bekanntgegeben“ (TBA).</span>
                   </div>
                 </div>
-                <datalist id="fight-champion-names">
-                  {championNames.map((name) => (
-                    <option key={name} value={name} />
-                  ))}
-                </datalist>
             </ModalSection>
 
             <ModalSection

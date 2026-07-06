@@ -92,7 +92,7 @@ export async function createSponsorAction(
   _prev: ActionResult | null,
   formData: FormData
 ): Promise<ActionResult> {
-  const admin = await getAdminClient();
+  const admin = await getAdminClient("sponsors.manage");
   if (!admin.ok) {
     return { ok: false, error: admin.error };
   }
@@ -121,7 +121,7 @@ export async function updateSponsorAction(
   _prev: ActionResult | null,
   formData: FormData
 ): Promise<ActionResult> {
-  const admin = await getAdminClient();
+  const admin = await getAdminClient("sponsors.manage");
   if (!admin.ok) {
     return { ok: false, error: admin.error };
   }
@@ -146,7 +146,7 @@ export async function updateSponsorAction(
 }
 
 export async function setSponsorActiveAction(id: number, isActive: boolean): Promise<ActionResult> {
-  const admin = await getAdminClient();
+  const admin = await getAdminClient("sponsors.manage");
   if (!admin.ok) {
     return { ok: false, error: admin.error };
   }
@@ -161,7 +161,7 @@ export async function setSponsorActiveAction(id: number, isActive: boolean): Pro
 }
 
 export async function deleteSponsorAction(id: number): Promise<ActionResult> {
-  const admin = await getAdminClient();
+  const admin = await getAdminClient("sponsors.manage");
   if (!admin.ok) {
     return { ok: false, error: admin.error };
   }

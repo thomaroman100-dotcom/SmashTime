@@ -9,7 +9,7 @@ function csvCell(value: unknown): string {
 }
 
 export async function GET() {
-  const admin = await getAdminClient();
+  const admin = await getAdminClient("events.manage");
   if (!admin.ok) {
     return NextResponse.json({ error: admin.error }, { status: 401 });
   }

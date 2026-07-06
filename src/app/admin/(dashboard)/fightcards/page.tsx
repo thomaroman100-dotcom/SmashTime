@@ -1,7 +1,9 @@
 import Link from "next/link";
 import { ListOrdered, Plus, ShieldAlert } from "lucide-react";
 import { FightcardBoard } from "@/components/admin/FightcardBoard";
+import type { FighterProfileOption } from "@/components/admin/FighterProfilePicker";
 import type { FightRow } from "@/lib/admin/actions/fightcards";
+import { loadVerifiedFighterOptions } from "@/lib/admin/fighters";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 export const metadata = {
@@ -32,22 +34,22 @@ export default async function AdminFightcardsPage({ searchParams }: AdminFightca
 
   let events: Array<{ id: number; name: string; dateLabel: string; location: string }> = [];
   let fights: FightRow[] = [];
-  let championNames: string[] = [];
+  let fighterOptions: FighterProfileOption[] = [];
   let loadError: string | null = null;
 
   if (!supabase) {
     loadError = "Supabase ist nicht konfiguriert.";
   } else {
-    const [{ data: eventData, error: eventError }, { data: championData, error: championError }] = await Promise.all([
+    const [{ data: eventData, error: eventError }, fighterOptionsResult] = await Promise.all([
       supabase
         .from("events")
         .select("id, name, date_label, event_date, location")
         .order("event_date", { ascending: false, nullsFirst: false }),
-      supabase.from("champions").select("name").eq("is_active", true).order("name", { ascending: true })
+      loadVerifiedFighterOptions(supabase)
     ]);
 
-    if (eventError || championError) {
-      loadError = eventError?.message ?? championError?.message ?? "Fightcard-Daten konnten nicht geladen werden.";
+    if (eventError || fighterOptionsResult.error) {
+      loadError = eventError?.message ?? fighterOptionsResult.error?.message ?? "Fightcard-Daten konnten nicht geladen werden.";
     } else {
       events = (eventData ?? []).map((item) => {
         const row = item as {
@@ -64,7 +66,7 @@ export default async function AdminFightcardsPage({ searchParams }: AdminFightca
           location: row.location ?? "Ort offen"
         };
       });
-      championNames = (championData ?? []).map((row) => (row as { name: string }).name);
+      fighterOptions = fighterOptionsResult.options;
     }
   }
 
@@ -77,7 +79,7 @@ export default async function AdminFightcardsPage({ searchParams }: AdminFightca
     const { data, error } = await supabase
       .from("fight_cards")
       .select(
-        "id, event_id, sort_order, label, fighter_a, fighter_b, fighter_a_is_tba, fighter_b_is_tba, weight_class, discipline, is_main_event, is_visible, status, notes"
+        "id, event_id, sort_order, label, fighter_a_user_id, fighter_b_user_id, fighter_a, fighter_b, fighter_a_is_tba, fighter_b_is_tba, weight_class, discipline, is_main_event, is_visible, status, notes"
       )
       .eq("event_id", activeEventId)
       .order("sort_order", { ascending: true });
@@ -118,7 +120,7 @@ export default async function AdminFightcardsPage({ searchParams }: AdminFightca
       ) : activeEventId ? (
         <div className="adm-cols adm-cols--main-rail">
           <section>
-            <FightcardBoard events={events} activeEventId={activeEventId} fights={fights} championNames={championNames} />
+            <FightcardBoard events={events} activeEventId={activeEventId} fights={fights} fighterOptions={fighterOptions} />
           </section>
           <aside className="adm-rail">
             <section className="adm-panel">

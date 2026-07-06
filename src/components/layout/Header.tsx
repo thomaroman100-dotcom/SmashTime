@@ -2,25 +2,31 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { ChevronDown, Menu, Ticket, X } from "lucide-react";
-import { usePathname } from "next/navigation";
+import { ChevronDown, LogIn, LogOut, Menu, Shield, Ticket, UserCircle, UserPlus, X } from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import type { NavigationItem } from "@/data/site";
 import { site as defaultSite } from "@/data/site";
+import type { SessionProfile } from "@/lib/admin/auth";
 import type { PublicSiteContent } from "@/lib/site-settings";
+import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
 import { cn } from "@/lib/utils";
 
 type HeaderProps = {
   siteContent?: PublicSiteContent;
+  sessionProfile?: SessionProfile | null;
 };
 
-export function Header({ siteContent = defaultSite }: HeaderProps) {
+export function Header({ siteContent = defaultSite, sessionProfile = null }: HeaderProps) {
   const site = siteContent;
   const pathname = usePathname();
+  const router = useRouter();
   const [open, setOpen] = useState(false);
   const [openGroup, setOpenGroup] = useState<string | null>(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement | null>(null);
+  const profileRef = useRef<HTMLDivElement | null>(null);
 
   const getPathFromHref = (href: string) => href.split("#")[0];
 
@@ -44,17 +50,30 @@ export function Header({ siteContent = defaultSite }: HeaderProps) {
     setOpenGroup((current) => (current === label ? null : label));
   };
 
+  const signOut = async () => {
+    const supabase = createSupabaseBrowserClient();
+    await supabase?.auth.signOut();
+    setProfileOpen(false);
+    closeMobileMenu();
+    router.push("/");
+    router.refresh();
+  };
+
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
         setOpen(false);
         setOpenGroup(null);
         setDropdownOpen(false);
+        setProfileOpen(false);
       }
     };
     const onPointerDown = (event: PointerEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setDropdownOpen(false);
+      }
+      if (profileRef.current && !profileRef.current.contains(event.target as Node)) {
+        setProfileOpen(false);
       }
     };
     window.addEventListener("keydown", onKeyDown);
@@ -128,9 +147,49 @@ export function Header({ siteContent = defaultSite }: HeaderProps) {
         </nav>
 
         <div className="site-header__actions">
-          <Link href={site.loginLink.href} className="site-header__login">
-            {site.loginLink.label}
-          </Link>
+          <div className="site-profile-menu" ref={profileRef}>
+            <button
+              className={cn("site-profile-menu__trigger", sessionProfile && "site-profile-menu__trigger--active")}
+              type="button"
+              aria-haspopup="true"
+              aria-expanded={profileOpen}
+              onClick={() => setProfileOpen((value) => !value)}
+            >
+              <UserCircle aria-hidden="true" size={20} />
+              <span>{sessionProfile ? sessionProfile.displayName : "Login"}</span>
+              <ChevronDown aria-hidden="true" size={13} />
+            </button>
+            <div className={cn("site-profile-menu__dropdown", profileOpen && "site-profile-menu__dropdown--open")}>
+              {sessionProfile ? (
+                <>
+                  <div className="site-profile-menu__identity">
+                    <strong>{sessionProfile.displayName}</strong>
+                    <span>{sessionProfile.roleLabel} · {sessionProfile.status}</span>
+                  </div>
+                  <Link href="/account" onClick={() => setProfileOpen(false)}>
+                    <UserCircle aria-hidden="true" size={16} /> Mein Profil
+                  </Link>
+                  {sessionProfile.canAccessAdmin ? (
+                    <Link href="/admin" onClick={() => setProfileOpen(false)}>
+                      <Shield aria-hidden="true" size={16} /> Adminbereich
+                    </Link>
+                  ) : null}
+                  <button type="button" onClick={signOut}>
+                    <LogOut aria-hidden="true" size={16} /> Abmelden
+                  </button>
+                </>
+              ) : (
+                <>
+                  <Link href="/login" onClick={() => setProfileOpen(false)}>
+                    <LogIn aria-hidden="true" size={16} /> Einloggen
+                  </Link>
+                  <Link href="/register" onClick={() => setProfileOpen(false)}>
+                    <UserPlus aria-hidden="true" size={16} /> Registrieren
+                  </Link>
+                </>
+              )}
+            </div>
+          </div>
           <Link href={site.headerCta.href} className="site-header__ticket-cta">
             <Ticket aria-hidden="true" size={16} strokeWidth={2.4} />
             <span>{site.headerCta.label}</span>
@@ -197,9 +256,30 @@ export function Header({ siteContent = defaultSite }: HeaderProps) {
               </Link>
             )
           )}
-          <Link href={site.loginLink.href} className="mobile-panel__login" onClick={closeMobileMenu}>
-            {site.loginLink.label}
-          </Link>
+          {sessionProfile ? (
+            <>
+              <Link href="/account" className="mobile-panel__login" onClick={closeMobileMenu}>
+                Mein Profil · {sessionProfile.displayName}
+              </Link>
+              {sessionProfile.canAccessAdmin ? (
+                <Link href="/admin" className="mobile-panel__login" onClick={closeMobileMenu}>
+                  Adminbereich
+                </Link>
+              ) : null}
+              <button className="mobile-panel__login mobile-panel__button" type="button" onClick={signOut}>
+                Abmelden
+              </button>
+            </>
+          ) : (
+            <>
+              <Link href="/login" className="mobile-panel__login" onClick={closeMobileMenu}>
+                Einloggen
+              </Link>
+              <Link href="/register" className="mobile-panel__login" onClick={closeMobileMenu}>
+                Registrieren
+              </Link>
+            </>
+          )}
           <Link href={site.headerCta.href} className="mobile-panel__ticket-cta" onClick={closeMobileMenu}>
             <Ticket aria-hidden="true" size={18} strokeWidth={2.4} />
             <span>{site.headerCta.label}</span>

@@ -139,7 +139,8 @@ async function applyEventPosterUpload({
     assetType: "Veranstaltung",
     altText: `${payload.name} Eventbild`,
     usageNote: `Event-Poster: ${payload.name}`,
-    isPublic: true
+    isPublic: true,
+    isChecked: true
   });
 
   if (!uploaded.ok) {
@@ -184,7 +185,8 @@ async function applyEventGalleryChanges({
       assetType: "Veranstaltung",
       altText: `${eventName} Galerie ${index + 1}`,
       usageNote: `Event-Galerie: ${eventName}`,
-      isPublic: true
+      isPublic: true,
+      isChecked: true
     });
 
     if (!uploaded.ok) {
@@ -212,7 +214,7 @@ export async function createEventAction(
   _prev: ActionResult | null,
   formData: FormData
 ): Promise<ActionResult> {
-  const admin = await getAdminClient();
+  const admin = await getAdminClient("events.manage");
   if (!admin.ok) {
     return { ok: false, error: admin.error };
   }
@@ -259,7 +261,7 @@ export async function updateEventAction(
   _prev: ActionResult | null,
   formData: FormData
 ): Promise<ActionResult> {
-  const admin = await getAdminClient();
+  const admin = await getAdminClient("events.manage");
   if (!admin.ok) {
     return { ok: false, error: admin.error };
   }
@@ -299,7 +301,7 @@ export async function updateEventAction(
 }
 
 export async function setEventStatusAction(id: number, status: EventStatus): Promise<ActionResult> {
-  const admin = await getAdminClient();
+  const admin = await getAdminClient("events.manage");
   if (!admin.ok) {
     return { ok: false, error: admin.error };
   }
@@ -319,7 +321,7 @@ export async function setEventStatusAction(id: number, status: EventStatus): Pro
 }
 
 export async function deleteEventAction(id: number): Promise<ActionResult> {
-  const admin = await getAdminClient();
+  const admin = await getAdminClient("events.manage");
   if (!admin.ok) {
     return { ok: false, error: admin.error };
   }

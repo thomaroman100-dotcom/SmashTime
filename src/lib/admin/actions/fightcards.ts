@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import {
   type ActionResult,
+  type AdminClientResult,
   fieldBool,
   fieldInt,
   fieldText,
@@ -13,12 +14,15 @@ import {
 import { FIGHT_STATUSES } from "@/lib/admin/resource-shared";
 
 export type FightStatus = (typeof FIGHT_STATUSES)[number];
+type AdminSupabaseClient = Extract<AdminClientResult, { ok: true }>["supabase"];
 
 export type FightRow = {
   id: number;
   event_id: number;
   sort_order: number;
   label: string | null;
+  fighter_a_user_id: string | null;
+  fighter_b_user_id: string | null;
   fighter_a: string | null;
   fighter_b: string | null;
   fighter_a_is_tba: boolean;
@@ -31,7 +35,42 @@ export type FightRow = {
   notes: string | null;
 };
 
-function fightPayload(formData: FormData) {
+async function verifiedFighterSnapshot(supabase: AdminSupabaseClient, userId: string | null) {
+  if (!userId) {
+    return null;
+  }
+
+  const { data, error } = await supabase
+    .from("fighter_profiles")
+    .select("user_id, nickname, weight_class, profiles!inner(display_name, profile_type, status)")
+    .eq("user_id", userId)
+    .eq("is_verified", true)
+    .maybeSingle();
+
+  if (error || !data) {
+    return { ok: false as const, error: "Ausgewählter Kämpfer ist nicht verifiziert oder nicht verfügbar." };
+  }
+
+  const row = data as unknown as {
+    user_id: string;
+    nickname: string | null;
+    weight_class: string | null;
+    profiles: { display_name: string | null; profile_type: string | null; status: string | null } | null;
+  };
+
+  if (row.profiles?.profile_type !== "fighter" || row.profiles.status !== "active") {
+    return { ok: false as const, error: "Ausgewählter Kämpfer ist nicht aktiv freigegeben." };
+  }
+
+  return {
+    ok: true as const,
+    userId: row.user_id,
+    name: row.nickname || row.profiles.display_name || "Kämpfer",
+    weightClass: row.weight_class
+  };
+}
+
+async function fightPayload(supabase: AdminSupabaseClient, formData: FormData) {
   const eventId = fieldInt(formData, "event_id", 0);
   if (!eventId) {
     return { error: "Bitte eine Veranstaltung auswählen." } as const;
@@ -42,19 +81,42 @@ function fightPayload(formData: FormData) {
     return { error: "Ungültiger Kampfstatus." } as const;
   }
 
-  const fighterA = fieldTextOrNull(formData, "fighter_a");
-  const fighterB = fieldTextOrNull(formData, "fighter_b");
+  const fighterAUserId = fieldTextOrNull(formData, "fighter_a_user_id");
+  const fighterBUserId = fieldTextOrNull(formData, "fighter_b_user_id");
+
+  if (fighterAUserId && fighterAUserId === fighterBUserId) {
+    return { error: "Ein Kämpfer kann nicht gegen sich selbst angesetzt werden." } as const;
+  }
+
+  const fighterAResult = await verifiedFighterSnapshot(supabase, fighterAUserId);
+  if (fighterAResult && !fighterAResult.ok) {
+    return { error: fighterAResult.error } as const;
+  }
+
+  const fighterBResult = await verifiedFighterSnapshot(supabase, fighterBUserId);
+  if (fighterBResult && !fighterBResult.ok) {
+    return { error: fighterBResult.error } as const;
+  }
+
+  const fighterA = fighterAResult?.ok ? fighterAResult.name : fieldTextOrNull(formData, "fighter_a");
+  const fighterB = fighterBResult?.ok ? fighterBResult.name : fieldTextOrNull(formData, "fighter_b");
 
   return {
     payload: {
       event_id: eventId,
       sort_order: fieldInt(formData, "sort_order", 0),
       label: fieldTextOrNull(formData, "label"),
+      fighter_a_user_id: fighterAResult?.ok ? fighterAResult.userId : null,
+      fighter_b_user_id: fighterBResult?.ok ? fighterBResult.userId : null,
       fighter_a: fighterA,
       fighter_b: fighterB,
       fighter_a_is_tba: !fighterA,
       fighter_b_is_tba: !fighterB,
-      weight_class: fieldTextOrNull(formData, "weight_class"),
+      weight_class:
+        fieldTextOrNull(formData, "weight_class") ??
+        (fighterAResult?.ok ? fighterAResult.weightClass : null) ??
+        (fighterBResult?.ok ? fighterBResult.weightClass : null) ??
+        null,
       discipline: fieldTextOrNull(formData, "discipline"),
       is_main_event: fieldBool(formData, "is_main_event"),
       is_visible: fieldBool(formData, "is_visible"),
@@ -75,12 +137,12 @@ export async function createFightAction(
   _prev: ActionResult | null,
   formData: FormData
 ): Promise<ActionResult> {
-  const admin = await getAdminClient();
+  const admin = await getAdminClient("fightcards.manage");
   if (!admin.ok) {
     return { ok: false, error: admin.error };
   }
 
-  const result = fightPayload(formData);
+  const result = await fightPayload(admin.supabase, formData);
   if ("error" in result) {
     return { ok: false, error: result.error ?? "Kampfdaten sind unvollständig." };
   }
@@ -99,12 +161,12 @@ export async function updateFightAction(
   _prev: ActionResult | null,
   formData: FormData
 ): Promise<ActionResult> {
-  const admin = await getAdminClient();
+  const admin = await getAdminClient("fightcards.manage");
   if (!admin.ok) {
     return { ok: false, error: admin.error };
   }
 
-  const result = fightPayload(formData);
+  const result = await fightPayload(admin.supabase, formData);
   if ("error" in result) {
     return { ok: false, error: result.error ?? "Kampfdaten sind unvollständig." };
   }
@@ -119,7 +181,7 @@ export async function updateFightAction(
 }
 
 export async function toggleFightVisibilityAction(id: number, isVisible: boolean): Promise<ActionResult> {
-  const admin = await getAdminClient();
+  const admin = await getAdminClient("fightcards.manage");
   if (!admin.ok) {
     return { ok: false, error: admin.error };
   }
@@ -134,7 +196,7 @@ export async function toggleFightVisibilityAction(id: number, isVisible: boolean
 }
 
 export async function moveFightAction(id: number, direction: "up" | "down"): Promise<ActionResult> {
-  const admin = await getAdminClient();
+  const admin = await getAdminClient("fightcards.manage");
   if (!admin.ok) {
     return { ok: false, error: admin.error };
   }
@@ -196,7 +258,7 @@ export async function moveFightAction(id: number, direction: "up" | "down"): Pro
 
 /** Persistiert die per Drag & Drop festgelegte Reihenfolge einer Event-Fightcard. */
 export async function reorderFightsAction(eventId: number, orderedIds: number[]): Promise<ActionResult> {
-  const admin = await getAdminClient();
+  const admin = await getAdminClient("fightcards.manage");
   if (!admin.ok) {
     return { ok: false, error: admin.error };
   }
@@ -223,7 +285,7 @@ export async function reorderFightsAction(eventId: number, orderedIds: number[])
 
 /** Schaltet alle Kämpfe eines Events öffentlich sichtbar. */
 export async function publishFightcardAction(eventId: number): Promise<ActionResult> {
-  const admin = await getAdminClient();
+  const admin = await getAdminClient("fightcards.manage");
   if (!admin.ok) {
     return { ok: false, error: admin.error };
   }
@@ -242,7 +304,7 @@ export async function publishFightcardAction(eventId: number): Promise<ActionRes
 }
 
 export async function deleteFightAction(id: number): Promise<ActionResult> {
-  const admin = await getAdminClient();
+  const admin = await getAdminClient("fightcards.manage");
   if (!admin.ok) {
     return { ok: false, error: admin.error };
   }

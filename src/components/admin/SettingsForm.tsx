@@ -1,22 +1,31 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { useActionState, useMemo, useState } from "react";
 import {
+  ArrowLeft,
+  Bell,
   CalendarDays,
   CheckCircle2,
   Crown,
+  Database,
   Diamond,
+  Globe2,
   GripVertical,
   ImageIcon,
+  KeyRound,
   List,
+  Mail,
   Newspaper,
+  Palette,
+  Plug,
   Plus,
   RotateCcw,
   Save,
   Settings,
   ShieldCheck,
-  SlidersHorizontal,
+  UserRound,
   X
 } from "lucide-react";
 import type { ActionResult } from "@/lib/admin/action-helpers";
@@ -74,10 +83,10 @@ type SettingsCardProps = {
 const defaultNavigationItems: NavigationItem[] = [
   { label: "Startseite", path: "/", isVisible: true, order: 1 },
   { label: "Champions", path: "/champions", isVisible: true, order: 2 },
-  { label: "Veranstaltungen", path: "/events", isVisible: true, order: 3 },
-  { label: "News", path: "/news", isVisible: true, order: 4 },
-  { label: "Sponsoren", path: "/sponsors", isVisible: true, order: 5 },
-  { label: "Über uns", path: "/about", isVisible: true, order: 6 },
+  { label: "Veranstaltungen", path: "/veranstaltungen", isVisible: true, order: 3 },
+  { label: "Neuigkeiten", path: "/neuigkeiten", isVisible: true, order: 4 },
+  { label: "Sponsoren", path: "/sponsoren", isVisible: true, order: 5 },
+  { label: "Über uns", path: "/ueber-uns", isVisible: true, order: 6 },
   { label: "Kontakt", path: "/kontakt", isVisible: true, order: 7 }
 ];
 
@@ -102,9 +111,9 @@ const defaultValues: Record<string, string> = {
   "homepage.hero.subtitle": "Respekt steigt in den Ring. Gemeinsam gegen Mobbing.",
   "homepage.hero.backgroundImageUrl": "/images/backgrounds/atmosphere-fighters-faceoff-wide.png",
   "homepage.cta.primaryLabel": "Tickets sichern",
-  "homepage.cta.primaryUrl": "https://smashtime.at/tickets",
+  "homepage.cta.primaryUrl": "/tickets",
   "homepage.cta.secondaryLabel": "Fightcard ansehen",
-  "homepage.cta.secondaryUrl": "https://smashtime.at/fightcard",
+  "homepage.cta.secondaryUrl": "/fight-night#fightcard",
   "homepage.modules.champions.enabled": "true",
   "homepage.modules.champions.title": "Unsere Champions",
   "homepage.modules.champions.description": "Lerne die Athleten kennen, die bereit sind, alles zu geben.",
@@ -116,23 +125,22 @@ const defaultValues: Record<string, string> = {
   "homepage.modules.news.description": "Bleib auf dem Laufenden mit den neuesten Updates.",
   "homepage.modules.news.displayLimit": "3",
   "homepage.modules.news.buttonLabel": "Alle News ansehen",
-  "homepage.modules.news.buttonUrl": "/news",
+  "homepage.modules.news.buttonUrl": "/neuigkeiten",
   "homepage.modules.sponsors.enabled": "true",
   "homepage.modules.sponsors.title": "Unsere Partner",
   "homepage.modules.sponsors.description": "Gemeinsam stark - mit unseren Partnern an der Spitze.",
   "homepage.modules.sponsors.displayLimit": "8",
   "homepage.modules.sponsors.buttonLabel": "Alle Partner ansehen",
-  "homepage.modules.sponsors.buttonUrl": "/sponsors"
+  "homepage.modules.sponsors.buttonUrl": "/sponsoren"
 };
 
 const tabs = [
-  { label: "Alle Einstellungen", value: "all" },
   { label: "Allgemein", value: "general" },
-  { label: "Homepage", value: "homepage" },
-  { label: "Inhalte", value: "content" },
-  { label: "Kontakt & Social", value: "contact" },
-  { label: "Rechtliches", value: "legal" },
-  { label: "Tracking & SEO", value: "tracking" }
+  { label: "Design & Branding", value: "branding" },
+  { label: "Konto & Sicherheit", value: "security" },
+  { label: "Benachrichtigungen & E-Mail", value: "notifications" },
+  { label: "Integrationen & API", value: "integrations" },
+  { label: "System & Backups", value: "system" }
 ];
 
 function parseNavigationItems(value: string | undefined): NavigationItem[] {
@@ -514,7 +522,7 @@ export function SettingsForm({ action, values, eventOptions }: SettingsFormProps
   );
 
   const [state, formAction] = useActionState(action, null);
-  const [activeTab, setActiveTab] = useState("all");
+  const [activeTab, setActiveTab] = useState("general");
   const [settings, setSettings] = useState(initialSettings);
   const [navigationItems, setNavigationItems] = useState(initialNavigationItems);
   const [isDirty, setIsDirty] = useState(false);
@@ -542,11 +550,13 @@ export function SettingsForm({ action, values, eventOptions }: SettingsFormProps
 
   const shouldShow = (category: string) => activeTab === "all" || activeTab === category;
   const countdownParts = countdownDateParts(settings["countdown.countdownEndAt"]);
+  const pageTitle = tabs.find((tab) => tab.value === activeTab)?.label ?? "Einstellungen";
+  const savedFields = SETTING_FIELDS.filter((field) => Boolean(settings[field.key])).length;
+  const completionPercent = Math.round((savedFields / SETTING_FIELDS.length) * 100);
 
   return (
     <form
       className="settings-dashboard"
-      encType="multipart/form-data"
       action={formAction}
       onSubmit={() => {
         setIsDirty(false);
@@ -555,10 +565,22 @@ export function SettingsForm({ action, values, eventOptions }: SettingsFormProps
     >
       <HiddenSettingsFields settings={settings} navigationItems={navigationItems} />
 
-      <header className="settings-page-header">
+      <header className="settings-page-header settings-page-header--admin">
         <div>
-          <h1>Einstellungen</h1>
-          <p>Verwalte alle Inhalte und Einstellungen deiner öffentlichen SmashTime-Website.</p>
+          <span className="settings-breadcrumb">Einstellungen / {pageTitle}</span>
+          <h1>{pageTitle === "Allgemein" ? "Allgemeine Einstellungen" : pageTitle}</h1>
+          <p>Verwalte System, Website, Sicherheit und Benachrichtigungen zentral an einem Ort.</p>
+        </div>
+        <div className="settings-page-actions">
+          <Link className="adm-btn" href="/admin">
+            <ArrowLeft aria-hidden="true" size={16} /> Zurück zur Übersicht
+          </Link>
+          <button type="button" className="adm-btn" onClick={resetSettings}>
+            <RotateCcw aria-hidden="true" size={16} /> Änderungen verwerfen
+          </button>
+          <button type="submit" className="adm-btn adm-btn--primary">
+            <Save aria-hidden="true" size={16} /> Speichern
+          </button>
         </div>
       </header>
 
@@ -575,6 +597,13 @@ export function SettingsForm({ action, values, eventOptions }: SettingsFormProps
         ))}
       </nav>
 
+      {state && !state.ok ? (
+        <p className="admin-form__message admin-form__message--error" role="alert">
+          {state.error}
+        </p>
+      ) : null}
+
+      <div className="settings-admin-layout">
       <div className="settings-grid">
         {shouldShow("general") ? (
           <SettingsCard title="Allgemein" icon={Settings} span="span-3" category="general">
@@ -607,8 +636,8 @@ export function SettingsForm({ action, values, eventOptions }: SettingsFormProps
           </SettingsCard>
         ) : null}
 
-        {shouldShow("general") ? (
-          <SettingsCard title="Branding & Logo" icon={SlidersHorizontal} span="span-3" category="general">
+        {shouldShow("branding") ? (
+          <SettingsCard title="Logos & Medien" icon={Palette} span="span-3" category="branding">
             <ImageUploadField
               label="Logo (Header)"
               src={settings["branding.headerLogoUrl"]}
@@ -647,14 +676,14 @@ export function SettingsForm({ action, values, eventOptions }: SettingsFormProps
           </SettingsCard>
         ) : null}
 
-        {shouldShow("content") ? (
-          <SettingsCard title="Navigation" icon={List} span="span-3" category="content">
+        {shouldShow("general") ? (
+          <SettingsCard title="Navigation" icon={List} span="span-3" category="general">
             <NavigationBuilder items={navigationItems} setItems={updateNavigationItems} />
           </SettingsCard>
         ) : null}
 
-        {shouldShow("content") ? (
-          <SettingsCard title="Nächste Veranstaltung & Countdown" icon={CalendarDays} span="span-3" category="content">
+        {shouldShow("general") ? (
+          <SettingsCard title="Event-Standardwerte & Countdown" icon={CalendarDays} span="span-3" category="general">
             <FormField label="Veranstaltung">
               <SelectInput
                 value={settings["countdown.featuredEventId"]}
@@ -703,8 +732,8 @@ export function SettingsForm({ action, values, eventOptions }: SettingsFormProps
           </SettingsCard>
         ) : null}
 
-        {shouldShow("homepage") ? (
-          <SettingsCard title="Startseite / Hero" icon={ImageIcon} span="span-3" category="homepage">
+        {shouldShow("branding") ? (
+          <SettingsCard title="Startseite / Hero" icon={ImageIcon} span="span-3" category="branding">
             <FormField label="Titel (H1)">
               <TextInput value={settings["homepage.hero.title"]} onChange={(value) => setValue("homepage.hero.title", value)} />
             </FormField>
@@ -722,8 +751,8 @@ export function SettingsForm({ action, values, eventOptions }: SettingsFormProps
           </SettingsCard>
         ) : null}
 
-        {shouldShow("homepage") ? (
-          <SettingsCard title="CTA-Bereich (Hero)" icon={Diamond} span="span-2" category="homepage">
+        {shouldShow("general") ? (
+          <SettingsCard title="CTA-Bereich (Hero)" icon={Diamond} span="span-2" category="general">
             <FormField label="Haupt-CTA Text">
               <TextInput value={settings["homepage.cta.primaryLabel"]} onChange={(value) => setValue("homepage.cta.primaryLabel", value)} />
             </FormField>
@@ -745,7 +774,7 @@ export function SettingsForm({ action, values, eventOptions }: SettingsFormProps
           </SettingsCard>
         ) : null}
 
-        {shouldShow("homepage") ? (
+        {shouldShow("general") ? (
           <HomepageModuleCard
             moduleKey="champions"
             title="Champions-Homepage-Modul"
@@ -758,7 +787,7 @@ export function SettingsForm({ action, values, eventOptions }: SettingsFormProps
           />
         ) : null}
 
-        {shouldShow("homepage") ? (
+        {shouldShow("general") ? (
           <HomepageModuleCard
             moduleKey="news"
             title="News-Homepage-Modul"
@@ -771,7 +800,7 @@ export function SettingsForm({ action, values, eventOptions }: SettingsFormProps
           />
         ) : null}
 
-        {shouldShow("homepage") ? (
+        {shouldShow("general") ? (
           <HomepageModuleCard
             moduleKey="sponsors"
             title="Sponsorenbereich"
@@ -783,27 +812,127 @@ export function SettingsForm({ action, values, eventOptions }: SettingsFormProps
             countOptions={["4", "6", "8", "10", "12"]}
           />
         ) : null}
+
+        {shouldShow("security") ? (
+          <SettingsCard title="Konto & Sicherheit" icon={KeyRound} span="span-3" category="security">
+            <div className="settings-security-grid">
+              <div className="settings-status-tile">
+                <ShieldCheck aria-hidden="true" size={20} />
+                <strong>Rollenmodell aktiv</strong>
+                <small>Admin, Mitarbeiter und Kämpfer werden über DB-Profile und RLS getrennt.</small>
+              </div>
+              <div className="settings-status-tile">
+                <CheckCircle2 aria-hidden="true" size={20} />
+                <strong>Keine Metadata-Rechte</strong>
+                <small>Berechtigungen liegen in `staff_permissions`, nicht in User-Metadaten.</small>
+              </div>
+              <div className="settings-status-tile">
+                <UserRound aria-hidden="true" size={20} />
+                <strong>Profil-Freigabe</strong>
+                <small>Neue Registrierungen starten als Pending-Profil.</small>
+              </div>
+            </div>
+            <Link className="adm-btn" href="/admin/members/roles">
+              Rechteverwaltung öffnen
+            </Link>
+          </SettingsCard>
+        ) : null}
+
+        {shouldShow("notifications") ? (
+          <SettingsCard title="Absender & Kontakt" icon={Mail} span="span-3" category="notifications">
+            <FormField label="Kontakt-E-Mail">
+              <TextInput value={settings["contact_email"]} onChange={(value) => setValue("contact_email", value)} />
+            </FormField>
+            <FormField label="Ticketlink">
+              <TextInput value={settings["ticket_url"]} onChange={(value) => setValue("ticket_url", value)} />
+            </FormField>
+            <div className="settings-security-grid">
+              <div className="settings-status-tile">
+                <Bell aria-hidden="true" size={20} />
+                <strong>Kontaktanfragen</strong>
+                <small>Neue Anfragen werden im Adminbereich über Kontaktanfragen verwaltet.</small>
+              </div>
+              <div className="settings-status-tile">
+                <Mail aria-hidden="true" size={20} />
+                <strong>E-Mail-Versand</strong>
+                <small>Einladungen nutzen den Supabase Auth Magic-Link-Flow.</small>
+              </div>
+            </div>
+          </SettingsCard>
+        ) : null}
+
+        {shouldShow("integrations") ? (
+          <SettingsCard title="Social Links & Integrationen" icon={Plug} span="span-3" category="integrations">
+            <FormField label="Instagram">
+              <TextInput value={settings["instagram_url"]} onChange={(value) => setValue("instagram_url", value)} />
+            </FormField>
+            <FormField label="Facebook">
+              <TextInput value={settings["facebook_url"]} onChange={(value) => setValue("facebook_url", value)} />
+            </FormField>
+            <FormField label="YouTube">
+              <TextInput value={settings["youtube_url"]} onChange={(value) => setValue("youtube_url", value)} />
+            </FormField>
+            <FormField label="TikTok">
+              <TextInput value={settings["tiktok_url"]} onChange={(value) => setValue("tiktok_url", value)} />
+            </FormField>
+          </SettingsCard>
+        ) : null}
+
+        {shouldShow("system") ? (
+          <SettingsCard title="System & Backups" icon={Database} span="span-3" category="system">
+            <FormField label="Startseiten-CTA Titel">
+              <TextInput value={settings["home_cta_title"]} onChange={(value) => setValue("home_cta_title", value)} />
+            </FormField>
+            <FormField label="Footer-Claim">
+              <TextInput value={settings["footer_claim"]} onChange={(value) => setValue("footer_claim", value)} />
+            </FormField>
+            <div className="settings-security-grid">
+              <div className="settings-status-tile">
+                <Database aria-hidden="true" size={20} />
+                <strong>Supabase RLS</strong>
+                <small>Schreibzugriffe laufen sessiongebunden über Server-Actions.</small>
+              </div>
+              <div className="settings-status-tile">
+                <Globe2 aria-hidden="true" size={20} />
+                <strong>Öffentliche Routen</strong>
+                <small>Navigation und CTA-Links werden über gespeicherte Settings gepflegt.</small>
+              </div>
+            </div>
+          </SettingsCard>
+        ) : null}
       </div>
 
-      <footer className="settings-save-bar">
-        <div className="settings-save-bar__status">
-          <CheckCircle2 aria-hidden="true" size={26} />
-          <span>
-            <strong>{isDirty ? "Nicht gespeicherte Änderungen vorhanden." : "Alle Änderungen werden automatisch gespeichert."}</strong>
-            <small>{state && !state.ok ? state.error : `Letzte Speicherung: ${lastSavedAt}`}</small>
-          </span>
-        </div>
-        <div className="settings-save-bar__actions">
-          <button type="button" className="settings-secondary-button" onClick={resetSettings}>
-            <RotateCcw aria-hidden="true" size={16} />
-            Änderungen verwerfen
-          </button>
-          <button type="submit" className="settings-primary-button">
-            <Save aria-hidden="true" size={16} />
-            Alle Einstellungen speichern
-          </button>
-        </div>
-      </footer>
+      <aside className="settings-side-stack" aria-label="Einstellungen Status">
+        <section className="settings-side-card">
+          <h2>Zusammenfassung</h2>
+          <div className="settings-summary-row">
+            <CheckCircle2 aria-hidden="true" size={26} />
+            <span>
+              <strong>{savedFields} / {SETTING_FIELDS.length}</strong>
+              <small>Gespeicherte Felder</small>
+            </span>
+            <em>{completionPercent}%</em>
+          </div>
+          <div className="settings-summary-row">
+            <Bell aria-hidden="true" size={26} />
+            <span>
+              <strong>{isDirty ? "Geändert" : "Aktuell"}</strong>
+              <small>{isDirty ? "Speichern erforderlich" : `Letzte Speicherung: ${lastSavedAt}`}</small>
+            </span>
+          </div>
+        </section>
+
+        <section className="settings-side-card">
+          <h2>Hinweise</h2>
+          <ul className="settings-hints">
+            <li>Änderungen werden erst nach dem Speichern öffentlich wirksam.</li>
+            <li>Bilder werden in die geschützte Admin-Medienlogik hochgeladen.</li>
+            <li>Rechte werden im Benutzerbereich verwaltet.</li>
+          </ul>
+        </section>
+      </aside>
+      </div>
+
     </form>
   );
 }

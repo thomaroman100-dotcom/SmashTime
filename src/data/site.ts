@@ -37,7 +37,7 @@ export const site = {
   },
   loginLink: {
     label: "Login",
-    href: "/admin/login"
+    href: "/login"
   },
   footerNavigation: [
     { label: "Veranstaltungen", href: "/veranstaltungen" },
@@ -90,7 +90,7 @@ export const site = {
     { label: "TikTok", href: "#" }
   ],
   contact: {
-    email: "kontakt@smashtime.at (Platzhalter)",
+    email: "Kontakt-E-Mail wird ergänzt",
     instagram: "Instagram wird ergänzt"
   }
 };

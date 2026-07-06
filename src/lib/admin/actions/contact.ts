@@ -33,7 +33,7 @@ export async function setContactStatusAction(id: number, status: ContactStatus):
     return { ok: false, error: "Ungültiger Status." };
   }
 
-  const admin = await getAdminClient();
+  const admin = await getAdminClient("contact.manage");
   if (!admin.ok) {
     return { ok: false, error: admin.error };
   }
@@ -52,7 +52,7 @@ export async function saveContactNotesAction(
   _prev: ActionResult | null,
   formData: FormData
 ): Promise<ActionResult> {
-  const admin = await getAdminClient();
+  const admin = await getAdminClient("contact.manage");
   if (!admin.ok) {
     return { ok: false, error: admin.error };
   }
@@ -78,7 +78,7 @@ export async function saveContactNotesAction(
 }
 
 export async function deleteContactRequestAction(id: number): Promise<ActionResult> {
-  const admin = await getAdminClient();
+  const admin = await getAdminClient("contact.manage");
   if (!admin.ok) {
     return { ok: false, error: admin.error };
   }

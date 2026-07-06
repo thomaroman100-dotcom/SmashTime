@@ -14,7 +14,7 @@ type AdminLoginFormProps = {
 const statusMessages: Record<string, string> = {
   "missing-config": "Supabase ist noch nicht konfiguriert. Admin-Login ist gesperrt.",
   unauthenticated: "Bitte melde dich an, um den Adminbereich zu öffnen.",
-  forbidden: "Dein Konto ist nicht als aktiver Admin freigeschaltet."
+  forbidden: "Dein Konto ist nicht freigeschaltet oder hat keine Berechtigung für diesen Adminbereich."
 };
 
 export function AdminLoginForm({ status }: AdminLoginFormProps) {
@@ -43,7 +43,7 @@ export function AdminLoginForm({ status }: AdminLoginFormProps) {
     });
 
     if (error) {
-      setMessage("Login fehlgeschlagen. Prüfe E-Mail, Passwort und Admin-Freigabe.");
+      setMessage("Login fehlgeschlagen. Prüfe E-Mail, Passwort und deine Freigabe.");
       setLoading(false);
       return;
     }

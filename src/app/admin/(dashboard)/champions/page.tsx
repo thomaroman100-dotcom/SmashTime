@@ -54,7 +54,7 @@ export default async function AdminChampionsPage({ searchParams }: PageProps) {
     const { data, error } = await supabase
       .from("champions")
       .select(
-        "id, slug, name, age, weight, weight_class, record, origin, image_path, stance, bio, quote, title, sort_order, is_active, updated_at"
+        "id, slug, fighter_user_id, name, age, weight, weight_class, record, origin, image_path, stance, bio, quote, title, sort_order, is_active, updated_at"
       )
       .order("sort_order", { ascending: true })
       .order("name", { ascending: true });

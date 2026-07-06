@@ -5,6 +5,7 @@ import type { ActionResult } from "@/lib/admin/action-helpers";
 import type { FightRow } from "@/lib/admin/actions/fightcards";
 import { EVENT_DISCIPLINES, FIGHT_STATUSES, FIGHT_STATUS_LABELS } from "@/lib/admin/resource-shared";
 import { AdminFormMessage, AdminSubmitButton } from "@/components/admin/AdminFormControls";
+import { FighterProfilePicker, type FighterProfileOption } from "@/components/admin/FighterProfilePicker";
 
 export type FightFormEventOption = {
   id: number;
@@ -14,11 +15,12 @@ export type FightFormEventOption = {
 type FightFormProps = {
   action: (prev: ActionResult | null, formData: FormData) => Promise<ActionResult>;
   events: FightFormEventOption[];
+  fighterOptions: FighterProfileOption[];
   initial?: FightRow | null;
   defaultEventId?: number;
 };
 
-export function FightForm({ action, events, initial, defaultEventId }: FightFormProps) {
+export function FightForm({ action, events, fighterOptions, initial, defaultEventId }: FightFormProps) {
   const [state, formAction] = useActionState(action, null);
 
   return (
@@ -48,14 +50,28 @@ export function FightForm({ action, events, initial, defaultEventId }: FightForm
         </label>
       </div>
       <div className="admin-form__grid">
-        <label>
-          Rote Ecke
-          <input name="fighter_a" defaultValue={initial?.fighter_a ?? ""} placeholder="Leer lassen = wird bekanntgegeben" />
-        </label>
-        <label>
-          Blaue Ecke
-          <input name="fighter_b" defaultValue={initial?.fighter_b ?? ""} placeholder="Leer lassen = wird bekanntgegeben" />
-        </label>
+        <div>
+          <FighterProfilePicker
+            name="fighter_a_user_id"
+            label="Rote Ecke"
+            options={fighterOptions}
+            initialUserId={initial?.fighter_a_user_id}
+            legacyName={initial?.fighter_a}
+            legacyFieldName="fighter_a"
+            corner="red"
+          />
+        </div>
+        <div>
+          <FighterProfilePicker
+            name="fighter_b_user_id"
+            label="Blaue Ecke"
+            options={fighterOptions}
+            initialUserId={initial?.fighter_b_user_id}
+            legacyName={initial?.fighter_b}
+            legacyFieldName="fighter_b"
+            corner="blue"
+          />
+        </div>
       </div>
       <div className="admin-form__grid">
         <label>

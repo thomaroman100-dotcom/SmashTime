@@ -97,7 +97,8 @@ async function applyNewsImageUploads({
       assetType: "News",
       altText: `${payload.title} Beitragsbild`,
       usageNote: `News-Beitragsbild: ${payload.title}`,
-      isPublic: true
+      isPublic: true,
+      isChecked: true
     });
     if (!uploaded.ok) {
       return uploaded;
@@ -113,7 +114,8 @@ async function applyNewsImageUploads({
       assetType: "News",
       altText: `${payload.title} Hero-Bild`,
       usageNote: `News-Hero: ${payload.title}`,
-      isPublic: true
+      isPublic: true,
+      isChecked: true
     });
     if (!uploaded.ok) {
       return uploaded;
@@ -128,7 +130,7 @@ export async function createNewsAction(
   _prev: ActionResult | null,
   formData: FormData
 ): Promise<ActionResult> {
-  const admin = await getAdminClient();
+  const admin = await getAdminClient("news.manage");
   if (!admin.ok) {
     return { ok: false, error: admin.error };
   }
@@ -161,7 +163,7 @@ export async function updateNewsAction(
   _prev: ActionResult | null,
   formData: FormData
 ): Promise<ActionResult> {
-  const admin = await getAdminClient();
+  const admin = await getAdminClient("news.manage");
   if (!admin.ok) {
     return { ok: false, error: admin.error };
   }
@@ -200,7 +202,7 @@ export async function updateNewsAction(
 }
 
 export async function setNewsStatusAction(id: number, status: NewsStatus): Promise<ActionResult> {
-  const admin = await getAdminClient();
+  const admin = await getAdminClient("news.manage");
   if (!admin.ok) {
     return { ok: false, error: admin.error };
   }
@@ -225,7 +227,7 @@ export async function setNewsStatusAction(id: number, status: NewsStatus): Promi
 }
 
 export async function deleteNewsAction(id: number): Promise<ActionResult> {
-  const admin = await getAdminClient();
+  const admin = await getAdminClient("news.manage");
   if (!admin.ok) {
     return { ok: false, error: admin.error };
   }

@@ -34,7 +34,7 @@ export async function uploadMediaAction(
   _prev: ActionResult | null,
   formData: FormData
 ): Promise<ActionResult> {
-  const admin = await getAdminClient();
+  const admin = await getAdminClient("media.manage");
   if (!admin.ok) {
     return { ok: false, error: admin.error };
   }
@@ -81,7 +81,7 @@ export async function updateMediaAssetAction(
   _prev: ActionResult | null,
   formData: FormData
 ): Promise<ActionResult> {
-  const admin = await getAdminClient();
+  const admin = await getAdminClient("media.manage");
   if (!admin.ok) {
     return { ok: false, error: admin.error };
   }
@@ -111,7 +111,7 @@ export async function updateMediaAssetAction(
 }
 
 export async function deleteMediaAssetAction(id: number): Promise<ActionResult> {
-  const admin = await getAdminClient();
+  const admin = await getAdminClient("media.manage");
   if (!admin.ok) {
     return { ok: false, error: admin.error };
   }

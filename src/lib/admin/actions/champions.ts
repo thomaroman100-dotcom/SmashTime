@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import {
   type ActionResult,
+  type AdminClientResult,
   fieldBool,
   fieldInt,
   fieldText,
@@ -13,9 +14,12 @@ import {
   supabaseErrorMessage
 } from "@/lib/admin/action-helpers";
 
+type AdminSupabaseClient = Extract<AdminClientResult, { ok: true }>["supabase"];
+
 export type ChampionRow = {
   id: number;
   slug: string;
+  fighter_user_id: string | null;
   name: string;
   age: string | null;
   weight: string | null;
@@ -32,7 +36,51 @@ export type ChampionRow = {
   updated_at: string;
 };
 
-function championPayload(formData: FormData) {
+async function verifiedFighterName(supabase: AdminSupabaseClient, userId: string | null) {
+  if (!userId) {
+    return null;
+  }
+
+  const { data, error } = await supabase
+    .from("fighter_profiles")
+    .select("user_id, nickname, profiles!inner(display_name, profile_type, status)")
+    .eq("user_id", userId)
+    .eq("is_verified", true)
+    .maybeSingle();
+
+  if (error || !data) {
+    return { ok: false as const, error: "Ausgewählter Kämpfer ist nicht verifiziert oder nicht verfügbar." };
+  }
+
+  const row = data as unknown as {
+    user_id: string;
+    nickname: string | null;
+    profiles: { display_name: string | null; profile_type: string | null; status: string | null } | null;
+  };
+
+  if (row.profiles?.profile_type !== "fighter" || row.profiles.status !== "active") {
+    return { ok: false as const, error: "Ausgewählter Kämpfer ist nicht aktiv freigegeben." };
+  }
+
+  return {
+    ok: true as const,
+    userId: row.user_id,
+    name: row.nickname || row.profiles.display_name || "Champion"
+  };
+}
+
+async function championPayload(supabase: AdminSupabaseClient, formData: FormData, requireFighter: boolean) {
+  const fighterUserId = fieldTextOrNull(formData, "fighter_user_id");
+  const fighter = await verifiedFighterName(supabase, fighterUserId);
+
+  if (fighter && !fighter.ok) {
+    return { error: fighter.error } as const;
+  }
+
+  if (requireFighter && !fighter?.ok) {
+    return { error: "Bitte ein verifiziertes Kämpferprofil auswählen." } as const;
+  }
+
   const name = fieldText(formData, "name");
 
   if (!name) {
@@ -49,6 +97,7 @@ function championPayload(formData: FormData) {
   return {
     payload: {
       slug,
+      fighter_user_id: fighter?.ok ? fighter.userId : null,
       name,
       age: fieldTextOrNull(formData, "age"),
       weight: fieldTextOrNull(formData, "weight"),
@@ -76,12 +125,12 @@ export async function createChampionAction(
   _prev: ActionResult | null,
   formData: FormData
 ): Promise<ActionResult> {
-  const admin = await getAdminClient();
+  const admin = await getAdminClient("champions.manage");
   if (!admin.ok) {
     return { ok: false, error: admin.error };
   }
 
-  const result = championPayload(formData);
+  const result = await championPayload(admin.supabase, formData, true);
   if ("error" in result) {
     return { ok: false, error: result.error ?? "Champion-Daten sind unvollständig." };
   }
@@ -100,12 +149,12 @@ export async function updateChampionAction(
   _prev: ActionResult | null,
   formData: FormData
 ): Promise<ActionResult> {
-  const admin = await getAdminClient();
+  const admin = await getAdminClient("champions.manage");
   if (!admin.ok) {
     return { ok: false, error: admin.error };
   }
 
-  const result = championPayload(formData);
+  const result = await championPayload(admin.supabase, formData, false);
   if ("error" in result) {
     return { ok: false, error: result.error ?? "Champion-Daten sind unvollständig." };
   }
@@ -120,7 +169,7 @@ export async function updateChampionAction(
 }
 
 export async function setChampionActiveAction(id: number, isActive: boolean): Promise<ActionResult> {
-  const admin = await getAdminClient();
+  const admin = await getAdminClient("champions.manage");
   if (!admin.ok) {
     return { ok: false, error: admin.error };
   }
@@ -135,7 +184,7 @@ export async function setChampionActiveAction(id: number, isActive: boolean): Pr
 }
 
 export async function deleteChampionAction(id: number): Promise<ActionResult> {
-  const admin = await getAdminClient();
+  const admin = await getAdminClient("champions.manage");
   if (!admin.ok) {
     return { ok: false, error: admin.error };
   }
