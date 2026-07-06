@@ -116,6 +116,19 @@ Referenzbilder/Admin/Desktop/medien-bibliothek.png               -> /admin/media
 Referenzbilder/Admin/Desktop/medien-datei-hochladen-modal.png    -> Modal "Datei hochladen"
 Referenzbilder/Admin/Desktop/medien-kategorie-modal.png          -> Modal "Kategorie hinzufügen"
 Referenzbilder/Admin/Desktop/globale-zustaende.png               -> /admin/global-states (Modals, Toasts, Alerts)
+Referenzbilder/Admin/Desktop/benutzer-uebersicht.png             -> /admin/members (lokale Quelldatei fehlt aktuell, Chat-Screen als Referenz genutzt)
+Referenzbilder/Admin/Desktop/benutzer-rollen-berechtigungen.png  -> /admin/members/roles (lokale Quelldatei fehlt aktuell, Chat-Screen als Referenz genutzt)
+Referenzbilder/Admin/Desktop/benutzer-bearbeiten.png             -> /admin/members/[userId] (lokale Quelldatei fehlt aktuell, Chat-Screen als Referenz genutzt)
+Referenzbilder/Admin/Desktop/benutzer-hinzufuegen.png            -> /admin/members/new (lokale Quelldatei fehlt aktuell, Chat-Screen als Referenz genutzt)
+Referenzbilder/Admin/Desktop/benutzer-verifizierungen-freigaben.png -> /admin/members/verifications (lokale Quelldatei fehlt aktuell, Chat-Screen als Referenz genutzt)
+Referenzbilder/Admin/Desktop/benutzer-rolle-bearbeiten.png       -> /admin/members/roles/[role] (lokale Quelldatei fehlt aktuell, Chat-Screen als Referenz genutzt)
+Referenzbilder/Admin/Desktop/einstellungen-uebersicht.png        -> /admin/settings
+Referenzbilder/Admin/Desktop/einstellungen-allgemein.png         -> /admin/settings Bereich "Allgemein"
+Referenzbilder/Admin/Desktop/einstellungen-design-branding.png   -> /admin/settings Bereich "Design & Branding"
+Referenzbilder/Admin/Desktop/einstellungen-benachrichtigungen-email.png -> /admin/settings Bereich "Benachrichtigungen & E-Mail"
+Referenzbilder/Admin/Desktop/einstellungen-konto-sicherheit.png  -> /admin/settings Bereich "Konto & Sicherheit"
+Referenzbilder/Admin/Desktop/einstellungen-integrationen-api.png -> /admin/settings Bereich "Integrationen & API"
+Referenzbilder/Admin/Desktop/einstellungen-system-backups.png    -> /admin/settings Bereich "System & Backups"
 ```
 
 Beispiel-Daten in diesen Screens (Maximilian Kurz, Darius Johnson, MusclePharm, Kruger Sports, SmashTime 32-39, Wiener Stadthalle usw.) sind reine Platzhalter und werden nie als echte Inhalte uebernommen.

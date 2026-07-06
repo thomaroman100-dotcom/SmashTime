@@ -12,7 +12,7 @@ Vor jeder Aufgabe lesen:
 4. `REFERENCE_IMAGES.md` - Referenzbild-/Asset-Zuordnung; alte Screens sind sekundär.
 5. `SECURITY_NOTES.md` - Supabase-/Secret-Regeln.
 
-Alte Dateien wie `CODEX_PHASE...` oder `CODEX_NAVIGATION_REWORK...` sind Archiv. Wenn sie dem finalen Brief oder `AGENTS.md` widersprechen, gelten sie nicht.
+Alte Root-Archivdateien wie `CODEX_PHASE...`, `CODEX_NAVIGATION_REWORK...` und `01_...` wurden entfernt. Nicht neu anlegen; Git ist die Historie.
 
 ## Neuer Designkern
 
@@ -47,6 +47,7 @@ Neue Zielrouten nutzen englische URLs (`/events`, `/news`, `/about`, `/contact`,
 
 - Sichtbare UI deutsch.
 - Nur echte Champions: Tanyo Tanev, Mike Capellan Rodriguez, Liam Stancel, Denis Berisha.
+- Fighter-/Profilseiten nur aus bestaetigten Projekt- oder Championdaten ableiten, bis eigene Fighter-Daten vorliegen.
 - Referenznamen und Beispiel-Events nie als echte Daten uebernehmen.
 - Fightcards als HTML/React, nie als starres Bild.
 - Logo kanonisch: `public/images/logo/smashtime-logo.png`.

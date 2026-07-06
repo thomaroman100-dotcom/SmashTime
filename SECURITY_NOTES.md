@@ -26,12 +26,12 @@ Enthält im Klartext einen Supabase Management/Personal Access Token, den anon k
 - Risiko: liegt unverschlüsselt im Arbeitsverzeichnis (Cloud-Sync, andere lokale Tools, KI-Workflows könnten sie lesen).
 - **Empfohlene Maßnahme (Nutzer-Aktion):** Access Token, anon key, service_role key und DB-Passwort im Supabase-Dashboard rotieren, die Datei danach aus dem Projektordner entfernen bzw. in einen Passwort-Manager verschieben. Wurde dem Nutzer bereits im Chat mitgeteilt, Ausführung steht noch aus.
 
-### 2. `supabase-temp.js` (Projekt-Root, untracked)
+### 2. `supabase-temp.js` (Projekt-Root, bereinigt)
 
 Node-Skript, das `SUPABASE_URL`/`SUPABASE_SERVICE_ROLE_KEY` aus `process.env` liest und `auth.admin.listUsers()` aufruft.
 
-- Kein Secret hartcodiert, aber: nicht in `.gitignore` gelistet (anders als `.env*`), ein `git add -A` würde es versehentlich einchecken. Verursacht zudem den einzigen aktuellen Lint-Fehler (`@typescript-eslint/no-require-imports`).
-- **Empfohlene Maßnahme:** Skript entfernen (Zweck erfüllt) oder explizit in `.gitignore` aufnehmen, falls es weiter gebraucht wird.
+- Kein Secret war hartcodiert.
+- **Status 05. Juli 2026:** Datei aus dem Projekt-Root entfernt und zusätzlich in `.gitignore` abgesichert.
 
 ### 3. Repository-Sichtbarkeit
 

@@ -14,7 +14,7 @@ Status: erledigt / teilweise / offen
 - offen: Repository-Sichtbarkeit pruefen/auf privat stellen.
 - offen: Paketmanager klaeren (`npm` aktuell verbindlich, `pnpm-lock.yaml` liegt ebenfalls vor).
 - offen: Dependency-Versionen vor Launch pinnen.
-- offen: lose Root-Risiken bereinigen: `env supabase.txt`, `supabase-temp.js`.
+- teilweise: lose Root-Risiken bereinigt; alte Phase-/Codex-Archivdateien und `supabase-temp.js` entfernt, `env supabase.txt` bleibt als lokales Credential-Risiko offen.
 - offen: Logo-Asset konsolidieren; kanonischer Pfad ist `public/images/logo/smashtime-logo.png`.
 
 ## 1. Finales Public Frontend
@@ -66,6 +66,7 @@ Finale Zielstruktur:
 - erledigt: zentrale `src/data/*`-Struktur vorhanden.
 - erledigt: echte Champions sind definiert; keine zusaetzlichen echten Champions erfinden.
 - offen: Fighter, Champions und Rankings als saubere Datenmodelle trennen.
+- teilweise: Fighter-Profile werden aus bestaetigten Champion-/Projekt-Daten abgeleitet, bis ein eigenes Fighter-Datenmodell/Supabase-Daten vorliegen.
 - offen: Doppeltes Fightcard-Modell (`fights.ts` vs. `fightcards.ts`) konsolidieren.
 - offen: finale Event-/Ticketdaten nur verwenden, wenn offiziell; sonst ehrlich "wird bald bekanntgegeben".
 - offen: sichtbare UI auf Deutsch halten, auch bei englischen URLs.
