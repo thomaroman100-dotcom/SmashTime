@@ -13,7 +13,24 @@ const supabaseHost = (() => {
   }
 })();
 
+const securityHeaders = [
+  { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+  { key: "X-Content-Type-Options", value: "nosniff" },
+  { key: "X-DNS-Prefetch-Control", value: "on" },
+  { key: "X-Frame-Options", value: "DENY" },
+  {
+    key: "Permissions-Policy",
+    value: "camera=(), microphone=(), geolocation=(), payment=(), usb=(), fullscreen=(self)"
+  },
+  { key: "Strict-Transport-Security", value: "max-age=31536000; includeSubDomains" }
+];
+
+const publicAssetCacheHeaders = [
+  { key: "Cache-Control", value: "public, max-age=86400, stale-while-revalidate=604800" }
+];
+
 const nextConfig: NextConfig = {
+  poweredByHeader: false,
   images: {
     formats: ["image/avif", "image/webp"],
     localPatterns: [{ pathname: "/images/**" }],
@@ -26,6 +43,22 @@ const nextConfig: NextConfig = {
           }
         ]
       : []
+  },
+  async headers() {
+    return [
+      {
+        source: "/:path*",
+        headers: securityHeaders
+      },
+      {
+        source: "/images/:path*",
+        headers: publicAssetCacheHeaders
+      },
+      {
+        source: "/favicon.svg",
+        headers: publicAssetCacheHeaders
+      }
+    ];
   },
   async redirects() {
     return [

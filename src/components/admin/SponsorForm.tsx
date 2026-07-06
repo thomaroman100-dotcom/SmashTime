@@ -50,7 +50,7 @@ export function SponsorForm({ action, initial, heading, subheading }: SponsorFor
           <p>{subheading}</p>
         </div>
         <div className="adm-head__actions">
-          <Link className="adm-btn" href="/sponsoren" target="_blank">
+          <Link className="adm-btn" href="/sponsoren" target="_blank" rel="noopener noreferrer">
             <Eye aria-hidden="true" size={16} /> Vorschau
           </Link>
           <button className="adm-btn adm-btn--primary" type="submit" disabled={pending}>

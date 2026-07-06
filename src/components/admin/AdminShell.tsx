@@ -104,7 +104,6 @@ export function AdminShell({ user, children }: AdminShellProps) {
               width={166}
               height={31}
               priority
-              unoptimized
             />
             <small>Admin</small>
           </Link>

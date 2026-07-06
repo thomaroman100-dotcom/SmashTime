@@ -60,7 +60,12 @@ export function NewsForm({ action, initial, heading, subheading }: NewsFormProps
           <p>{subheading}</p>
         </div>
         <div className="adm-head__actions">
-          <Link className="adm-btn" href={initial ? `/neuigkeiten/${initial.slug}` : "/neuigkeiten"} target="_blank">
+          <Link
+            className="adm-btn"
+            href={initial ? `/neuigkeiten/${initial.slug}` : "/neuigkeiten"}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
             <Eye aria-hidden="true" size={16} /> Vorschau
           </Link>
           <button className="adm-btn" type="submit" disabled={pending} onClick={() => setStatus("draft")}>

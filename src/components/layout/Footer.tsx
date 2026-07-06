@@ -25,7 +25,7 @@ export function Footer({ siteContent = defaultSite }: FooterProps) {
       <div className="site-footer__inner">
         <div className="site-footer__brand-col">
           <Link href="/" className="site-footer__brand" aria-label="SmashTime Startseite">
-            <Image src={site.logo} alt="SmashTime" width={180} height={60} unoptimized />
+            <Image src={site.logo} alt="SmashTime" width={180} height={60} />
           </Link>
           <p className="site-footer__claim">{site.claim}</p>
           <p className="site-footer__description">{site.description}</p>

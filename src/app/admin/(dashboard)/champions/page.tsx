@@ -274,6 +274,7 @@ export default async function AdminChampionsPage({ searchParams }: PageProps) {
                     className="adm-icon-btn"
                     href="/champions"
                     target="_blank"
+                    rel="noopener noreferrer"
                     aria-label={`${champion.name} auf der Website ansehen`}
                   >
                     <Eye aria-hidden="true" size={15} />

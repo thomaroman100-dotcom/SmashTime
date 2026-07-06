@@ -280,6 +280,7 @@ export default async function AdminEventsPage({ searchParams }: PageProps) {
                       className="adm-icon-btn"
                       href="/veranstaltungen"
                       target="_blank"
+                      rel="noopener noreferrer"
                       aria-label={`${event.name} auf der Website ansehen`}
                     >
                       <Eye aria-hidden="true" size={15} />

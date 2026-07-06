@@ -6,6 +6,7 @@ import {
   type AdminClientResult,
   type ActionResult,
   fieldBool,
+  fieldHrefOrNull,
   fieldInt,
   fieldText,
   fieldTextOrNull,
@@ -39,7 +40,7 @@ function sponsorPayload(formData: FormData) {
     payload: {
       name,
       logo_path: fieldTextOrNull(formData, "logo_path"),
-      website_url: fieldTextOrNull(formData, "website_url"),
+      website_url: fieldHrefOrNull(formData, "website_url", { allowRelative: false }),
       package_name: fieldTextOrNull(formData, "package_name"),
       sort_order: fieldInt(formData, "sort_order", 0),
       is_active: fieldBool(formData, "is_active")

@@ -497,7 +497,12 @@ export function EventForm({ action, initial, gallery = [], heading, subheading }
                       <FileText aria-hidden="true" size={13} /> Event-Details
                     </span>
                     {ticketUrl ? (
-                      <a className="adm-btn adm-btn--primary adm-btn--sm" href={ticketUrl} target="_blank" rel="noreferrer">
+                      <a
+                        className="adm-btn adm-btn--primary adm-btn--sm"
+                        href={ticketUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
                         <ExternalLink aria-hidden="true" size={13} /> Tickets sichern
                       </a>
                     ) : (

@@ -93,7 +93,7 @@ export function Header({ siteContent = defaultSite, sessionProfile = null }: Hea
     <>
       <header className="site-header">
         <Link href="/" className="site-header__logo" aria-label="SmashTime Startseite">
-          <Image src={site.logo} alt="SmashTime" width={216} height={72} priority unoptimized />
+          <Image src={site.logo} alt="SmashTime" width={216} height={72} priority />
         </Link>
 
         <nav className="site-header__nav" aria-label="Hauptnavigation">

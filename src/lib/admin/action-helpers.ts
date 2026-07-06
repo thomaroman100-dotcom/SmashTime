@@ -1,5 +1,6 @@
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { type AdminAccessRequirement, getAdminSession } from "@/lib/admin/auth";
+import { normalizePublicHref } from "@/lib/public-url";
 
 export type ActionResult =
   | { ok: true; message: string }
@@ -60,6 +61,43 @@ export function fieldText(formData: FormData, name: string) {
 export function fieldTextOrNull(formData: FormData, name: string) {
   const value = fieldText(formData, name);
   return value.length > 0 ? value : null;
+}
+
+export function fieldHrefOrNull(
+  formData: FormData,
+  name: string,
+  options: { allowRelative?: boolean; allowContactProtocols?: boolean } = {}
+) {
+  const value = fieldText(formData, name);
+  if (!value) {
+    return null;
+  }
+
+  const allowRelative = options.allowRelative ?? true;
+  const allowContactProtocols = options.allowContactProtocols ?? false;
+  const hasScheme = /^[a-z][a-z0-9+.-]*:/i.test(value);
+
+  if (hasScheme && !/^(https?:|mailto:|tel:)/i.test(value)) {
+    return null;
+  }
+
+  if (!allowContactProtocols && /^(mailto:|tel:)/i.test(value)) {
+    return null;
+  }
+
+  const withProtocol =
+    !hasScheme && /^[a-z0-9.-]+\.[a-z]{2,}(?:[/?#].*)?$/i.test(value) ? `https://${value}` : value;
+  const normalized = normalizePublicHref(withProtocol);
+
+  if (normalized === "#" || normalized.startsWith("#")) {
+    return null;
+  }
+
+  if (!allowRelative && normalized.startsWith("/")) {
+    return null;
+  }
+
+  return normalized;
 }
 
 export function fieldInt(formData: FormData, name: string, fallback: number) {

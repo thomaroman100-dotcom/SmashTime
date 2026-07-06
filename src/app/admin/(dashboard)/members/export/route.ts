@@ -1,12 +1,10 @@
 import { NextResponse } from "next/server";
 import { getAdminSession } from "@/lib/admin/auth";
+import { csvCell, csvDownloadHeaders } from "@/lib/admin/csv";
 import { emptyMembersAdminData, loadMembersAdminData, memberStatusLabels, memberTypeLabels } from "@/lib/admin/members";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
-function csvCell(value: string | number | null | undefined) {
-  const text = String(value ?? "");
-  return `"${text.replace(/"/g, '""')}"`;
-}
+export const dynamic = "force-dynamic";
 
 export async function GET() {
   const session = await getAdminSession("users.manage");
@@ -52,9 +50,6 @@ export async function GET() {
 
   const csv = [header, ...rows].map((row) => row.map(csvCell).join(";")).join("\n");
   return new NextResponse(`\uFEFF${csv}`, {
-    headers: {
-      "content-type": "text/csv; charset=utf-8",
-      "content-disposition": `attachment; filename="smashtime-benutzer.csv"`
-    }
+    headers: csvDownloadHeaders("smashtime-benutzer.csv")
   });
 }

@@ -6,6 +6,7 @@ import {
   type AdminClientResult,
   type ActionResult,
   fieldBool,
+  fieldHrefOrNull,
   fieldText,
   fieldTextOrNull,
   formFile,
@@ -98,7 +99,7 @@ function eventPayload(formData: FormData) {
       disciplines,
       gastro: fieldTextOrNull(formData, "gastro"),
       image_path: fieldBool(formData, "clear_image_path") ? null : fieldTextOrNull(formData, "image_path"),
-      ticket_url: fieldTextOrNull(formData, "ticket_url"),
+      ticket_url: fieldHrefOrNull(formData, "ticket_url"),
       status: status as EventStatus
     }
   };

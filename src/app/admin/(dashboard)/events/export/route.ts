@@ -1,12 +1,8 @@
 import { NextResponse } from "next/server";
 import { getAdminClient } from "@/lib/admin/action-helpers";
+import { csvCell, csvDownloadHeaders } from "@/lib/admin/csv";
 
 export const dynamic = "force-dynamic";
-
-function csvCell(value: unknown): string {
-  const text = value == null ? "" : String(value);
-  return `"${text.replaceAll('"', '""')}"`;
-}
 
 export async function GET() {
   const admin = await getAdminClient("events.manage");
@@ -44,9 +40,6 @@ export async function GET() {
   const csv = [header.map(csvCell).join(";"), ...rows].join("\r\n");
 
   return new NextResponse(`﻿${csv}`, {
-    headers: {
-      "Content-Type": "text/csv; charset=utf-8",
-      "Content-Disposition": 'attachment; filename="smashtime-events.csv"'
-    }
+    headers: csvDownloadHeaders("smashtime-events.csv")
   });
 }

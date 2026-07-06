@@ -102,7 +102,7 @@ export function PublicAuthForm({ mode }: PublicAuthFormProps) {
   return (
     <section className="public-auth">
       <form className="public-auth__panel" onSubmit={submit}>
-        <Image src={site.logo} alt="SmashTime" width={210} height={70} priority unoptimized />
+        <Image src={site.logo} alt="SmashTime" width={210} height={70} priority />
         <div>
           <span className="public-auth__kicker">{isRegister ? "Mitglied werden" : "Profilzugang"}</span>
           <h1>{isRegister ? "Registrieren" : "Einloggen"}</h1>
