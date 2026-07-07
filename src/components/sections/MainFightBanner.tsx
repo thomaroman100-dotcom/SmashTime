@@ -3,6 +3,7 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import type { SmashEvent } from "@/data/events";
 import { formatFightCardLabel, isTeamFight, type FightCardEntry } from "@/data/fightcards";
+import { getMemberImageSrc } from "@/lib/media-placeholders";
 
 type MainFightBannerProps = {
   event: SmashEvent;
@@ -26,11 +27,7 @@ type BannerPortraitProps = {
 function BannerPortrait({ name, image, side }: BannerPortraitProps) {
   return (
     <div className={`main-fight__portrait main-fight__portrait--${side}`}>
-      {image ? (
-        <Image src={image} alt={`${name} Fightcard-Portrait`} fill sizes="(max-width: 900px) 0px, 260px" />
-      ) : (
-        <span aria-hidden="true">{name.slice(0, 2).toUpperCase()}</span>
-      )}
+      <Image src={getMemberImageSrc(image)} alt={`${name} Fightcard-Portrait`} fill sizes="(max-width: 900px) 0px, 260px" />
     </div>
   );
 }

@@ -9,6 +9,7 @@ import { NEWS_CATEGORIES } from "@/lib/admin/resource-shared";
 import { slugify } from "@/lib/slug";
 import { useAdminUi } from "@/components/admin/ui/AdminUiProvider";
 import { AdminImagePreview } from "@/components/admin/ui/AdminImagePreview";
+import { AdminImageUploadField } from "@/components/admin/ui/AdminImageUploadField";
 import { Badge } from "@/components/admin/ui/primitives";
 
 type NewsFormProps = {
@@ -214,35 +215,34 @@ export function NewsForm({ action, initial, heading, subheading }: NewsFormProps
               </div>
             </div>
             <div className="adm-panel__body">
-              <div className="adm-field">
-                <label htmlFor="news-image">Bildpfad (Karte)</label>
-                <input
-                  id="news-image"
-                  name="image_path"
-                  value={imagePath}
-                  onChange={(event) => setImagePath(event.target.value)}
-                  placeholder="/images/news/… oder Medien-URL"
-                />
-              </div>
-              <div className="adm-field">
-                <label htmlFor="news-image-file">Beitragsbild hochladen</label>
-                <input id="news-image-file" name="news_image_file" type="file" accept="image/png,image/jpeg,image/webp,image/avif,image/svg+xml" />
-                <span className="adm-field__hint">Max. 6 MB. Ersetzt den Bildpfad beim Speichern.</span>
-              </div>
-              <div className="adm-field">
-                <label htmlFor="news-hero">Hero-Bildpfad</label>
-                <input
-                  id="news-hero"
-                  name="hero_image_path"
-                  value={heroImagePath}
-                  onChange={(event) => setHeroImagePath(event.target.value)}
-                  placeholder="optional"
-                />
-              </div>
-              <div className="adm-field">
-                <label htmlFor="news-hero-file">Hero-Bild hochladen</label>
-                <input id="news-hero-file" name="news_hero_image_file" type="file" accept="image/png,image/jpeg,image/webp,image/avif,image/svg+xml" />
-              </div>
+              <AdminImageUploadField
+                id="news-image"
+                label="Beitragsbild"
+                pathName="image_path"
+                fileName="news_image_file"
+                clearName="clear_image_path"
+                value={imagePath}
+                onValueChange={setImagePath}
+                pathLabel="Bildpfad (Karte)"
+                fileLabel="Beitragsbild hochladen"
+                fallback="Beitragsbild fehlt"
+                previewAlt={`${title || "Neuigkeit"} Beitragsbild`}
+                uploadHint="Max. 6 MB. Ein Upload ersetzt das gespeicherte Beitragsbild beim Speichern."
+              />
+              <AdminImageUploadField
+                id="news-hero"
+                label="Hero-Bild"
+                pathName="hero_image_path"
+                fileName="news_hero_image_file"
+                clearName="clear_hero_image_path"
+                value={heroImagePath}
+                onValueChange={setHeroImagePath}
+                pathLabel="Hero-Bildpfad"
+                fileLabel="Hero-Bild hochladen"
+                fallback="Hero-Bild fehlt"
+                previewAlt={`${title || "Neuigkeit"} Hero-Bild`}
+                uploadHint="Max. 6 MB. Ein Upload ersetzt das gespeicherte Hero-Bild beim Speichern."
+              />
             </div>
           </section>
 

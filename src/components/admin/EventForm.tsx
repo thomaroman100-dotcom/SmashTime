@@ -20,6 +20,7 @@ import type { EventGalleryRow, EventRow, EventStatus } from "@/lib/admin/actions
 import { EVENT_DISCIPLINES } from "@/lib/admin/resource-shared";
 import { useAdminUi } from "@/components/admin/ui/AdminUiProvider";
 import { AdminImagePreview } from "@/components/admin/ui/AdminImagePreview";
+import { AdminImageUploadField, AdminMultiImageUploadField } from "@/components/admin/ui/AdminImageUploadField";
 import { Badge, type BadgeTone } from "@/components/admin/ui/primitives";
 
 type EventFormProps = {
@@ -365,28 +366,22 @@ export function EventForm({ action, initial, gallery = [], heading, subheading }
             </div>
             <div className="adm-fsection__body">
               <div className="adm-grid-2" style={{ alignItems: "start" }}>
-                <div className="adm-field">
-                  <label htmlFor="event-image">Event-Bild / Poster</label>
-                  <input
-                    id="event-image"
-                    name="image_path"
-                    value={imagePath}
-                    onChange={(event) => setImagePath(event.target.value)}
-                    placeholder="/images/events/… oder Medien-URL"
-                  />
-                  <span className="adm-field__hint">JPG, PNG oder WebP. Empfohlen für den Hero: 4:5 (z. B. 1200×1500 px).</span>
-                </div>
-                <div className="adm-field">
-                  <label htmlFor="event-image-file">Neues Poster hochladen</label>
-                  <input id="event-image-file" name="event_image_file" type="file" accept="image/png,image/jpeg,image/webp,image/avif,image/svg+xml" />
-                  <span className="adm-field__hint">Max. 6 MB. Ein Upload ersetzt den gespeicherten Poster-Pfad beim Speichern.</span>
-                  {imagePath ? (
-                    <label className="adm-checkbox-line">
-                      <input type="checkbox" name="clear_image_path" onChange={(event) => event.target.checked && setImagePath("")} />
-                      Poster beim Speichern entfernen
-                    </label>
-                  ) : null}
-                </div>
+                <AdminImageUploadField
+                  id="event-image"
+                  label="Event-Bild / Poster"
+                  pathName="image_path"
+                  fileName="event_image_file"
+                  clearName="clear_image_path"
+                  value={imagePath}
+                  onValueChange={setImagePath}
+                  hint="Empfohlen für den Hero: 4:5 (z. B. 1200x1500 px)."
+                  uploadHint="Max. 6 MB. Ein Upload ersetzt das gespeicherte Poster beim Speichern."
+                  fallback="Poster wird hier angezeigt"
+                  previewAlt="Event-Poster Vorschau"
+                  aspectRatio="4 / 5"
+                  sizes="360px"
+                  previewClassName="adm-image-preview--field"
+                />
                 <label className="adm-checkbox-line adm-checkbox-line--hero">
                   <input
                     type="checkbox"
@@ -399,14 +394,6 @@ export function EventForm({ action, initial, gallery = [], heading, subheading }
                     <small>Zeigt diesen Event-Flyer auf der Startseite. Wenn aktiviert, werden andere Hero-Events automatisch deaktiviert.</small>
                   </span>
                 </label>
-                <AdminImagePreview
-                  src={imagePath}
-                  alt="Event-Poster Vorschau"
-                  fallback="Poster wird hier angezeigt"
-                  aspectRatio="4 / 5"
-                  sizes="360px"
-                  className="adm-image-preview--field"
-                />
               </div>
             </div>
           </section>
@@ -417,17 +404,7 @@ export function EventForm({ action, initial, gallery = [], heading, subheading }
               <h2>Event-Galerie</h2>
             </div>
             <div className="adm-fsection__body">
-              <div className="adm-field">
-                <label htmlFor="event-gallery-files">Weitere Eventbilder hochladen</label>
-                <input
-                  id="event-gallery-files"
-                  name="gallery_files"
-                  type="file"
-                  multiple
-                  accept="image/png,image/jpeg,image/webp,image/avif,image/svg+xml"
-                />
-                <span className="adm-field__hint">Mehrere Bilder möglich, max. 6 MB pro Datei.</span>
-              </div>
+              <AdminMultiImageUploadField id="event-gallery-files" label="Weitere Eventbilder hochladen" fileName="gallery_files" />
 
               {gallery.length > 0 ? (
                 <div className="adm-gallery-admin" aria-label="Aktuelle Event-Galerie">

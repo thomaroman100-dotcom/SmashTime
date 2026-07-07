@@ -129,7 +129,7 @@ export default async function AdminMemberRoleDetailPage({ params }: PageProps) {
               {members.map((member) => (
                 <div className="adm-table__row" key={member.userId} style={{ gridTemplateColumns: "minmax(240px, 1fr) 150px minmax(180px, 1fr) 150px 120px" }}>
                   <div className="adm-user-cell">
-                    <InitialsAvatar name={member.displayName} size="sm" />
+                    <InitialsAvatar name={member.displayName} src={member.avatarUrl} size="sm" />
                     <span>
                       <strong>{member.displayName}</strong>
                       <small>{member.email ?? "Keine E-Mail"}</small>

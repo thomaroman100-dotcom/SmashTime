@@ -10,7 +10,8 @@ import {
   fieldTextOrNull,
   getAdminClient,
   supabaseErrorMessage,
-  uploadAdminMediaAsset
+  uploadAdminMediaAsset,
+  deleteAdminMediaAssetByPath
 } from "@/lib/admin/action-helpers";
 import { MEDIA_TYPES } from "@/lib/admin/resource-shared";
 
@@ -125,15 +126,19 @@ export async function deleteMediaAssetAction(id: number): Promise<ActionResult> 
   const asset = data as Pick<MediaAssetRow, "path" | "bucket"> | null;
 
   if (asset) {
-    const { error: storageError } = await admin.supabase.storage.from(asset.bucket).remove([asset.path]);
-    if (storageError) {
-      return { ok: false, error: `Datei konnte nicht gelöscht werden: ${storageError.message}` };
+    const deleted = await deleteAdminMediaAssetByPath({
+      supabase: admin.supabase,
+      bucket: asset.bucket,
+      path: asset.path
+    });
+    if (!deleted.ok) {
+      return deleted;
     }
-  }
-
-  const { error } = await admin.supabase.from("media_assets").delete().eq("id", id);
-  if (error) {
-    return { ok: false, error: supabaseErrorMessage(error) };
+  } else {
+    const { error } = await admin.supabase.from("media_assets").delete().eq("id", id);
+    if (error) {
+      return { ok: false, error: supabaseErrorMessage(error) };
+    }
   }
 
   revalidateMedia();

@@ -14,7 +14,9 @@ import {
   getAdminClient,
   slugify,
   supabaseErrorMessage,
-  uploadAdminMediaAsset
+  uploadAdminMediaAsset,
+  cleanupAdminMediaUrls,
+  cleanupReplacedAdminMedia
 } from "@/lib/admin/action-helpers";
 
 type AdminSupabaseClient = Extract<AdminClientResult, { ok: true }>["supabase"];
@@ -39,7 +41,7 @@ function sponsorPayload(formData: FormData) {
   return {
     payload: {
       name,
-      logo_path: fieldTextOrNull(formData, "logo_path"),
+      logo_path: fieldBool(formData, "clear_logo_path") ? null : fieldTextOrNull(formData, "logo_path"),
       website_url: fieldHrefOrNull(formData, "website_url", { allowRelative: false }),
       package_name: fieldTextOrNull(formData, "package_name"),
       sort_order: fieldInt(formData, "sort_order", 0),
@@ -132,6 +134,16 @@ export async function updateSponsorAction(
     return { ok: false, error: result.error ?? "Sponsorendaten sind unvollständig." };
   }
 
+  const { data: existingData, error: existingError } = await admin.supabase
+    .from("sponsors")
+    .select("logo_path")
+    .eq("id", id)
+    .maybeSingle();
+
+  if (existingError) {
+    return { ok: false, error: supabaseErrorMessage(existingError) };
+  }
+
   const uploadResult = await applySponsorLogoUpload({ supabase: admin.supabase, payload: result.payload, formData });
   if (!uploadResult.ok) {
     return { ok: false, error: uploadResult.error };
@@ -140,6 +152,15 @@ export async function updateSponsorAction(
   const { error } = await admin.supabase.from("sponsors").update(result.payload).eq("id", id);
   if (error) {
     return { ok: false, error: supabaseErrorMessage(error) };
+  }
+
+  const cleanup = await cleanupReplacedAdminMedia({
+    supabase: admin.supabase,
+    previousUrl: (existingData as { logo_path: string | null } | null)?.logo_path,
+    nextUrl: result.payload.logo_path
+  });
+  if (!cleanup.ok) {
+    return cleanup;
   }
 
   revalidateSponsors();
@@ -167,9 +188,27 @@ export async function deleteSponsorAction(id: number): Promise<ActionResult> {
     return { ok: false, error: admin.error };
   }
 
+  const { data: existingData, error: selectError } = await admin.supabase
+    .from("sponsors")
+    .select("logo_path")
+    .eq("id", id)
+    .maybeSingle();
+
+  if (selectError) {
+    return { ok: false, error: supabaseErrorMessage(selectError) };
+  }
+
   const { error } = await admin.supabase.from("sponsors").delete().eq("id", id);
   if (error) {
     return { ok: false, error: supabaseErrorMessage(error) };
+  }
+
+  const cleanup = await cleanupAdminMediaUrls({
+    supabase: admin.supabase,
+    publicUrls: [(existingData as { logo_path: string | null } | null)?.logo_path]
+  });
+  if (!cleanup.ok) {
+    return cleanup;
   }
 
   revalidateSponsors();

@@ -22,7 +22,6 @@ export const site = {
       label: "Mehr",
       href: "/events",
       children: [
-        { label: "Ranglisten", href: "/rankings" },
         { label: "Events", href: "/events" },
         { label: "Kämpfer", href: "/fighters" },
         { label: "Partner", href: "/partners" },
@@ -64,7 +63,6 @@ export const site = {
       links: [
         { label: "Tickets sichern", href: "/tickets" },
         { label: "Events", href: "/events" },
-        { label: "Ranglisten", href: "/rankings" },
         { label: "Kämpfer", href: "/fighters" },
         { label: "FAQ", href: "/faq" }
       ]

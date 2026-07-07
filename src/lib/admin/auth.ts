@@ -13,6 +13,7 @@ export type AdminUser = {
   userId: string;
   email: string;
   displayName: string;
+  avatarUrl: string | null;
   role: "admin" | "staff";
   profileType: "staff";
   status: "active";
@@ -49,6 +50,7 @@ type ProfileRow = {
   display_name: string | null;
   profile_type: string | null;
   status: string | null;
+  avatar_url?: string | null;
   created_at?: string | null;
 };
 
@@ -103,7 +105,7 @@ export async function getAdminSession(requirement: AdminAccessRequirement = "adm
         .maybeSingle(),
       supabase
         .from("profiles")
-        .select("display_name, profile_type, status")
+        .select("display_name, profile_type, status, avatar_url")
         .eq("user_id", user.id)
         .maybeSingle(),
       supabase
@@ -121,6 +123,7 @@ export async function getAdminSession(requirement: AdminAccessRequirement = "adm
       userId: user.id,
       email: user.email ?? "admin@smashtime.local",
       displayName: profile?.display_name ?? adminProfile.display_name ?? "Admin",
+      avatarUrl: profile?.avatar_url ?? null,
       role: "admin",
       profileType: "staff",
       status: "active",
@@ -137,6 +140,7 @@ export async function getAdminSession(requirement: AdminAccessRequirement = "adm
       userId: user.id,
       email: user.email ?? "mitglied@smashtime.local",
       displayName: profile.display_name ?? adminProfile?.display_name ?? "Mitarbeiter",
+      avatarUrl: profile.avatar_url ?? null,
       role: "staff",
       profileType: "staff",
       status: "active",
@@ -156,6 +160,7 @@ export async function getAdminSession(requirement: AdminAccessRequirement = "adm
     userId: user.id,
     email: user.email ?? "admin@smashtime.local",
     displayName: adminProfile.display_name ?? "Redaktion",
+    avatarUrl: profile?.avatar_url ?? null,
     role: adminProfile.role === "admin" ? "admin" : "staff",
     profileType: "staff",
     status: "active",

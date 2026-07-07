@@ -31,6 +31,7 @@ export function NewsletterForm() {
           name="email"
           autoComplete="email"
           placeholder={site.newsletter.placeholder}
+          suppressHydrationWarning
           value={email}
           onChange={(event) => {
             setEmail(event.target.value);

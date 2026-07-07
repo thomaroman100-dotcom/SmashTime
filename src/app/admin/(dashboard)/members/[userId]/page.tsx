@@ -104,7 +104,7 @@ export default async function AdminMemberEditPage({ params }: PageProps) {
         <aside className="adm-rail">
           <Panel icon={UserRound} title="Profilzusammenfassung">
             <div className="adm-profile-summary">
-              <InitialsAvatar name={member.displayName} online={member.status === "active"} />
+              <InitialsAvatar name={member.displayName} src={member.avatarUrl} online={member.status === "active"} />
               <div>
                 <strong>{member.displayName}</strong>
                 <span>{member.email ?? "Keine E-Mail hinterlegt"}</span>

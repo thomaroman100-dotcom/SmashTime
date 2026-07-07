@@ -29,7 +29,7 @@ import {
 } from "lucide-react";
 import type { ActionResult } from "@/lib/admin/action-helpers";
 import { SETTING_FIELDS } from "@/lib/admin/resource-shared";
-import { AdminImagePreview } from "@/components/admin/ui/AdminImagePreview";
+import { AdminImageUploadField } from "@/components/admin/ui/AdminImageUploadField";
 import { cn } from "@/lib/utils";
 
 type SettingsFormProps = {
@@ -107,8 +107,9 @@ const defaultValues: Record<string, string> = {
   "countdown.featuredEventId": "smashtime-3-respekt-steigt-in-den-ring",
   "countdown.countdownEndAt": "2026-10-17T18:00:00+02:00",
   "countdown.label": "Der Kampf beginnt in",
-  "homepage.hero.title": "SmashTime 3",
-  "homepage.hero.subtitle": "Respekt steigt in den Ring. Gemeinsam gegen Mobbing.",
+  "homepage.hero.title": "WO KAMPF\nCHARAKTER ZEIGT.",
+  "homepage.hero.subtitle":
+    "SmashTime ist die Bühne für Live-Kampfsport, starke Athleten und echte Emotionen.\nHier geht es nicht nur ums Gewinnen, sondern um Respekt, Haltung und Momente, die bleiben.",
   "homepage.hero.backgroundImageUrl": "/images/backgrounds/hero-smash-cage-arena-wide.png",
   "homepage.cta.primaryLabel": "Nächste Veranstaltung",
   "homepage.cta.primaryUrl": "/veranstaltungen/smashtime-3-respekt-steigt-in-den-ring",
@@ -263,56 +264,6 @@ function ColorTokenInput({
         <input value={value} onChange={(event) => onChange(event.target.value)} />
       </span>
     </FormField>
-  );
-}
-
-function ImageUploadField({
-  label,
-  src,
-  hint,
-  inputName,
-  compact = false,
-  onRemove,
-  onPreviewChange
-}: {
-  label: string;
-  src: string;
-  hint: string;
-  inputName: string;
-  compact?: boolean;
-  onRemove: () => void;
-  onPreviewChange: (src: string) => void;
-}) {
-  return (
-    <div className="settings-field">
-      <span>{label}</span>
-      <div className="settings-image-preview-wrap">
-        <AdminImagePreview
-          src={src}
-          alt={label}
-          fallback="Bild wird bald ergänzt"
-          aspectRatio={compact ? "1 / 1" : "16 / 9"}
-          sizes={compact ? "80px" : "360px"}
-          className={cn("settings-image-preview", compact && "settings-image-preview--compact")}
-        />
-        <button type="button" aria-label={`${label} entfernen`} onClick={onRemove}>
-          <X aria-hidden="true" size={14} />
-        </button>
-      </div>
-      <small>{hint}</small>
-      <input
-        className="settings-file-input"
-        name={inputName}
-        type="file"
-        accept="image/png,image/jpeg,image/webp,image/avif,image/svg+xml"
-        onChange={(event) => {
-          const file = event.target.files?.[0];
-          if (file) {
-            onPreviewChange(URL.createObjectURL(file));
-          }
-        }}
-      />
-    </div>
   );
 }
 
@@ -638,22 +589,28 @@ export function SettingsForm({ action, values, eventOptions }: SettingsFormProps
 
         {shouldShow("branding") ? (
           <SettingsCard title="Logos & Medien" icon={Palette} span="span-3" category="branding">
-            <ImageUploadField
+            <AdminImageUploadField
+              id="settings-header-logo"
               label="Logo (Header)"
-              src={settings["branding.headerLogoUrl"]}
-              hint="Empfohlen: 200x60px, PNG oder SVG"
-              inputName="headerLogoFile"
-              onRemove={() => setValue("branding.headerLogoUrl", "")}
-              onPreviewChange={(src) => setValue("branding.headerLogoUrl", src)}
+              value={settings["branding.headerLogoUrl"]}
+              fileName="headerLogoFile"
+              onValueChange={(value) => setValue("branding.headerLogoUrl", value)}
+              fallback="Logo wird hier angezeigt"
+              uploadHint="Empfohlen: 200x60px, PNG oder SVG. Ein Upload ersetzt das gespeicherte Logo beim Speichern."
+              aspectRatio="16 / 5"
+              sizes="260px"
             />
-            <ImageUploadField
+            <AdminImageUploadField
+              id="settings-favicon"
               label="Favicon"
-              src={settings["branding.faviconUrl"]}
-              hint="Empfohlen: 32x32px, PNG oder ICO"
-              inputName="faviconFile"
+              value={settings["branding.faviconUrl"]}
+              fileName="faviconFile"
+              onValueChange={(value) => setValue("branding.faviconUrl", value)}
+              fallback="Favicon wird hier angezeigt"
+              uploadHint="Empfohlen: 32x32px, PNG oder SVG. Ein Upload ersetzt das gespeicherte Favicon beim Speichern."
+              aspectRatio="1 / 1"
+              sizes="90px"
               compact
-              onRemove={() => setValue("branding.faviconUrl", "")}
-              onPreviewChange={(src) => setValue("branding.faviconUrl", src)}
             />
             <div className="settings-color-group">
               <strong>Farben</strong>
@@ -734,19 +691,23 @@ export function SettingsForm({ action, values, eventOptions }: SettingsFormProps
 
         {shouldShow("branding") ? (
           <SettingsCard title="Startseite / Hero" icon={ImageIcon} span="span-3" category="branding">
-            <FormField label="Titel (H1)">
-              <TextInput value={settings["homepage.hero.title"]} onChange={(value) => setValue("homepage.hero.title", value)} />
+            <FormField label="Titel (H1)" hint="Zeilenumbrüche werden im Hero übernommen.">
+              <TextareaInput value={settings["homepage.hero.title"]} onChange={(value) => setValue("homepage.hero.title", value)} />
             </FormField>
-            <FormField label="Untertitel">
-              <TextInput value={settings["homepage.hero.subtitle"]} onChange={(value) => setValue("homepage.hero.subtitle", value)} />
+            <FormField label="Untertitel" hint="Für ruhige Lesbarkeit maximal zwei kurze Zeilen verwenden.">
+              <TextareaInput value={settings["homepage.hero.subtitle"]} onChange={(value) => setValue("homepage.hero.subtitle", value)} />
             </FormField>
-            <ImageUploadField
+            <AdminImageUploadField
+              id="settings-hero-background"
               label="Hintergrundbild"
-              src={settings["homepage.hero.backgroundImageUrl"]}
-              hint="Empfohlen: 1920x1080px, JPG/PNG, max. 2MB"
-              inputName="heroBackgroundFile"
-              onRemove={() => setValue("homepage.hero.backgroundImageUrl", "")}
-              onPreviewChange={(src) => setValue("homepage.hero.backgroundImageUrl", src)}
+              value={settings["homepage.hero.backgroundImageUrl"]}
+              fileName="heroBackgroundFile"
+              onValueChange={(value) => setValue("homepage.hero.backgroundImageUrl", value)}
+              fallback="Hintergrundbild wird hier angezeigt"
+              uploadHint="Empfohlen: 1920x1080px, JPG/PNG. Ein Upload ersetzt das gespeicherte Hero-Bild beim Speichern."
+              aspectRatio="16 / 9"
+              sizes="420px"
+              fit="cover"
             />
           </SettingsCard>
         ) : null}

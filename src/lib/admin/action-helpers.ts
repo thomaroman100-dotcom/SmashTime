@@ -14,6 +14,8 @@ export type AdminClientResult =
 
 export const ADMIN_MAX_UPLOAD_BYTES = 6 * 1024 * 1024;
 export const ADMIN_ALLOWED_IMAGE_MIME = ["image/png", "image/jpeg", "image/webp", "image/avif", "image/svg+xml"] as const;
+export const ADMIN_MEDIA_BUCKET = "smashtime-media";
+const ADMIN_MEDIA_PUBLIC_MARKER = `/storage/v1/object/public/${ADMIN_MEDIA_BUCKET}/`;
 
 export async function getAdminClient(requirement: AdminAccessRequirement = "admin.access"): Promise<AdminClientResult> {
   const supabase = await createSupabaseServerClient();
@@ -168,19 +170,19 @@ export async function uploadAdminMediaAsset({
   const path = `${folder.replace(/^\/+|\/+$/g, "")}/${Date.now()}-${baseName}.${extension}`;
 
   const { error: uploadError } = await supabase.storage
-    .from("smashtime-media")
+    .from(ADMIN_MEDIA_BUCKET)
     .upload(path, file, { contentType: file.type, upsert: false });
 
   if (uploadError) {
     return { ok: false as const, error: `Upload fehlgeschlagen: ${uploadError.message}` };
   }
 
-  const publicUrl = supabase.storage.from("smashtime-media").getPublicUrl(path).data.publicUrl;
+  const publicUrl = supabase.storage.from(ADMIN_MEDIA_BUCKET).getPublicUrl(path).data.publicUrl;
 
   const { data, error: insertError } = await supabase
     .from("media_assets")
     .insert({
-      bucket: "smashtime-media",
+      bucket: ADMIN_MEDIA_BUCKET,
       path,
       asset_type: assetType,
       alt_text: altText ?? file.name,
@@ -192,9 +194,111 @@ export async function uploadAdminMediaAsset({
     .maybeSingle();
 
   if (insertError) {
-    await supabase.storage.from("smashtime-media").remove([path]);
+    await supabase.storage.from(ADMIN_MEDIA_BUCKET).remove([path]);
     return { ok: false as const, error: supabaseErrorMessage(insertError) };
   }
 
   return { ok: true as const, mediaAssetId: (data as { id: number } | null)?.id ?? null, path, publicUrl };
+}
+
+export function adminMediaStoragePathFromPublicUrl(value: string | null | undefined) {
+  const raw = value?.trim() ?? "";
+  if (!raw || raw.startsWith("blob:") || raw.startsWith("data:")) {
+    return null;
+  }
+
+  const fromPathname = (pathname: string) => {
+    const markerIndex = pathname.indexOf(ADMIN_MEDIA_PUBLIC_MARKER);
+    if (markerIndex === -1) {
+      return null;
+    }
+
+    const encodedPath = pathname.slice(markerIndex + ADMIN_MEDIA_PUBLIC_MARKER.length).replace(/^\/+/, "");
+    return encodedPath ? decodeURIComponent(encodedPath) : null;
+  };
+
+  try {
+    return fromPathname(new URL(raw).pathname);
+  } catch {
+    return fromPathname(raw);
+  }
+}
+
+export async function deleteAdminMediaAssetByPath({
+  supabase,
+  path,
+  bucket = ADMIN_MEDIA_BUCKET
+}: {
+  supabase: ServerClient;
+  path: string | null | undefined;
+  bucket?: string;
+}) {
+  const storagePath = path?.trim();
+  if (!storagePath) {
+    return { ok: true as const };
+  }
+
+  const { error: storageError } = await supabase.storage.from(bucket).remove([storagePath]);
+  if (storageError) {
+    return { ok: false as const, error: `Datei konnte nicht gelöscht werden: ${storageError.message}` };
+  }
+
+  const { error: rowError } = await supabase.from("media_assets").delete().eq("bucket", bucket).eq("path", storagePath);
+  if (rowError) {
+    return { ok: false as const, error: supabaseErrorMessage(rowError) };
+  }
+
+  return { ok: true as const };
+}
+
+export async function deleteAdminMediaAssetByPublicUrl({
+  supabase,
+  publicUrl
+}: {
+  supabase: ServerClient;
+  publicUrl: string | null | undefined;
+}) {
+  return deleteAdminMediaAssetByPath({
+    supabase,
+    path: adminMediaStoragePathFromPublicUrl(publicUrl)
+  });
+}
+
+export async function cleanupReplacedAdminMedia({
+  supabase,
+  previousUrl,
+  nextUrl
+}: {
+  supabase: ServerClient;
+  previousUrl: string | null | undefined;
+  nextUrl: string | null | undefined;
+}) {
+  const previousPath = adminMediaStoragePathFromPublicUrl(previousUrl);
+  const nextPath = adminMediaStoragePathFromPublicUrl(nextUrl);
+  if (!previousPath || previousPath === nextPath) {
+    return { ok: true as const };
+  }
+
+  return deleteAdminMediaAssetByPath({ supabase, path: previousPath });
+}
+
+export async function cleanupAdminMediaUrls({
+  supabase,
+  publicUrls
+}: {
+  supabase: ServerClient;
+  publicUrls: Array<string | null | undefined>;
+}) {
+  const uniquePaths = Array.from(
+    new Set(publicUrls.map((url) => adminMediaStoragePathFromPublicUrl(url)).filter((path): path is string => Boolean(path)))
+  );
+
+  for (const path of uniquePaths) {
+    const deleted = await deleteAdminMediaAssetByPath({ supabase, path });
+    if (!deleted.ok) {
+      return deleted;
+    }
+  }
+
+  return { ok: true as const };
 }

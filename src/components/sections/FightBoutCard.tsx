@@ -1,5 +1,6 @@
 import Image from "next/image";
-import { formatFightCardLabel, type FightCardEntry, type FightParticipant } from "@/data/fightcards";
+import { formatFightCardLabel, teamSizeForMatchup, type FightCardEntry, type FightParticipant } from "@/data/fightcards";
+import { getMemberImageSrc } from "@/lib/media-placeholders";
 
 type FightBoutCardProps = {
   fight: FightCardEntry;
@@ -15,18 +16,12 @@ type FightPortraitProps = {
 function FightPortrait({ name, image, corner }: FightPortraitProps) {
   return (
     <div className={`fight-bout-card__fighter fight-bout-card__fighter--${corner}`}>
-      {image ? (
-        <Image
-          src={image}
-          alt={`${name} Fightcard-Portrait`}
-          fill
-          sizes="(max-width: 767px) 86vw, (max-width: 1180px) 28vw, 360px"
-        />
-      ) : (
-        <span className="fight-bout-card__fallback" aria-hidden="true">
-          {name.slice(0, 2).toUpperCase()}
-        </span>
-      )}
+      <Image
+        src={getMemberImageSrc(image)}
+        alt={`${name} Fightcard-Portrait`}
+        fill
+        sizes="(max-width: 767px) 86vw, (max-width: 1180px) 28vw, 360px"
+      />
       <strong>{name}</strong>
     </div>
   );
@@ -63,11 +58,7 @@ function TeamParticipant({ participant }: TeamParticipantProps) {
   return (
     <li>
       <span className="team-bout-card__avatar">
-        {participant.image ? (
-          <Image src={participant.image} alt="" fill sizes="46px" />
-        ) : (
-          participant.name.slice(0, 2).toUpperCase()
-        )}
+        <Image src={getMemberImageSrc(participant.image)} alt="" fill sizes="46px" />
       </span>
       <strong>{participant.name}</strong>
       {participant.isTba ? <small>Wird bekanntgegeben</small> : null}
@@ -75,8 +66,8 @@ function TeamParticipant({ participant }: TeamParticipantProps) {
   );
 }
 
-function normalizedTeamParticipants(participants: FightParticipant[]) {
-  const slots = [1, 2];
+function normalizedTeamParticipants(participants: FightParticipant[], size: number) {
+  const slots = Array.from({ length: size }, (_, index) => index + 1);
   return slots.map((slot) => {
     const participant = participants.find((item) => item.slot === slot);
     return participant ?? {
@@ -88,8 +79,9 @@ function normalizedTeamParticipants(participants: FightParticipant[]) {
 }
 
 export function TeamBoutCard({ fight, variant = "default" }: FightBoutCardProps) {
-  const redParticipants = normalizedTeamParticipants(fight.redCorner.participants);
-  const blueParticipants = normalizedTeamParticipants(fight.blueCorner.participants);
+  const teamSize = teamSizeForMatchup(fight.matchupType);
+  const redParticipants = normalizedTeamParticipants(fight.redCorner.participants, teamSize);
+  const blueParticipants = normalizedTeamParticipants(fight.blueCorner.participants, teamSize);
 
   return (
     <article className={`team-bout-card team-bout-card--${variant}`}>
@@ -105,7 +97,7 @@ export function TeamBoutCard({ fight, variant = "default" }: FightBoutCardProps)
 
       <div className="team-bout-card__center">
         <span>{formatFightCardLabel(fight.label)}</span>
-        <b>2 VS 2</b>
+        <b>{teamSize} VS {teamSize}</b>
         <small>
           {fight.weightClass} · {fight.discipline}
         </small>

@@ -158,6 +158,7 @@ export function EventLibrary({ events, ticketHref }: EventLibraryProps) {
           <input
             type="search"
             placeholder="Events durchsuchen..."
+            suppressHydrationWarning
             value={query}
             onChange={(event) => updateFilter(() => setQuery(event.target.value))}
           />

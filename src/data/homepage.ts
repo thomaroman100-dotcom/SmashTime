@@ -7,11 +7,8 @@ import type { FightCardEntry } from "@/data/fightcards";
 // und src/data/fightcards.ts – nichts davon ist im JSX festgeschrieben.
 
 export type HomeHero = {
-  title?: string;
-  subtitle?: string;
-  claimLines: string[];
-  brandLine: string;
-  tagline: string;
+  title: string;
+  subtitle: string;
   backgroundImage: string;
   backgroundPosition: string;
   primaryCta: { label: string; href: string };
@@ -32,10 +29,9 @@ export const nextEvent: SmashEvent = upcomingEvent;
 export const featuredEvent: SmashEvent = upcomingEvent;
 
 export const homeHero: HomeHero = {
-  claimLines: ["Wo Kampf Charakter zeigt."],
-  brandLine: "",
-  tagline:
-    "SmashTime ist die Bühne für Live-Kampfsport, starke Athleten und echte Emotionen. Hier geht es nicht nur ums Gewinnen – sondern um Respekt, Haltung und Momente, die bleiben.",
+  title: "WO KAMPF\nCHARAKTER ZEIGT.",
+  subtitle:
+    "SmashTime ist die Bühne für Live-Kampfsport, starke Athleten und echte Emotionen.\nHier geht es nicht nur ums Gewinnen, sondern um Respekt, Haltung und Momente, die bleiben.",
   backgroundImage: "/images/backgrounds/hero-smash-cage-arena-wide.png",
   backgroundPosition: "center center",
   primaryCta: { label: "Nächste Veranstaltung", href: nextEvent.detailHref ?? "/veranstaltungen" },
@@ -97,11 +93,6 @@ export const homeSections = {
     ctaLabel: "Alle Veranstaltungen ansehen",
     ctaHref: "/veranstaltungen",
     emptyNote: "Weitere Termine werden bald angekündigt."
-  },
-  rankings: {
-    title: "Top Fighter Rangliste",
-    ctaLabel: "Gesamte Rangliste ansehen",
-    ctaHref: "/champions"
   },
   news: {
     title: "Neuigkeiten",

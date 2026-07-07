@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { ProfileSettingsForm } from "@/components/profile/ProfileSettingsForm";
 import { getSessionProfile } from "@/lib/admin/auth";
+import { getMemberBackgroundStyle } from "@/lib/media-placeholders";
 import { updateMyProfileSettingsAction } from "@/lib/profile/actions";
 
 export const metadata = {
@@ -19,35 +20,6 @@ export const metadata = {
 };
 
 export const dynamic = "force-dynamic";
-
-function initials(name: string) {
-  return (
-    name
-      .split(" ")
-      .filter(Boolean)
-      .slice(0, 2)
-      .map((part) => part[0])
-      .join("")
-      .toUpperCase() || "ST"
-  );
-}
-
-function safeAvatarStyle(avatarUrl: string | null) {
-  if (!avatarUrl) {
-    return undefined;
-  }
-
-  try {
-    const url = new URL(avatarUrl);
-    if (url.protocol !== "https:") {
-      return undefined;
-    }
-
-    return { backgroundImage: `url("${url.href.replace(/"/g, "%22")}")` };
-  } catch {
-    return undefined;
-  }
-}
 
 export default async function EditProfilePage() {
   const profile = await getSessionProfile();
@@ -57,7 +29,7 @@ export default async function EditProfilePage() {
 
   const isFighter = profile.profileType === "fighter";
   const publicRole = isFighter ? "Kämpfer" : "Mitglied";
-  const avatarStyle = safeAvatarStyle(profile.avatarUrl);
+  const avatarStyle = getMemberBackgroundStyle(profile.avatarUrl);
 
   return (
     <section className="account-page account-page--dashboard profile-edit-page">
@@ -98,16 +70,10 @@ export default async function EditProfilePage() {
               </div>
               <div className="account-profile-preview__body">
                 <span
-                  className={
-                    avatarStyle
-                      ? "account-avatar account-avatar--preview account-avatar--image"
-                      : "account-avatar account-avatar--preview"
-                  }
+                  className="account-avatar account-avatar--preview account-avatar--image"
                   style={avatarStyle}
                   aria-hidden="true"
-                >
-                  {avatarStyle ? null : initials(profile.displayName)}
-                </span>
+                />
                 <div>
                   <strong>{profile.displayName}</strong>
                   <small>{publicRole}</small>

@@ -14,7 +14,9 @@ import {
   getAdminClient,
   slugify,
   supabaseErrorMessage,
-  uploadAdminMediaAsset
+  uploadAdminMediaAsset,
+  cleanupAdminMediaUrls,
+  cleanupReplacedAdminMedia
 } from "@/lib/admin/action-helpers";
 import { EVENT_DISCIPLINES } from "@/lib/admin/resource-shared";
 
@@ -188,9 +190,27 @@ async function applyEventGalleryChanges({
     .filter(Number.isFinite);
 
   if (removeIds.length > 0) {
+    const { data: removedRows, error: selectError } = await supabase
+      .from("event_gallery")
+      .select("image_path")
+      .eq("event_id", eventId)
+      .in("id", removeIds);
+
+    if (selectError) {
+      return { ok: false as const, error: supabaseErrorMessage(selectError) };
+    }
+
     const { error } = await supabase.from("event_gallery").delete().eq("event_id", eventId).in("id", removeIds);
     if (error) {
       return { ok: false as const, error: supabaseErrorMessage(error) };
+    }
+
+    const cleanup = await cleanupAdminMediaUrls({
+      supabase,
+      publicUrls: ((removedRows as Array<{ image_path: string | null }> | null) ?? []).map((row) => row.image_path)
+    });
+    if (!cleanup.ok) {
+      return cleanup;
     }
   }
 
@@ -296,6 +316,18 @@ export async function updateEventAction(
     return { ok: false, error: result.error ?? "Veranstaltungsdaten sind unvollständig." };
   }
 
+  const { data: existingData, error: existingError } = await admin.supabase
+    .from("events")
+    .select("image_path")
+    .eq("id", id)
+    .maybeSingle();
+
+  if (existingError) {
+    return { ok: false, error: supabaseErrorMessage(existingError) };
+  }
+
+  const existing = existingData as { image_path: string | null } | null;
+
   const posterUpload = await applyEventPosterUpload({
     supabase: admin.supabase,
     payload: result.payload,
@@ -328,6 +360,15 @@ export async function updateEventAction(
     return { ok: false, error: gallery.error };
   }
 
+  const cleanup = await cleanupReplacedAdminMedia({
+    supabase: admin.supabase,
+    previousUrl: existing?.image_path,
+    nextUrl: result.payload.image_path
+  });
+  if (!cleanup.ok) {
+    return cleanup;
+  }
+
   revalidateEvents(id);
   return { ok: true, message: "Veranstaltung gespeichert." };
 }
@@ -358,9 +399,39 @@ export async function deleteEventAction(id: number): Promise<ActionResult> {
     return { ok: false, error: admin.error };
   }
 
+  const { data: eventData, error: eventSelectError } = await admin.supabase
+    .from("events")
+    .select("image_path")
+    .eq("id", id)
+    .maybeSingle();
+
+  if (eventSelectError) {
+    return { ok: false, error: supabaseErrorMessage(eventSelectError) };
+  }
+
+  const { data: galleryData, error: gallerySelectError } = await admin.supabase
+    .from("event_gallery")
+    .select("image_path")
+    .eq("event_id", id);
+
+  if (gallerySelectError) {
+    return { ok: false, error: supabaseErrorMessage(gallerySelectError) };
+  }
+
   const { error } = await admin.supabase.from("events").delete().eq("id", id);
   if (error) {
     return { ok: false, error: supabaseErrorMessage(error) };
+  }
+
+  const cleanup = await cleanupAdminMediaUrls({
+    supabase: admin.supabase,
+    publicUrls: [
+      (eventData as { image_path: string | null } | null)?.image_path,
+      ...(((galleryData as Array<{ image_path: string | null }> | null) ?? []).map((row) => row.image_path))
+    ]
+  });
+  if (!cleanup.ok) {
+    return cleanup;
   }
 
   revalidateEvents(id);

@@ -102,11 +102,29 @@ function normalizeNavigationLabel(label: string) {
     news: "Neuigkeiten",
     sponsors: "Partner",
     contact: "Kontakt",
-    fighters: "Kämpfer",
-    rankings: "Ranglisten"
+    fighters: "Kämpfer"
   };
 
   return publicLabelAliases[trimmed.toLowerCase()] ?? trimmed;
+}
+
+function isRankingNavigationLink(labelValue?: string, hrefValue?: string) {
+  const label = (labelValue ?? "").trim().toLowerCase();
+  const href = (hrefValue ?? "").trim().toLowerCase();
+  return label === "ranglisten" || label === "rankings" || href === "/rankings" || href.startsWith("/rankings?");
+}
+
+function isRankingNavigationItem(item: StoredNavigationItem) {
+  return isRankingNavigationLink(item.label, item.path ?? item.href);
+}
+
+function defaultNavigationWithoutRankings() {
+  return site.navigation
+    .filter((item) => !isRankingNavigationLink(item.label, item.href))
+    .map((item) => ({
+      ...item,
+      children: item.children?.filter((child) => !isRankingNavigationLink(child.label, child.href))
+    }));
 }
 
 const legacyHomeHeroBackgroundImages = new Set([
@@ -117,6 +135,30 @@ const legacyHomeHeroBackgroundImages = new Set([
 function homeHeroBackgroundImage(rows: Record<string, string>) {
   const configuredImage = setting(rows, "homepage.hero.backgroundImageUrl", homeHero.backgroundImage);
   return legacyHomeHeroBackgroundImages.has(configuredImage) ? homeHero.backgroundImage : configuredImage;
+}
+
+function normalizeHomeHeroTitle(value: string) {
+  const normalized = value.trim().toLowerCase().replace(/\s+/g, " ");
+  const legacyTitles = new Set([
+    "smashtime 3",
+    "über smashtime.",
+    "ueber smashtime.",
+    "bei uns wird nicht gespielt.",
+    "bei uns wird nicht gespielt"
+  ]);
+  return legacyTitles.has(normalized) ? homeHero.title : value;
+}
+
+function normalizeHomeHeroSubtitle(value: string) {
+  const normalized = value.trim().toLowerCase();
+  const isLegacySubtitle =
+    normalized.includes("geboren als untergrund-format") ||
+    normalized.includes("smashtime bringt kämpfer") ||
+    normalized.includes("smashtime bringt kaempfer") ||
+    normalized.includes("die elite des kampfes") ||
+    normalized.includes("respekt steigt in den ring");
+
+  return isLegacySubtitle ? homeHero.subtitle : value;
 }
 
 function parseNavigation(rows: Record<string, string>) {
@@ -133,10 +175,11 @@ function parseNavigation(rows: Record<string, string>) {
   }
 
   if (parsed.length === 0) {
-    return site.navigation;
+    return defaultNavigationWithoutRankings();
   }
 
   const visibleItems = parsed
+    .filter((item) => !isRankingNavigationItem(item))
     .filter((item) => item.isVisible !== false && (item.label ?? "").trim())
     .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
     .map((item) => ({
@@ -193,8 +236,8 @@ export const getPublicSiteSettings = cache(async (): Promise<PublicSettings> => 
   const primaryColor = setting(rows, "branding.theme.primaryColor", "#D71920");
   const accentColor = setting(rows, "branding.theme.accentColor", "#C9A24A");
   const textColor = setting(rows, "branding.theme.textColor", "#E5E5E5");
-  const heroTitle = setting(rows, "homepage.hero.title", "");
-  const heroSubtitle = setting(rows, "homepage.hero.subtitle", "");
+  const heroTitle = normalizeHomeHeroTitle(setting(rows, "homepage.hero.title", homeHero.title));
+  const heroSubtitle = normalizeHomeHeroSubtitle(setting(rows, "homepage.hero.subtitle", homeHero.subtitle));
   const ticketHref = normalizePublicHref(setting(rows, "header.cta.url", site.ticketHref), site.ticketHref);
   const ticketLabel = setting(rows, "header.cta.label", site.headerCta.label);
   const heroPrimaryHref = normalizePublicHref(

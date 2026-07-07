@@ -18,9 +18,9 @@ insert into public.events (
 )
 values (
   'smashtime-3-respekt-steigt-in-den-ring',
-  'SmashTime 3 - Respekt steigt in den Ring',
+  'SmashTime 3 - Gemeinsam gegen Mobbing',
   'SmashTime 3',
-  'Respekt steigt in den Ring',
+  'Gemeinsam gegen Mobbing',
   '2026-10-17T18:00:00+02:00',
   '17. Oktober 2026',
   'Jahnturnhalle St. Pölten',
@@ -29,7 +29,7 @@ values (
   '18:00',
   array['Xtreme Boxen', 'K1', 'MMA', 'Boxen', 'Influenza Kämpfe'],
   null,
-  '/images/events/smashtime-3-respekt-steigt-in-den-ring.png',
+  '/images/events/smashtime-3-gemeinsam-gegen-mobbing.png',
   null,
   'published',
   true
@@ -124,7 +124,9 @@ where not exists (select 1 from updated_fight);
 insert into public.site_settings (key, value, is_public)
 values
   ('countdown.featuredEventId', '{"text":"smashtime-3-respekt-steigt-in-den-ring"}'::jsonb, true),
-  ('countdown.countdownEndAt', '{"text":"2026-10-17T18:00:00+02:00"}'::jsonb, true)
+  ('countdown.countdownEndAt', '{"text":"2026-10-17T18:00:00+02:00"}'::jsonb, true),
+  ('homepage.hero.title', '{"text":"Über SmashTime."}'::jsonb, true),
+  ('homepage.hero.subtitle', '{"text":"Geboren als Untergrund-Format auf 12 Quadratmetern. Auf die große internationale Bühne."}'::jsonb, true)
 on conflict (key) do update set
   value = excluded.value,
   is_public = excluded.is_public;

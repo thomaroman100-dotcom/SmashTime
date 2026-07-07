@@ -1,4 +1,4 @@
-export type FightMatchupType = "single" | "team_2v2";
+export type FightMatchupType = "single" | "team_1v1" | "team_2v2" | "team_3v3" | "team_4v4";
 
 export type FightParticipant = {
   slot: number;
@@ -25,6 +25,10 @@ export type FightCardEntry = {
   blueCorner: FightCorner;
   weightClass: string;
   discipline: string;
+  rounds?: number;
+  roundDuration?: string;
+  scheduledAt?: string;
+  winnerCorner?: "red" | "blue" | null;
   label?: string;
   fighterAImage?: string;
   fighterBImage?: string;
@@ -53,7 +57,16 @@ export function isMainEventFight(fight: FightCardEntry) {
 }
 
 export function isTeamFight(fight: FightCardEntry) {
-  return fight.matchupType === "team_2v2";
+  return fight.matchupType.startsWith("team_");
+}
+
+export function teamSizeForMatchup(matchupType: FightMatchupType) {
+  if (!matchupType.startsWith("team_")) {
+    return 1;
+  }
+
+  const parsed = Number.parseInt(matchupType.replace("team_", "").split("v")[0], 10);
+  return Number.isFinite(parsed) ? Math.min(Math.max(parsed, 1), 4) : 2;
 }
 
 export function fightCornerTitle(fight: FightCardEntry, corner: "red" | "blue") {

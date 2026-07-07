@@ -9,9 +9,13 @@ import {
   fieldInt,
   fieldText,
   fieldTextOrNull,
+  formFile,
   getAdminClient,
   slugify,
-  supabaseErrorMessage
+  supabaseErrorMessage,
+  uploadAdminMediaAsset,
+  cleanupAdminMediaUrls,
+  cleanupReplacedAdminMedia
 } from "@/lib/admin/action-helpers";
 
 type AdminSupabaseClient = Extract<AdminClientResult, { ok: true }>["supabase"];
@@ -104,7 +108,7 @@ async function championPayload(supabase: AdminSupabaseClient, formData: FormData
       weight_class: fieldTextOrNull(formData, "weight_class"),
       record: fieldTextOrNull(formData, "record"),
       origin: fieldTextOrNull(formData, "origin"),
-      image_path: fieldTextOrNull(formData, "image_path"),
+      image_path: fieldBool(formData, "clear_image_path") ? null : fieldTextOrNull(formData, "image_path"),
       stance: fieldTextOrNull(formData, "stance"),
       bio: fieldTextOrNull(formData, "bio"),
       quote: fieldTextOrNull(formData, "quote"),
@@ -112,7 +116,42 @@ async function championPayload(supabase: AdminSupabaseClient, formData: FormData
       sort_order: fieldInt(formData, "sort_order", 0),
       is_active: fieldBool(formData, "is_active")
     }
-  } as const;
+  };
+}
+
+type ChampionPayload = Extract<Awaited<ReturnType<typeof championPayload>>, { payload: unknown }>["payload"];
+
+async function applyChampionPhotoUpload({
+  supabase,
+  payload,
+  formData
+}: {
+  supabase: AdminSupabaseClient;
+  payload: ChampionPayload;
+  formData: FormData;
+}) {
+  const photoFile = formFile(formData, "champion_image_file");
+  if (!photoFile) {
+    return { ok: true as const };
+  }
+
+  const uploaded = await uploadAdminMediaAsset({
+    supabase,
+    file: photoFile,
+    folder: `champions/${payload.slug}`,
+    assetType: "Champion",
+    altText: `${payload.name} Champion-Foto`,
+    usageNote: `Champion-Foto: ${payload.name}`,
+    isPublic: true,
+    isChecked: true
+  });
+
+  if (!uploaded.ok) {
+    return uploaded;
+  }
+
+  payload.image_path = uploaded.publicUrl;
+  return { ok: true as const };
 }
 
 function revalidateChampions() {
@@ -133,6 +172,15 @@ export async function createChampionAction(
   const result = await championPayload(admin.supabase, formData, true);
   if ("error" in result) {
     return { ok: false, error: result.error ?? "Champion-Daten sind unvollständig." };
+  }
+
+  const uploadResult = await applyChampionPhotoUpload({
+    supabase: admin.supabase,
+    payload: result.payload,
+    formData
+  });
+  if (!uploadResult.ok) {
+    return { ok: false, error: uploadResult.error };
   }
 
   const { error } = await admin.supabase.from("champions").insert(result.payload);
@@ -159,9 +207,37 @@ export async function updateChampionAction(
     return { ok: false, error: result.error ?? "Champion-Daten sind unvollständig." };
   }
 
+  const { data: existingData, error: existingError } = await admin.supabase
+    .from("champions")
+    .select("image_path")
+    .eq("id", id)
+    .maybeSingle();
+
+  if (existingError) {
+    return { ok: false, error: supabaseErrorMessage(existingError) };
+  }
+
+  const uploadResult = await applyChampionPhotoUpload({
+    supabase: admin.supabase,
+    payload: result.payload,
+    formData
+  });
+  if (!uploadResult.ok) {
+    return { ok: false, error: uploadResult.error };
+  }
+
   const { error } = await admin.supabase.from("champions").update(result.payload).eq("id", id);
   if (error) {
     return { ok: false, error: supabaseErrorMessage(error) };
+  }
+
+  const cleanup = await cleanupReplacedAdminMedia({
+    supabase: admin.supabase,
+    previousUrl: (existingData as { image_path: string | null } | null)?.image_path,
+    nextUrl: result.payload.image_path
+  });
+  if (!cleanup.ok) {
+    return cleanup;
   }
 
   revalidateChampions();
@@ -189,9 +265,27 @@ export async function deleteChampionAction(id: number): Promise<ActionResult> {
     return { ok: false, error: admin.error };
   }
 
+  const { data: existingData, error: selectError } = await admin.supabase
+    .from("champions")
+    .select("image_path")
+    .eq("id", id)
+    .maybeSingle();
+
+  if (selectError) {
+    return { ok: false, error: supabaseErrorMessage(selectError) };
+  }
+
   const { error } = await admin.supabase.from("champions").delete().eq("id", id);
   if (error) {
     return { ok: false, error: supabaseErrorMessage(error) };
+  }
+
+  const cleanup = await cleanupAdminMediaUrls({
+    supabase: admin.supabase,
+    publicUrls: [(existingData as { image_path: string | null } | null)?.image_path]
+  });
+  if (!cleanup.ok) {
+    return cleanup;
   }
 
   revalidateChampions();

@@ -184,7 +184,7 @@ export default async function AdminMemberRolesPage() {
               <div className="adm-activity-list">
                 {staff.slice(0, 5).map((member) => (
                   <Link className="adm-activity" href={`/admin/members/${member.userId}`} key={member.userId}>
-                    <InitialsAvatar name={member.displayName} size="sm" />
+                    <InitialsAvatar name={member.displayName} src={member.avatarUrl} size="sm" />
                     <span>
                       <strong>{member.displayName}</strong>
                       <small>{member.permissions.length} Rechte</small>

@@ -24,6 +24,7 @@ import { useEffect, useRef, useState } from "react";
 import type { NavigationItem } from "@/data/site";
 import { site as defaultSite } from "@/data/site";
 import type { SessionProfile } from "@/lib/admin/auth";
+import { getMemberBackgroundStyle } from "@/lib/media-placeholders";
 import type { PublicSiteContent } from "@/lib/site-settings";
 import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
 import { cn } from "@/lib/utils";
@@ -32,30 +33,6 @@ type HeaderProps = {
   siteContent?: PublicSiteContent;
   sessionProfile?: SessionProfile | null;
 };
-
-function profileInitials(name: string) {
-  return (
-    name
-      .split(" ")
-      .filter(Boolean)
-      .slice(0, 2)
-      .map((part) => part[0])
-      .join("")
-      .toUpperCase() || "ST"
-  );
-}
-
-function safeAvatarBackground(avatarUrl: string | null | undefined) {
-  if (!avatarUrl) return undefined;
-
-  try {
-    const url = new URL(avatarUrl);
-    if (url.protocol !== "https:") return undefined;
-    return { backgroundImage: `url("${url.href.replace(/"/g, "%22")}")` };
-  } catch {
-    return undefined;
-  }
-}
 
 export function Header({ siteContent = defaultSite, sessionProfile = null }: HeaderProps) {
   const site = siteContent;
@@ -109,7 +86,7 @@ export function Header({ siteContent = defaultSite, sessionProfile = null }: Hea
     ? Number(sessionProfile.status !== "active") +
       Number(sessionProfile.profileType === "fighter" && !sessionProfile.fighter?.isVerified)
     : 0;
-  const profileAvatarStyle = safeAvatarBackground(sessionProfile?.avatarUrl);
+  const profileAvatarStyle = sessionProfile ? getMemberBackgroundStyle(sessionProfile.avatarUrl) : undefined;
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
@@ -223,11 +200,9 @@ export function Header({ siteContent = defaultSite, sessionProfile = null }: Hea
               {sessionProfile ? (
                 <span
                   aria-hidden="true"
-                  className={cn("site-profile-menu__avatar", profileAvatarStyle && "site-profile-menu__avatar--image")}
+                  className="site-profile-menu__avatar site-profile-menu__avatar--image"
                   style={profileAvatarStyle}
-                >
-                  {profileAvatarStyle ? null : profileInitials(sessionProfile.displayName)}
-                </span>
+                />
               ) : (
                 <UserCircle aria-hidden="true" size={20} />
               )}

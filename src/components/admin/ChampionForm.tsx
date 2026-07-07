@@ -15,6 +15,7 @@ import type { ActionResult } from "@/lib/admin/action-helpers";
 import type { ChampionRow } from "@/lib/admin/actions/champions";
 import { useAdminUi } from "@/components/admin/ui/AdminUiProvider";
 import { AdminImagePreview } from "@/components/admin/ui/AdminImagePreview";
+import { AdminImageUploadField } from "@/components/admin/ui/AdminImageUploadField";
 import { Badge } from "@/components/admin/ui/primitives";
 import { FighterProfilePicker, type FighterProfileOption } from "@/components/admin/FighterProfilePicker";
 
@@ -205,17 +206,22 @@ export function ChampionForm({ action, initial, heading, subheading, fighterOpti
               <h2>Foto</h2>
             </div>
             <div className="adm-fsection__body">
-              <div className="adm-field">
-                <label htmlFor="champion-image">Bildpfad</label>
-                <input
-                  id="champion-image"
-                  name="image_path"
-                  value={imagePath}
-                  onChange={(event) => setImagePath(event.target.value)}
-                  placeholder="/images/champions/… oder Medien-URL"
-                />
-                <span className="adm-field__hint">Empfohlen: Hochformat, mindestens 800 px Breite.</span>
-              </div>
+              <AdminImageUploadField
+                id="champion-image"
+                label="Champion-Foto"
+                pathName="image_path"
+                fileName="champion_image_file"
+                clearName="clear_image_path"
+                value={imagePath}
+                onValueChange={setImagePath}
+                pathLabel="Bildpfad"
+                fileLabel="Foto hochladen"
+                hint="Empfohlen: Hochformat, mindestens 800 px Breite."
+                fallback="Foto wird hier angezeigt"
+                previewAlt={`${name || "Champion"} Foto`}
+                aspectRatio="4 / 5"
+                uploadHint="Max. 6 MB. Ein Upload ersetzt das gespeicherte Champion-Foto beim Speichern."
+              />
             </div>
           </section>
 

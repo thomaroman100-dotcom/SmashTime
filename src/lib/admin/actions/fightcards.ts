@@ -9,19 +9,24 @@ import {
   fieldInt,
   fieldText,
   fieldTextOrNull,
+  formFile,
   getAdminClient,
-  supabaseErrorMessage
+  supabaseErrorMessage,
+  uploadAdminMediaAsset,
+  cleanupReplacedAdminMedia
 } from "@/lib/admin/action-helpers";
+import { DEFAULT_FIGHTCARD_SETTINGS, type FightcardSettings } from "@/lib/admin/fightcard-settings";
 import { FIGHT_MATCHUP_TYPES, FIGHT_STATUSES } from "@/lib/admin/resource-shared";
 
 export type FightStatus = (typeof FIGHT_STATUSES)[number];
 export type FightMatchupType = (typeof FIGHT_MATCHUP_TYPES)[number];
 type AdminSupabaseClient = Extract<AdminClientResult, { ok: true }>["supabase"];
+type FightCorner = "red" | "blue";
 
 export type FightParticipantRow = {
   id?: number;
   fight_card_id?: number;
-  corner: "red" | "blue";
+  corner: FightCorner;
   slot: number;
   fighter_user_id: string | null;
   display_name: string | null;
@@ -49,12 +54,75 @@ export type FightRow = {
   fighter_b_is_tba: boolean;
   weight_class: string | null;
   discipline: string | null;
+  rounds: number | null;
+  round_duration: string | null;
+  scheduled_at: string | null;
+  winner_corner: FightCorner | null;
   is_main_event: boolean;
   is_visible: boolean;
   status: FightStatus;
   notes: string | null;
   fight_card_participants?: FightParticipantRow[] | null;
 };
+
+type ParticipantPayload = Omit<FightParticipantRow, "id" | "fight_card_id">;
+
+function normalizedFightName(value: string | null) {
+  return value?.trim().replace(/\s+/g, " ").toLowerCase() ?? "";
+}
+
+function isTeamMatchup(matchupType: string): matchupType is Exclude<FightMatchupType, "single"> {
+  return matchupType.startsWith("team_");
+}
+
+function teamSizeForMatchup(matchupType: string) {
+  if (!isTeamMatchup(matchupType)) {
+    return 1;
+  }
+
+  const parsed = Number.parseInt(matchupType.match(/team_(\d)v\d/)?.[1] ?? "1", 10);
+  return [1, 2, 3, 4].includes(parsed) ? parsed : 1;
+}
+
+function participantName(participant: ParticipantPayload | undefined) {
+  return participant?.display_name?.trim() || null;
+}
+
+function firstImage(participants: ParticipantPayload[]) {
+  return participants.find((participant) => participant.image_path)?.image_path ?? null;
+}
+
+function parseScheduledAt(formData: FormData) {
+  const value = fieldText(formData, "scheduled_at");
+  if (!value) {
+    return null;
+  }
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? null : date.toISOString();
+}
+
+function parseWinnerCorner(formData: FormData) {
+  const value = fieldText(formData, "winner_corner");
+  return value === "red" || value === "blue" ? value : null;
+}
+
+function duplicateParticipantError(participants: ParticipantPayload[]) {
+  const userIds = participants
+    .map((participant) => participant.fighter_user_id)
+    .filter((userId): userId is string => Boolean(userId));
+  if (new Set(userIds).size !== userIds.length) {
+    return "Ein Kämpfer kann nicht doppelt im selben Matchup eingetragen werden.";
+  }
+
+  const names = participants
+    .map((participant) => normalizedFightName(participant.display_name))
+    .filter(Boolean);
+  if (new Set(names).size !== names.length) {
+    return "Ein manueller Teilnehmername ist im selben Matchup doppelt vergeben.";
+  }
+
+  return null;
+}
 
 async function verifiedFighterSnapshot(supabase: AdminSupabaseClient, userId: string | null) {
   if (!userId) {
@@ -93,13 +161,11 @@ async function verifiedFighterSnapshot(supabase: AdminSupabaseClient, userId: st
   };
 }
 
-type ParticipantPayload = Omit<FightParticipantRow, "id" | "fight_card_id">;
-
 async function participantFromForm(
   supabase: AdminSupabaseClient,
   formData: FormData,
   prefix: string,
-  corner: "red" | "blue",
+  corner: FightCorner,
   slot: number
 ) {
   const fighterUserId = fieldTextOrNull(formData, `${prefix}_user_id`);
@@ -125,30 +191,27 @@ async function participantFromForm(
   } as const;
 }
 
-function participantName(participant: ParticipantPayload) {
-  return participant.display_name?.trim() || null;
-}
-
-function firstImage(participants: ParticipantPayload[]) {
-  return participants.find((participant) => participant.image_path)?.image_path ?? null;
-}
-
-function duplicateParticipantError(participants: ParticipantPayload[]) {
-  const userIds = participants
-    .map((participant) => participant.fighter_user_id)
-    .filter((userId): userId is string => Boolean(userId));
-  if (new Set(userIds).size !== userIds.length) {
-    return "Ein Kämpfer kann nicht doppelt im selben Matchup eingetragen werden.";
+async function participantsForPayload(
+  supabase: AdminSupabaseClient,
+  formData: FormData,
+  matchupType: FightMatchupType
+) {
+  if (!isTeamMatchup(matchupType)) {
+    return [
+      await participantFromForm(supabase, formData, "fighter_a", "red", 1),
+      await participantFromForm(supabase, formData, "fighter_b", "blue", 1)
+    ];
   }
 
-  const names = participants
-    .map((participant) => normalizedFightName(participant.display_name))
-    .filter(Boolean);
-  if (new Set(names).size !== names.length) {
-    return "Ein manueller Teilnehmername ist im selben Matchup doppelt vergeben.";
+  const teamSize = teamSizeForMatchup(matchupType);
+  const results = [];
+  for (let slot = 1; slot <= teamSize; slot += 1) {
+    results.push(await participantFromForm(supabase, formData, `participant_red_${slot}`, "red", slot));
   }
-
-  return null;
+  for (let slot = 1; slot <= teamSize; slot += 1) {
+    results.push(await participantFromForm(supabase, formData, `participant_blue_${slot}`, "blue", slot));
+  }
+  return results;
 }
 
 async function fightPayload(supabase: AdminSupabaseClient, formData: FormData) {
@@ -167,20 +230,8 @@ async function fightPayload(supabase: AdminSupabaseClient, formData: FormData) {
     return { error: "Ungültiger Kampfstatus." } as const;
   }
 
-  const isVisible = fieldBool(formData, "is_visible");
-  const participantResults =
-    matchupType === "team_2v2"
-      ? [
-          await participantFromForm(supabase, formData, "participant_red_1", "red", 1),
-          await participantFromForm(supabase, formData, "participant_red_2", "red", 2),
-          await participantFromForm(supabase, formData, "participant_blue_1", "blue", 1),
-          await participantFromForm(supabase, formData, "participant_blue_2", "blue", 2)
-        ]
-      : [
-          await participantFromForm(supabase, formData, "fighter_a", "red", 1),
-          await participantFromForm(supabase, formData, "fighter_b", "blue", 1)
-        ];
-
+  const typedMatchup = matchupType as FightMatchupType;
+  const participantResults = await participantsForPayload(supabase, formData, typedMatchup);
   const participantError = participantResults.find((result) => "error" in result);
   if (participantError && "error" in participantError) {
     return { error: participantError.error } as const;
@@ -197,18 +248,20 @@ async function fightPayload(supabase: AdminSupabaseClient, formData: FormData) {
     return { error: duplicateError } as const;
   }
 
+  const isTeamFight = isTeamMatchup(typedMatchup);
+  const isVisible = fieldBool(formData, "is_visible");
   const cornerALabel = fieldTextOrNull(formData, "corner_a_label");
   const cornerBLabel = fieldTextOrNull(formData, "corner_b_label");
   const redParticipants = participants.filter((participant) => participant.corner === "red");
   const blueParticipants = participants.filter((participant) => participant.corner === "blue");
-  const fighterA = matchupType === "team_2v2" ? cornerALabel : participantName(redParticipants[0]);
-  const fighterB = matchupType === "team_2v2" ? cornerBLabel : participantName(blueParticipants[0]);
+  const fighterA = isTeamFight ? cornerALabel : participantName(redParticipants[0]);
+  const fighterB = isTeamFight ? cornerBLabel : participantName(blueParticipants[0]);
 
-  if (matchupType === "single" && redParticipants[0].fighter_user_id && redParticipants[0].fighter_user_id === blueParticipants[0].fighter_user_id) {
+  if (!isTeamFight && redParticipants[0].fighter_user_id && redParticipants[0].fighter_user_id === blueParticipants[0].fighter_user_id) {
     return { error: "Ein Kämpfer kann nicht gegen sich selbst angesetzt werden." } as const;
   }
 
-  if (matchupType === "team_2v2") {
+  if (isTeamFight) {
     if (!cornerALabel || !cornerBLabel) {
       return { error: "Bitte beide Länder oder Teamnamen eintragen." } as const;
     }
@@ -217,7 +270,7 @@ async function fightPayload(supabase: AdminSupabaseClient, formData: FormData) {
     }
   }
 
-  if (isVisible && matchupType === "single" && (!fighterA || !fighterB)) {
+  if (isVisible && !isTeamFight && (!fighterA || !fighterB)) {
     return { error: "Ein sichtbarer Einzelkampf braucht beide Kämpfer oder muss verborgen bleiben." } as const;
   }
 
@@ -225,14 +278,14 @@ async function fightPayload(supabase: AdminSupabaseClient, formData: FormData) {
     payload: {
       event_id: eventId,
       sort_order: fieldInt(formData, "sort_order", 0),
-      matchup_type: matchupType as FightMatchupType,
+      matchup_type: typedMatchup,
       label: fieldTextOrNull(formData, "label"),
-      corner_a_label: matchupType === "team_2v2" ? cornerALabel : fighterA,
-      corner_b_label: matchupType === "team_2v2" ? cornerBLabel : fighterB,
+      corner_a_label: isTeamFight ? cornerALabel : fighterA,
+      corner_b_label: isTeamFight ? cornerBLabel : fighterB,
       corner_a_country_code: fieldTextOrNull(formData, "corner_a_country_code"),
       corner_b_country_code: fieldTextOrNull(formData, "corner_b_country_code"),
-      fighter_a_user_id: matchupType === "single" ? redParticipants[0].fighter_user_id : null,
-      fighter_b_user_id: matchupType === "single" ? blueParticipants[0].fighter_user_id : null,
+      fighter_a_user_id: !isTeamFight ? redParticipants[0].fighter_user_id : null,
+      fighter_b_user_id: !isTeamFight ? blueParticipants[0].fighter_user_id : null,
       fighter_a: fighterA,
       fighter_b: fighterB,
       fighter_a_image_path: firstImage(redParticipants),
@@ -244,6 +297,10 @@ async function fightPayload(supabase: AdminSupabaseClient, formData: FormData) {
         validParticipantResults.find((result) => result.weightClass)?.weightClass ??
         null,
       discipline: fieldTextOrNull(formData, "discipline"),
+      rounds: Math.max(1, fieldInt(formData, "rounds", 3)),
+      round_duration: fieldTextOrNull(formData, "round_duration") ?? "3 Minuten",
+      scheduled_at: parseScheduledAt(formData),
+      winner_corner: parseWinnerCorner(formData),
       is_main_event: fieldBool(formData, "is_main_event"),
       is_visible: isVisible,
       status: status as FightStatus,
@@ -251,10 +308,6 @@ async function fightPayload(supabase: AdminSupabaseClient, formData: FormData) {
     },
     participants
   } as const;
-}
-
-function normalizedFightName(value: string | null) {
-  return value?.trim().replace(/\s+/g, " ").toLowerCase() ?? "";
 }
 
 async function replaceFightParticipants(
@@ -419,6 +472,44 @@ export async function toggleFightVisibilityAction(id: number, isVisible: boolean
   return { ok: true, message: isVisible ? "Kampf ist jetzt öffentlich sichtbar." : "Kampf ist verborgen." };
 }
 
+export async function updateFightStatusAction(id: number, status: FightStatus): Promise<ActionResult> {
+  const admin = await getAdminClient("fightcards.manage");
+  if (!admin.ok) {
+    return { ok: false, error: admin.error };
+  }
+
+  if (!FIGHT_STATUSES.includes(status)) {
+    return { ok: false, error: "Ungültiger Kampfstatus." };
+  }
+
+  const { error } = await admin.supabase.from("fight_cards").update({ status }).eq("id", id);
+  if (error) {
+    return { ok: false, error: supabaseErrorMessage(error) };
+  }
+
+  revalidateFightcards();
+  return { ok: true, message: "Status aktualisiert." };
+}
+
+export async function setFightWinnerAction(id: number, winnerCorner: FightCorner | null): Promise<ActionResult> {
+  const admin = await getAdminClient("fightcards.manage");
+  if (!admin.ok) {
+    return { ok: false, error: admin.error };
+  }
+
+  const { error } = await admin.supabase
+    .from("fight_cards")
+    .update({ winner_corner: winnerCorner, status: winnerCorner ? "completed" : "planned" })
+    .eq("id", id);
+
+  if (error) {
+    return { ok: false, error: supabaseErrorMessage(error) };
+  }
+
+  revalidateFightcards();
+  return { ok: true, message: winnerCorner ? "Gewinner gesetzt." : "Gewinner zurückgesetzt." };
+}
+
 export async function moveFightAction(id: number, direction: "up" | "down"): Promise<ActionResult> {
   const admin = await getAdminClient("fightcards.manage");
   if (!admin.ok) {
@@ -480,7 +571,6 @@ export async function moveFightAction(id: number, direction: "up" | "down"): Pro
   return { ok: true, message: "Reihenfolge aktualisiert." };
 }
 
-/** Persistiert die per Drag & Drop festgelegte Reihenfolge einer Event-Fightcard. */
 export async function reorderFightsAction(eventId: number, orderedIds: number[]): Promise<ActionResult> {
   const admin = await getAdminClient("fightcards.manage");
   if (!admin.ok) {
@@ -507,7 +597,6 @@ export async function reorderFightsAction(eventId: number, orderedIds: number[])
   return { ok: true, message: "Kampfreihenfolge aktualisiert." };
 }
 
-/** Schaltet alle Kämpfe eines Events öffentlich sichtbar. */
 export async function publishFightcardAction(eventId: number): Promise<ActionResult> {
   const admin = await getAdminClient("fightcards.manage");
   if (!admin.ok) {
@@ -524,7 +613,111 @@ export async function publishFightcardAction(eventId: number): Promise<ActionRes
   }
 
   revalidateFightcards();
-  return { ok: true, message: "Fightcard veröffentlicht – alle Kämpfe sind sichtbar." };
+  return { ok: true, message: "Fightcard veröffentlicht - alle Kämpfe sind sichtbar." };
+}
+
+export async function duplicateFightAction(id: number): Promise<ActionResult> {
+  const admin = await getAdminClient("fightcards.manage");
+  if (!admin.ok) {
+    return { ok: false, error: admin.error };
+  }
+
+  const { data: current, error: currentError } = await admin.supabase
+    .from("fight_cards")
+    .select(
+      "id, event_id, sort_order, matchup_type, label, corner_a_label, corner_b_label, corner_a_country_code, corner_b_country_code, fighter_a_user_id, fighter_b_user_id, fighter_a, fighter_b, fighter_a_image_path, fighter_b_image_path, fighter_a_is_tba, fighter_b_is_tba, weight_class, discipline, rounds, round_duration, scheduled_at, winner_corner, is_main_event, is_visible, status, notes"
+    )
+    .eq("id", id)
+    .maybeSingle();
+
+  if (currentError || !current) {
+    return { ok: false, error: "Kampf wurde nicht gefunden." };
+  }
+
+  const fight = current as FightRow;
+  const { data: last } = await admin.supabase
+    .from("fight_cards")
+    .select("sort_order")
+    .eq("event_id", fight.event_id)
+    .order("sort_order", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  const nextSortOrder = ((last as { sort_order: number } | null)?.sort_order ?? fight.sort_order) + 10;
+  const clonePayload = {
+    event_id: fight.event_id,
+    sort_order: nextSortOrder,
+    matchup_type: fight.matchup_type,
+    label: fight.label,
+    corner_a_label: fight.corner_a_label,
+    corner_b_label: fight.corner_b_label,
+    corner_a_country_code: fight.corner_a_country_code,
+    corner_b_country_code: fight.corner_b_country_code,
+    fighter_a_user_id: fight.fighter_a_user_id,
+    fighter_b_user_id: fight.fighter_b_user_id,
+    fighter_a: fight.fighter_a,
+    fighter_b: fight.fighter_b,
+    fighter_a_image_path: fight.fighter_a_image_path,
+    fighter_b_image_path: fight.fighter_b_image_path,
+    fighter_a_is_tba: fight.fighter_a_is_tba,
+    fighter_b_is_tba: fight.fighter_b_is_tba,
+    weight_class: fight.weight_class,
+    discipline: fight.discipline,
+    rounds: fight.rounds,
+    round_duration: fight.round_duration,
+    scheduled_at: fight.scheduled_at,
+    winner_corner: null,
+    is_main_event: false,
+    is_visible: false,
+    status: "planned" as FightStatus,
+    notes: fight.notes
+  };
+
+  const { data: inserted, error: insertError } = await admin.supabase
+    .from("fight_cards")
+    .insert(clonePayload)
+    .select("id")
+    .single();
+
+  if (insertError) {
+    return { ok: false, error: supabaseErrorMessage(insertError) };
+  }
+
+  const nextFight = inserted as Pick<FightRow, "id"> | null;
+  if (!nextFight) {
+    return { ok: false, error: "Kopie wurde erstellt, aber die ID konnte nicht geladen werden." };
+  }
+
+  const { data: participants, error: participantsError } = await admin.supabase
+    .from("fight_card_participants")
+    .select("corner, slot, fighter_user_id, display_name, image_path, is_tba")
+    .eq("fight_card_id", id)
+    .order("slot", { ascending: true });
+
+  if (participantsError) {
+    return { ok: false, error: supabaseErrorMessage(participantsError) };
+  }
+
+  if ((participants ?? []).length > 0) {
+    const { error: cloneParticipantsError } = await admin.supabase.from("fight_card_participants").insert(
+      ((participants ?? []) as ParticipantPayload[]).map((participant) => ({
+        fight_card_id: nextFight.id,
+        corner: participant.corner,
+        slot: participant.slot,
+        fighter_user_id: participant.fighter_user_id,
+        display_name: participant.display_name,
+        image_path: participant.image_path,
+        is_tba: participant.is_tba
+      }))
+    );
+
+    if (cloneParticipantsError) {
+      return { ok: false, error: supabaseErrorMessage(cloneParticipantsError) };
+    }
+  }
+
+  revalidateFightcards();
+  return { ok: true, message: "Kampf dupliziert." };
 }
 
 export async function deleteFightAction(id: number): Promise<ActionResult> {
@@ -540,4 +733,185 @@ export async function deleteFightAction(id: number): Promise<ActionResult> {
 
   revalidateFightcards();
   return { ok: true, message: "Kampf gelöscht." };
+}
+
+function textList(formData: FormData, name: string, fallback: string[]) {
+  const value = fieldText(formData, name);
+  if (!value) {
+    return fallback;
+  }
+  return value
+    .split(/\r?\n|,/)
+    .map((item) => item.trim())
+    .filter(Boolean);
+}
+
+function mergeBool(formData: FormData, name: string, fallback: boolean) {
+  return formData.has(name) ? fieldBool(formData, name) : fallback;
+}
+
+function settingsPayload(formData: FormData, media: FightcardSettings["media"]): FightcardSettings {
+  const defaultMatchupType = fieldText(formData, "default_matchup_type") || DEFAULT_FIGHTCARD_SETTINGS.general.defaultMatchupType;
+  const defaultStatus = fieldText(formData, "default_status") || DEFAULT_FIGHTCARD_SETTINGS.general.defaultStatus;
+  const defaultVisibility = fieldText(formData, "default_visibility") || DEFAULT_FIGHTCARD_SETTINGS.general.defaultVisibility;
+
+  return {
+    general: {
+      defaultMatchupType: FIGHT_MATCHUP_TYPES.includes(defaultMatchupType as FightMatchupType)
+        ? (defaultMatchupType as FightMatchupType)
+        : DEFAULT_FIGHTCARD_SETTINGS.general.defaultMatchupType,
+      defaultRounds: Math.max(1, fieldInt(formData, "default_rounds", DEFAULT_FIGHTCARD_SETTINGS.general.defaultRounds)),
+      defaultRoundDuration:
+        fieldTextOrNull(formData, "default_round_duration") ?? DEFAULT_FIGHTCARD_SETTINGS.general.defaultRoundDuration,
+      defaultStatus: FIGHT_STATUSES.includes(defaultStatus as FightStatus)
+        ? (defaultStatus as FightStatus)
+        : DEFAULT_FIGHTCARD_SETTINGS.general.defaultStatus,
+      defaultVisibility: defaultVisibility === "public" ? "public" : "admin"
+    },
+    display: {
+      autoNumbering: mergeBool(formData, "display_auto_numbering", DEFAULT_FIGHTCARD_SETTINGS.display.autoNumbering),
+      showNationality: mergeBool(formData, "display_show_nationality", DEFAULT_FIGHTCARD_SETTINGS.display.showNationality),
+      showWeightClass: mergeBool(formData, "display_show_weight_class", DEFAULT_FIGHTCARD_SETTINGS.display.showWeightClass),
+      showTeamLogos: mergeBool(formData, "display_show_team_logos", DEFAULT_FIGHTCARD_SETTINGS.display.showTeamLogos),
+      showTeamFlags: mergeBool(formData, "display_show_team_flags", DEFAULT_FIGHTCARD_SETTINGS.display.showTeamFlags),
+      hideCompleted: mergeBool(formData, "display_hide_completed", DEFAULT_FIGHTCARD_SETTINGS.display.hideCompleted)
+    },
+    tournament: {
+      enabled: mergeBool(formData, "tournament_enabled", DEFAULT_FIGHTCARD_SETTINGS.tournament.enabled),
+      maxTeamSize: Math.min(4, Math.max(1, fieldInt(formData, "tournament_max_team_size", 4))),
+      publicBracket: mergeBool(formData, "tournament_public_bracket", DEFAULT_FIGHTCARD_SETTINGS.tournament.publicBracket),
+      liveUpdates: mergeBool(formData, "tournament_live_updates", DEFAULT_FIGHTCARD_SETTINGS.tournament.liveUpdates)
+    },
+    system: {
+      autosave: mergeBool(formData, "system_autosave", DEFAULT_FIGHTCARD_SETTINGS.system.autosave),
+      saveHistory: mergeBool(formData, "system_save_history", DEFAULT_FIGHTCARD_SETTINGS.system.saveHistory),
+      backupEnabled: mergeBool(formData, "system_backup", DEFAULT_FIGHTCARD_SETTINGS.system.backupEnabled)
+    },
+    categories: textList(formData, "categories", DEFAULT_FIGHTCARD_SETTINGS.categories),
+    weightClasses: textList(formData, "weight_classes", DEFAULT_FIGHTCARD_SETTINGS.weightClasses),
+    rules: {
+      format: fieldTextOrNull(formData, "rules_format") ?? DEFAULT_FIGHTCARD_SETTINGS.rules.format,
+      tiebreaker: fieldTextOrNull(formData, "rules_tiebreaker") ?? DEFAULT_FIGHTCARD_SETTINGS.rules.tiebreaker
+    },
+    points: {
+      win: fieldInt(formData, "points_win", DEFAULT_FIGHTCARD_SETTINGS.points.win),
+      draw: fieldInt(formData, "points_draw", DEFAULT_FIGHTCARD_SETTINGS.points.draw),
+      loss: fieldInt(formData, "points_loss", DEFAULT_FIGHTCARD_SETTINGS.points.loss),
+      teamWin: fieldTextOrNull(formData, "points_team_win") ?? DEFAULT_FIGHTCARD_SETTINGS.points.teamWin
+    },
+    media
+  };
+}
+
+export async function saveFightcardSettingsAction(
+  _prev: ActionResult | null,
+  formData: FormData
+): Promise<ActionResult> {
+  const admin = await getAdminClient("fightcards.manage");
+  if (!admin.ok) {
+    return { ok: false, error: admin.error };
+  }
+
+  const eventId = fieldInt(formData, "event_id", 0);
+  if (!eventId) {
+    return { ok: false, error: "Bitte eine Veranstaltung auswählen." };
+  }
+
+  const { data: existingSettingsData, error: existingSettingsError } = await admin.supabase
+    .from("fightcard_settings")
+    .select("media")
+    .eq("event_id", eventId)
+    .maybeSingle();
+
+  if (existingSettingsError) {
+    return { ok: false, error: supabaseErrorMessage(existingSettingsError) };
+  }
+
+  const existingMedia =
+    (existingSettingsData as { media: FightcardSettings["media"] | null } | null)?.media ?? null;
+
+  let media: FightcardSettings["media"] = {
+    bannerUrl: fieldBool(formData, "clear_banner_url") ? null : fieldHrefOrNull(formData, "media_banner_url"),
+    logoUrl: fieldBool(formData, "clear_logo_url") ? null : fieldHrefOrNull(formData, "media_logo_url")
+  };
+
+  const bannerFile = formFile(formData, "banner_file");
+  if (bannerFile) {
+    const upload = await uploadAdminMediaAsset({
+      supabase: admin.supabase,
+      file: bannerFile,
+      folder: `fightcards/${eventId}`,
+      assetType: "Veranstaltung",
+      altText: "Fightcard Banner",
+      usageNote: "Admin Fightcard Standard Banner",
+      isPublic: true,
+      isChecked: true
+    });
+
+    if (!upload.ok) {
+      return { ok: false, error: upload.error };
+    }
+    media = { ...media, bannerUrl: upload.publicUrl };
+  }
+
+  const logoFile = formFile(formData, "logo_file");
+  if (logoFile) {
+    const upload = await uploadAdminMediaAsset({
+      supabase: admin.supabase,
+      file: logoFile,
+      folder: `fightcards/${eventId}`,
+      assetType: "Logo",
+      altText: "Fightcard Event Logo",
+      usageNote: "Admin Fightcard Event Logo",
+      isPublic: true,
+      isChecked: true
+    });
+
+    if (!upload.ok) {
+      return { ok: false, error: upload.error };
+    }
+    media = { ...media, logoUrl: upload.publicUrl };
+  }
+
+  const settings = settingsPayload(formData, media);
+  const { error } = await admin.supabase.from("fightcard_settings").upsert(
+    {
+      event_id: eventId,
+      general: settings.general,
+      display: settings.display,
+      tournament: settings.tournament,
+      system: settings.system,
+      categories: settings.categories,
+      weight_classes: settings.weightClasses,
+      rules: settings.rules,
+      points: settings.points,
+      media: settings.media
+    },
+    { onConflict: "event_id" }
+  );
+
+  if (error) {
+    return { ok: false, error: supabaseErrorMessage(error) };
+  }
+
+  const cleanupBanner = await cleanupReplacedAdminMedia({
+    supabase: admin.supabase,
+    previousUrl: existingMedia?.bannerUrl,
+    nextUrl: settings.media.bannerUrl
+  });
+  if (!cleanupBanner.ok) {
+    return cleanupBanner;
+  }
+
+  const cleanupLogo = await cleanupReplacedAdminMedia({
+    supabase: admin.supabase,
+    previousUrl: existingMedia?.logoUrl,
+    nextUrl: settings.media.logoUrl
+  });
+  if (!cleanupLogo.ok) {
+    return cleanupLogo;
+  }
+
+  revalidateFightcards();
+  return { ok: true, message: "Fightcard-Einstellungen gespeichert." };
 }

@@ -9,11 +9,16 @@ export const CONTACT_STATUSES = ["neu", "gelesen", "erledigt"] as const;
 
 export const FIGHT_STATUSES = ["planned", "confirmed", "cancelled", "completed"] as const;
 
-export const FIGHT_MATCHUP_TYPES = ["single", "team_2v2"] as const;
+export const FIGHT_TEAM_SIZES = [1, 2, 3, 4] as const;
+
+export const FIGHT_MATCHUP_TYPES = ["single", "team_1v1", "team_2v2", "team_3v3", "team_4v4"] as const;
 
 export const FIGHT_MATCHUP_TYPE_LABELS: Record<(typeof FIGHT_MATCHUP_TYPES)[number], string> = {
   single: "Einzelkampf",
-  team_2v2: "Länderduell 2 gegen 2"
+  team_1v1: "Länderduell 1 gegen 1",
+  team_2v2: "Länderduell 2 gegen 2",
+  team_3v3: "Länderduell 3 gegen 3",
+  team_4v4: "Länderduell 4 gegen 4"
 };
 
 export const FIGHT_STATUS_LABELS: Record<(typeof FIGHT_STATUSES)[number], string> = {
@@ -45,8 +50,13 @@ export const SETTING_FIELDS = [
   { key: "countdown.featuredEventId", label: "Nächste Veranstaltung", placeholder: "smashtime-3-respekt-steigt-in-den-ring" },
   { key: "countdown.countdownEndAt", label: "Countdown-Ende", placeholder: "2026-10-17T18:00:00+02:00" },
   { key: "countdown.label", label: "Countdown-Text", placeholder: "Der Kampf beginnt in" },
-  { key: "homepage.hero.title", label: "Hero Titel", placeholder: "SmashTime 3" },
-  { key: "homepage.hero.subtitle", label: "Hero Untertitel", placeholder: "Die Elite des Kampfes." },
+  { key: "homepage.hero.title", label: "Hero Titel", placeholder: "WO KAMPF\nCHARAKTER ZEIGT." },
+  {
+    key: "homepage.hero.subtitle",
+    label: "Hero Untertitel",
+    placeholder:
+      "SmashTime ist die Bühne für Live-Kampfsport, starke Athleten und echte Emotionen.\nHier geht es nicht nur ums Gewinnen, sondern um Respekt, Haltung und Momente, die bleiben."
+  },
   { key: "homepage.hero.backgroundImageUrl", label: "Hero Hintergrundbild", placeholder: "/images/backgrounds/..." },
   { key: "homepage.cta.primaryLabel", label: "Haupt-CTA Text", placeholder: "Nächste Veranstaltung" },
   { key: "homepage.cta.primaryUrl", label: "Haupt-CTA Link", placeholder: "/veranstaltungen/smashtime-3-respekt-steigt-in-den-ring" },

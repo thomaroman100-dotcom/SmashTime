@@ -49,7 +49,7 @@ on public.fight_card_participants(fighter_user_id);
 drop trigger if exists set_fight_card_participants_updated_at on public.fight_card_participants;
 create trigger set_fight_card_participants_updated_at
 before update on public.fight_card_participants
-for each row execute function public.update_updated_at();
+for each row execute function public.set_updated_at();
 
 insert into public.fight_card_participants (
   fight_card_id,

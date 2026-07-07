@@ -23,12 +23,17 @@ type PublicFightCardRow = {
   corner_b_label: string | null;
   corner_a_country_code: string | null;
   corner_b_country_code: string | null;
+  rounds: number | null;
+  round_duration: string | null;
+  scheduled_at: string | null;
+  winner_corner: "red" | "blue" | null;
   is_visible: boolean | null;
   fight_card_participants?: PublicFightParticipantRow[] | null;
 };
 
 type PublicFightParticipantRow = {
   id: number;
+  fight_card_id?: number | null;
   corner: "red" | "blue";
   slot: number;
   fighter_user_id: string | null;
@@ -76,13 +81,14 @@ function rowParticipants(row: PublicFightCardRow, corner: "red" | "blue") {
 }
 
 function rowToFightCard(row: PublicFightCardRow, eventSlug: string): FightCardEntry {
-  const matchupType = row.matchup_type === "team_2v2" ? "team_2v2" : "single";
+  const matchupType = row.matchup_type?.startsWith("team_") ? row.matchup_type : "single";
   const redParticipants = rowParticipants(row, "red");
   const blueParticipants = rowParticipants(row, "blue");
-  const fighterA = matchupType === "team_2v2"
+  const isTeam = matchupType.startsWith("team_");
+  const fighterA = isTeam
     ? row.corner_a_label || row.fighter_a || "Team Rot"
     : redParticipants[0]?.name ?? row.fighter_a ?? "Wird bekanntgegeben";
-  const fighterB = matchupType === "team_2v2"
+  const fighterB = isTeam
     ? row.corner_b_label || row.fighter_b || "Team Blau"
     : blueParticipants[0]?.name ?? row.fighter_b ?? "Wird bekanntgegeben";
 
@@ -94,12 +100,12 @@ function rowToFightCard(row: PublicFightCardRow, eventSlug: string): FightCardEn
     fighterA,
     fighterB,
     redCorner: {
-      label: matchupType === "team_2v2" ? fighterA : redParticipants[0]?.name ?? fighterA,
+      label: isTeam ? fighterA : redParticipants[0]?.name ?? fighterA,
       countryCode: row.corner_a_country_code ?? undefined,
       participants: redParticipants
     },
     blueCorner: {
-      label: matchupType === "team_2v2" ? fighterB : blueParticipants[0]?.name ?? fighterB,
+      label: isTeam ? fighterB : blueParticipants[0]?.name ?? fighterB,
       countryCode: row.corner_b_country_code ?? undefined,
       participants: blueParticipants
     },
@@ -107,9 +113,32 @@ function rowToFightCard(row: PublicFightCardRow, eventSlug: string): FightCardEn
     fighterBImage: blueParticipants[0]?.image ?? row.fighter_b_image_path ?? undefined,
     weightClass: row.weight_class || "Wird nachgetragen",
     discipline: row.discipline || "Disziplin wird bekanntgegeben",
+    rounds: row.rounds ?? undefined,
+    roundDuration: row.round_duration ?? undefined,
+    scheduledAt: row.scheduled_at ?? undefined,
+    winnerCorner: row.winner_corner ?? null,
     label: row.label ?? undefined,
     visible: Boolean(row.is_visible)
   };
+}
+
+function attachParticipants(rows: PublicFightCardRow[], participants: PublicFightParticipantRow[]) {
+  const participantsByFight = new Map<number, PublicFightParticipantRow[]>();
+
+  for (const participant of participants) {
+    if (!participant.fight_card_id) {
+      continue;
+    }
+    participantsByFight.set(participant.fight_card_id, [
+      ...(participantsByFight.get(participant.fight_card_id) ?? []),
+      participant
+    ]);
+  }
+
+  return rows.map((row) => ({
+    ...row,
+    fight_card_participants: participantsByFight.get(row.id) ?? []
+  }));
 }
 
 export async function getPublicFightcardsForEvent(eventSlug: string): Promise<FightCardEntry[]> {
@@ -136,20 +165,89 @@ export async function getPublicFightcardsForEvent(eventSlug: string): Promise<Fi
   }
 
   const eventRow = event as EventIdRow;
-  const { data, error } = await supabase
+  const fightResult = await supabase
     .from("fight_cards")
     .select(
-      "id, event_id, sort_order, matchup_type, label, fighter_a, fighter_b, fighter_a_image_path, fighter_b_image_path, weight_class, discipline, corner_a_label, corner_b_label, corner_a_country_code, corner_b_country_code, is_visible, fight_card_participants(id, corner, slot, fighter_user_id, display_name, image_path, is_tba)"
+      "id, event_id, sort_order, matchup_type, label, fighter_a, fighter_b, fighter_a_image_path, fighter_b_image_path, weight_class, discipline, corner_a_label, corner_b_label, corner_a_country_code, corner_b_country_code, rounds, round_duration, scheduled_at, winner_corner, is_visible"
     )
     .eq("event_id", eventRow.id)
     .eq("is_visible", true)
     .order("sort_order", { ascending: true });
 
-  if (error) {
+  let fightData = fightResult.data as PublicFightCardRow[] | null;
+  let fightError = fightResult.error;
+  let teamColumnsMissing = Boolean(fightError?.message.includes("matchup_type") || fightError?.message.includes("corner_a_label"));
+  const detailColumnsMissing = Boolean(
+    fightError?.message.includes("rounds") ||
+    fightError?.message.includes("round_duration") ||
+    fightError?.message.includes("scheduled_at") ||
+    fightError?.message.includes("winner_corner")
+  );
+
+  if (detailColumnsMissing && !teamColumnsMissing) {
+    const teamResult = await supabase
+      .from("fight_cards")
+      .select(
+        "id, event_id, sort_order, matchup_type, label, fighter_a, fighter_b, fighter_a_image_path, fighter_b_image_path, weight_class, discipline, corner_a_label, corner_b_label, corner_a_country_code, corner_b_country_code, is_visible"
+      )
+      .eq("event_id", eventRow.id)
+      .eq("is_visible", true)
+      .order("sort_order", { ascending: true });
+
+    fightData = teamResult.data as PublicFightCardRow[] | null;
+    fightError = teamResult.error;
+    teamColumnsMissing = Boolean(fightError?.message.includes("matchup_type") || fightError?.message.includes("corner_a_label"));
+  }
+
+  if (teamColumnsMissing) {
+    const legacyResult = await supabase
+      .from("fight_cards")
+      .select(
+        "id, event_id, sort_order, label, fighter_a, fighter_b, fighter_a_image_path, fighter_b_image_path, weight_class, discipline, is_visible"
+      )
+      .eq("event_id", eventRow.id)
+      .eq("is_visible", true)
+      .order("sort_order", { ascending: true });
+
+    fightData = legacyResult.data as PublicFightCardRow[] | null;
+    fightError = legacyResult.error;
+
+    const imageColumnsMissing = Boolean(fightError?.message.includes("fighter_a_image_path"));
+
+    if (imageColumnsMissing) {
+      const baseResult = await supabase
+        .from("fight_cards")
+        .select("id, event_id, sort_order, label, fighter_a, fighter_b, weight_class, discipline, is_visible")
+        .eq("event_id", eventRow.id)
+        .eq("is_visible", true)
+        .order("sort_order", { ascending: true });
+
+      fightData = baseResult.data as PublicFightCardRow[] | null;
+      fightError = baseResult.error;
+    }
+  }
+
+  if (fightError) {
     return fallbackFightcards(eventSlug);
   }
 
-  const fights = ((data ?? []) as PublicFightCardRow[]).map((row) => rowToFightCard(row, eventSlug));
+  const rows = fightData ?? [];
+  const fightIds = rows.map((row) => row.id);
+  let rowsWithParticipants = rows;
+
+  if (!teamColumnsMissing && fightIds.length > 0) {
+    const { data: participantData, error: participantError } = await supabase
+      .from("fight_card_participants")
+      .select("id, fight_card_id, corner, slot, fighter_user_id, display_name, image_path, is_tba")
+      .in("fight_card_id", fightIds)
+      .order("slot", { ascending: true });
+
+    if (!participantError) {
+      rowsWithParticipants = attachParticipants(rows, participantData as PublicFightParticipantRow[]);
+    }
+  }
+
+  const fights = rowsWithParticipants.map((row) => rowToFightCard(row, eventSlug));
   return fights.length > 0 ? fights : fallbackFightcards(eventSlug);
 }
 

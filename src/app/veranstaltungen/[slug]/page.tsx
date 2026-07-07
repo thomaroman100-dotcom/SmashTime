@@ -7,14 +7,17 @@ import { PageHero } from "@/components/sections/PageHero";
 import { SponsorStrip } from "@/components/sections/SponsorStrip";
 import { FightCardList } from "@/components/sections/FightCardList";
 import { IconBadge } from "@/components/ui/IconBadge";
-import { eventRecaps, getEventRecap } from "@/data/eventRecaps";
+import { eventRecaps, getEventRecap, type EventRecap } from "@/data/eventRecaps";
 import { pageHeroes } from "@/data/heroes";
 import { site } from "@/data/site";
 import { getPublicFightcardsForEvent } from "@/lib/public-fightcards";
+import { getPublicEventBySlug, type PublicEvent } from "@/lib/public-events";
 
 type EventDetailPageProps = {
   params: Promise<{ slug: string }>;
 };
+
+export const dynamic = "force-dynamic";
 
 export function generateStaticParams() {
   return eventRecaps.map((event) => ({ slug: event.slug }));
@@ -22,22 +25,83 @@ export function generateStaticParams() {
 
 export async function generateMetadata({ params }: EventDetailPageProps) {
   const { slug } = await params;
-  const event = getEventRecap(slug);
+  const publicEvent = await getPublicEventBySlug(slug);
+  const fallbackEvent = publicEvent ? null : getEventRecap(slug);
+  const metadataTitle = publicEvent ? publicEvent.name : fallbackEvent?.title;
 
   return {
-    title: event ? `${event.title} ${event.redTitle} | SmashTime` : "Veranstaltung | SmashTime"
+    title: metadataTitle ? `${metadataTitle} | SmashTime` : "Veranstaltung | SmashTime"
+  };
+}
+
+function shortDateLabel(dateValue: string) {
+  const date = new Date(dateValue);
+  if (Number.isNaN(date.getTime())) {
+    return "TBA";
+  }
+
+  return new Intl.DateTimeFormat("de-AT", {
+    day: "2-digit",
+    month: "2-digit"
+  }).format(date);
+}
+
+function publicEventToRecap(event: PublicEvent, fightCount: number): EventRecap & { ticketHref?: string } {
+  const title = event.shortName.endsWith(".") ? event.shortName : `${event.shortName}.`;
+  const redTitle = event.subtitle.endsWith(".") ? event.subtitle : `${event.subtitle}.`;
+  const detailSentence = `${event.shortName} findet am ${event.dateLabel} in der ${event.location} statt. Einlass ist ${event.admission}, Beginn ${event.start}.`;
+
+  return {
+    slug: event.id,
+    title,
+    redTitle,
+    intro: `${event.subtitle}: ${event.shortName} bringt Kampfsport, Haltung und Live-Atmosphäre in den Ring.`,
+    date: event.dateLabel,
+    location: event.location,
+    address: event.address,
+    admission: event.admission,
+    start: event.start,
+    disciplines: event.disciplines,
+    image: event.image,
+    stats: [
+      { value: shortDateLabel(event.date), label: "Veranstaltungsdatum", icon: "calendar" },
+      { value: event.start, label: "Beginn", icon: "clock" },
+      { value: event.disciplines.length.toString(), label: "Disziplinen", icon: "fighter" },
+      { value: fightCount.toString(), label: fightCount === 1 ? "Bestätigte Paarung" : "Bestätigte Paarungen", icon: "list" }
+    ],
+    description: [
+      detailSentence,
+      `Der Kampfabend steht unter dem Motto "${event.subtitle}" und setzt ein klares Zeichen für Respekt, Stärke und Zusammenhalt.`,
+      event.gastro
+        ? event.gastro
+        : "Fightcard und weitere Informationen werden ergänzt, sobald sie offiziell bestätigt sind."
+    ],
+    results: [],
+    quote: {
+      text: "Ein Abend für Respekt, Stärke und Zusammenhalt.",
+      author: "SmashTime Team"
+    },
+    gallery: [
+      { src: event.image, alt: `${event.name} Eventposter` },
+      { src: "/images/backgrounds/smashtime-hero-faceoff-cage.png", alt: "Cage und Arena bei SmashTime" },
+      { src: "/images/backgrounds/arena-seats-cage.png", alt: "Arena mit Käfig" }
+    ],
+    ticketHref: event.ticketHref
   };
 }
 
 export default async function EventDetailPage({ params }: EventDetailPageProps) {
   const { slug } = await params;
-  const event = getEventRecap(slug);
+  const publicEvent = await getPublicEventBySlug(slug);
+  const fallbackEvent = publicEvent ? null : getEventRecap(slug);
 
-  if (!event) {
+  if (!publicEvent && !fallbackEvent) {
     notFound();
   }
 
-  const visibleFights = await getPublicFightcardsForEvent(event.slug);
+  const visibleFights = await getPublicFightcardsForEvent(slug);
+  const event = publicEvent ? publicEventToRecap(publicEvent, visibleFights.length) : fallbackEvent!;
+  const ticketHref = publicEvent?.ticketHref ?? site.ticketHref;
 
   return (
     <>
@@ -96,7 +160,7 @@ export default async function EventDetailPage({ params }: EventDetailPageProps) 
             fights={visibleFights}
             title="Fightcard"
             description="Die zentrale Kampfkarte für diesen Kampfabend: Länderduelle, Hauptkarte und weitere Paarungen werden hier gepflegt."
-            ctaHref={site.ticketHref}
+            ctaHref={ticketHref}
             ctaLabel="Tickets sichern"
           />
 

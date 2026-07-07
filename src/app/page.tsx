@@ -6,7 +6,6 @@ import { CTASection } from "@/components/sections/CTASection";
 import { EventCard } from "@/components/sections/EventCard";
 import { HeroSection } from "@/components/sections/HeroSection";
 import { MainFightBanner } from "@/components/sections/MainFightBanner";
-import { RankingPreview } from "@/components/sections/RankingPreview";
 import { SectionHead } from "@/components/ui/SectionHead";
 import { champions } from "@/data/champions";
 import { upcomingEvent } from "@/data/events";
@@ -18,7 +17,6 @@ import {
 } from "@/data/homepage";
 import type { HomeEventPoster } from "@/data/homepage";
 import { newsItems } from "@/data/news";
-import { rankings, rankingsFallback } from "@/data/rankings";
 import { sponsorLogos } from "@/data/sponsors";
 import { getPublicHeroEvent, type PublicHomeEvent } from "@/lib/public-events";
 import { getPublicFightcardsForEvent, pickFeaturedFight } from "@/lib/public-fightcards";
@@ -136,7 +134,7 @@ export default async function Home() {
         </div>
       </section>
 
-      <section className="home-lower" aria-label="Veranstaltungen, Rangliste und Neuigkeiten">
+      <section className="home-lower" aria-label="Veranstaltungen und Neuigkeiten">
         <div className="container home-lower__grid">
           <div className="home-lower__col home-lower__col--events">
             <SectionHead title={homeSections.events.title} />
@@ -148,14 +146,6 @@ export default async function Home() {
             </div>
             <Link href={homeSections.events.ctaHref} className="section-head__cta home-lower__more">
               {homeSections.events.ctaLabel} <ArrowRight aria-hidden="true" size={15} strokeWidth={2.6} />
-            </Link>
-          </div>
-
-          <div className="home-lower__col home-lower__col--rankings">
-            <SectionHead title={homeSections.rankings.title} />
-            <RankingPreview entries={rankings} fallback={rankingsFallback} />
-            <Link href={homeSections.rankings.ctaHref} className="section-head__cta home-lower__more">
-              {homeSections.rankings.ctaLabel} <ArrowRight aria-hidden="true" size={15} strokeWidth={2.6} />
             </Link>
           </div>
 

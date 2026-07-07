@@ -7,6 +7,7 @@ import type { MediaAssetRow } from "@/lib/admin/actions/media";
 import { MEDIA_TYPES } from "@/lib/admin/resource-shared";
 import { useAdminUi } from "@/components/admin/ui/AdminUiProvider";
 import { AdminImagePreview } from "@/components/admin/ui/AdminImagePreview";
+import { AdminImageUploadField } from "@/components/admin/ui/AdminImageUploadField";
 import { Badge } from "@/components/admin/ui/primitives";
 
 type UploadAction = (prev: ActionResult | null, formData: FormData) => Promise<ActionResult>;
@@ -41,13 +42,15 @@ export function MediaUploadForm({ action }: MediaUploadFormProps) {
         </div>
       </div>
       <div className="adm-panel__body">
-        <div className="adm-field">
-          <label htmlFor="media-file">
-            Bilddatei <em>*</em>
-          </label>
-          <input id="media-file" name="file" type="file" accept="image/png,image/jpeg,image/webp,image/avif,image/svg+xml" required />
-          <span className="adm-field__hint">PNG, JPG, WebP, AVIF oder SVG. Max. 6 MB.</span>
-        </div>
+        <AdminImageUploadField
+          id="media-file"
+          label="Bilddatei"
+          fileName="file"
+          fileLabel="Bilddatei auswählen"
+          fallback="Dateivorschau"
+          uploadHint="PNG, JPG, WebP, AVIF oder SVG. Max. 6 MB."
+          required
+        />
         <div className="adm-grid-2">
           <div className="adm-field">
             <label htmlFor="media-type">Asset-Typ</label>

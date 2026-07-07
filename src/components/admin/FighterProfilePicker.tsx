@@ -1,7 +1,9 @@
 "use client";
 
+import Image from "next/image";
 import { useMemo, useState } from "react";
-import { Search, UserRound, X } from "lucide-react";
+import { Search, X } from "lucide-react";
+import { getMemberImageSrc } from "@/lib/media-placeholders";
 import { cn } from "@/lib/utils";
 
 export type FighterProfileOption = {
@@ -88,7 +90,7 @@ export function FighterProfilePicker({
       </select>
       <div className="adm-fighter-profile-picker__selected">
         <span className="adm-fighter-profile-picker__avatar">
-          <UserRound aria-hidden="true" size={18} />
+          <Image src={getMemberImageSrc(selected?.imagePath)} alt="" fill sizes="34px" />
         </span>
         <span>
           <strong>{selected?.name ?? legacyName ?? emptyLabel}</strong>

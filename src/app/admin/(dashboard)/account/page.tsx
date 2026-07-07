@@ -129,7 +129,7 @@ export default async function AdminAccountPage() {
 
       <section className="adm-account-hero" id="profil">
         <div className="adm-account-hero__identity">
-          <InitialsAvatar name={user.displayName} online />
+          <InitialsAvatar name={user.displayName} src={user.avatarUrl} online />
           <div>
             <span className="adm-account-kicker">Aktives Admin-Konto</span>
             <h2>{user.displayName}</h2>

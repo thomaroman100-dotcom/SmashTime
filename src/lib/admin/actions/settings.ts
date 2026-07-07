@@ -2,14 +2,13 @@
 
 import { revalidatePath } from "next/cache";
 import {
-  type AdminClientResult,
   type ActionResult,
-  ADMIN_ALLOWED_IMAGE_MIME,
-  ADMIN_MAX_UPLOAD_BYTES,
   fieldText,
+  formFile,
   getAdminClient,
-  slugify,
-  supabaseErrorMessage
+  supabaseErrorMessage,
+  uploadAdminMediaAsset,
+  cleanupReplacedAdminMedia
 } from "@/lib/admin/action-helpers";
 import { SETTING_FIELDS } from "@/lib/admin/resource-shared";
 import { normalizePublicHref } from "@/lib/public-url";
@@ -18,8 +17,6 @@ export type SettingRow = {
   key: string;
   value: { text?: string };
 };
-
-type AdminSupabaseClient = Extract<AdminClientResult, { ok: true }>["supabase"];
 
 const SETTINGS_UPLOAD_FIELDS: Record<string, { settingKey: string; folder: string; assetType: string }> = {
   headerLogoFile: {
@@ -47,11 +44,6 @@ const INTERNAL_HREF_SETTINGS = new Set([
   "homepage.modules.sponsors.buttonUrl",
   "ticket_url"
 ]);
-
-function uploadedFile(formData: FormData, fieldName: string) {
-  const file = formData.get(fieldName);
-  return file instanceof File && file.size > 0 ? file : null;
-}
 
 function normalizeNavigationItems(value: string) {
   try {
@@ -86,56 +78,6 @@ function normalizeSettingValue(key: string, value: string) {
   return value;
 }
 
-async function uploadSettingsAsset({
-  file,
-  folder,
-  assetType,
-  supabase
-}: {
-  file: File;
-  folder: string;
-  assetType: string;
-  supabase: AdminSupabaseClient;
-}) {
-  if (file.size > ADMIN_MAX_UPLOAD_BYTES) {
-    return { ok: false as const, error: "Datei ist zu groß (max. 6 MB)." };
-  }
-
-  if (!ADMIN_ALLOWED_IMAGE_MIME.includes(file.type as (typeof ADMIN_ALLOWED_IMAGE_MIME)[number])) {
-    return { ok: false as const, error: "Nur Bilddateien (PNG, JPG, WebP, AVIF, SVG) sind erlaubt." };
-  }
-
-  const extension = file.name.includes(".") ? file.name.split(".").pop()!.toLowerCase() : "bin";
-  const baseName = slugify(file.name.replace(/\.[^.]+$/, "")) || "asset";
-  const path = `${folder}/${Date.now()}-${baseName}.${extension}`;
-  const { error: uploadError } = await supabase.storage
-    .from("smashtime-media")
-    .upload(path, file, { contentType: file.type, upsert: false });
-
-  if (uploadError) {
-    return { ok: false as const, error: `Upload fehlgeschlagen: ${uploadError.message}` };
-  }
-
-  const publicUrl = supabase.storage.from("smashtime-media").getPublicUrl(path).data.publicUrl;
-
-  const { error: insertError } = await supabase.from("media_assets").insert({
-    bucket: "smashtime-media",
-    path,
-    asset_type: assetType,
-    alt_text: file.name,
-    usage_note: "Admin-Einstellungen",
-    is_public: true,
-    is_checked: true
-  });
-
-  if (insertError) {
-    await supabase.storage.from("smashtime-media").remove([path]);
-    return { ok: false as const, error: supabaseErrorMessage(insertError) };
-  }
-
-  return { ok: true as const, publicUrl };
-}
-
 export async function saveSettingsAction(
   _prev: ActionResult | null,
   formData: FormData
@@ -145,18 +87,36 @@ export async function saveSettingsAction(
     return { ok: false, error: admin.error };
   }
 
+  const uploadSettingKeys = Object.values(SETTINGS_UPLOAD_FIELDS).map((config) => config.settingKey);
+  const { data: previousRows, error: previousError } = await admin.supabase
+    .from("site_settings")
+    .select("key, value")
+    .in("key", uploadSettingKeys);
+
+  if (previousError) {
+    return { ok: false, error: supabaseErrorMessage(previousError) };
+  }
+
+  const previousByKey = new Map(
+    ((previousRows as SettingRow[] | null) ?? []).map((row) => [row.key, typeof row.value?.text === "string" ? row.value.text : ""])
+  );
+
   const uploadedValues: Record<string, string> = {};
   for (const [fieldName, config] of Object.entries(SETTINGS_UPLOAD_FIELDS)) {
-    const file = uploadedFile(formData, fieldName);
+    const file = formFile(formData, fieldName);
     if (!file) {
       continue;
     }
 
-    const uploaded = await uploadSettingsAsset({
+    const uploaded = await uploadAdminMediaAsset({
+      supabase: admin.supabase,
       file,
       folder: config.folder,
       assetType: config.assetType,
-      supabase: admin.supabase
+      altText: file.name,
+      usageNote: "Admin-Einstellungen",
+      isPublic: true,
+      isChecked: true
     });
 
     if (!uploaded.ok) {
@@ -180,6 +140,18 @@ export async function saveSettingsAction(
 
   if (error) {
     return { ok: false, error: supabaseErrorMessage(error) };
+  }
+
+  for (const key of uploadSettingKeys) {
+    const next = rows.find((row) => row.key === key)?.value.text ?? "";
+    const cleanup = await cleanupReplacedAdminMedia({
+      supabase: admin.supabase,
+      previousUrl: previousByKey.get(key),
+      nextUrl: next
+    });
+    if (!cleanup.ok) {
+      return cleanup;
+    }
   }
 
   revalidatePath("/admin/settings");

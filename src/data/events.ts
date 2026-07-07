@@ -20,9 +20,9 @@ export type SmashEvent = {
 
 export const upcomingEvent: SmashEvent = {
   id: "smashtime-3-respekt-steigt-in-den-ring",
-  name: "SmashTime 3 - Respekt steigt in den Ring",
+  name: "SmashTime 3 - Gemeinsam gegen Mobbing",
   shortName: "SmashTime 3",
-  subtitle: "Respekt steigt in den Ring",
+  subtitle: "Gemeinsam gegen Mobbing",
   date: "2026-10-17T18:00:00+02:00",
   dateLabel: "17. Oktober 2026",
   location: "Jahnturnhalle St. Pölten",
@@ -31,7 +31,7 @@ export const upcomingEvent: SmashEvent = {
   start: "18:00 Uhr",
   disciplines: ["Xtreme Boxen", "K1", "MMA", "Boxen", "Influenza Kämpfe"],
   status: "upcoming",
-  image: "/images/events/smashtime-3-respekt-steigt-in-den-ring.png",
+  image: "/images/events/smashtime-3-gemeinsam-gegen-mobbing.png",
   detailHref: "/veranstaltungen/smashtime-3-respekt-steigt-in-den-ring"
 };
 

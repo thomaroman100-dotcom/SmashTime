@@ -229,7 +229,7 @@ export default async function AdminMembersPage({ searchParams }: PageProps) {
               {pageRows.map((member) => (
                 <div className="adm-table__row" key={member.userId} style={{ gridTemplateColumns: tableColumns }}>
                   <div className="adm-user-cell">
-                    <InitialsAvatar name={member.displayName} size="sm" online={member.status === "active"} />
+                    <InitialsAvatar name={member.displayName} src={member.avatarUrl} size="sm" online={member.status === "active"} />
                     <div>
                       <strong>{member.displayName}</strong>
                       <span className="adm-cell-sub">{member.email ?? "E-Mail nicht verfügbar"}</span>
@@ -366,7 +366,7 @@ export default async function AdminMembersPage({ searchParams }: PageProps) {
               <div className="adm-activity-list">
                 {recentMembers.map((member) => (
                   <Link className="adm-activity" href={`/admin/members/${member.userId}`} key={member.userId}>
-                    <InitialsAvatar name={member.displayName} size="sm" />
+                    <InitialsAvatar name={member.displayName} src={member.avatarUrl} size="sm" />
                     <span>
                       <strong>{member.displayName}</strong>
                       <small>{member.email ?? member.roleLabel}</small>

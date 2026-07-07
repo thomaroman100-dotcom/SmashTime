@@ -24,24 +24,13 @@ import {
   Swords
 } from "lucide-react";
 import { getSessionProfile } from "@/lib/admin/auth";
+import { getMemberBackgroundStyle } from "@/lib/media-placeholders";
 
 export const metadata = {
   title: "Mein Profil | SmashTime"
 };
 
 export const dynamic = "force-dynamic";
-
-function initials(name: string) {
-  return (
-    name
-      .split(" ")
-      .filter(Boolean)
-      .slice(0, 2)
-      .map((part) => part[0])
-      .join("")
-      .toUpperCase() || "ST"
-  );
-}
 
 function formatDate(value: string | null) {
   if (!value) {
@@ -61,23 +50,6 @@ function statusLabel(status: string) {
   return "Wartet auf Freigabe";
 }
 
-function safeAvatarStyle(avatarUrl: string | null) {
-  if (!avatarUrl) {
-    return undefined;
-  }
-
-  try {
-    const url = new URL(avatarUrl);
-    if (url.protocol !== "https:") {
-      return undefined;
-    }
-
-    return { backgroundImage: `url("${url.href.replace(/"/g, "%22")}")` };
-  } catch {
-    return undefined;
-  }
-}
-
 export default async function AccountPage() {
   const profile = await getSessionProfile();
   if (!profile) {
@@ -88,7 +60,7 @@ export default async function AccountPage() {
   const isActive = profile.status === "active";
   const isSuspended = profile.status === "suspended";
   const isVerifiedFighter = Boolean(profile.fighter?.isVerified);
-  const avatarStyle = safeAvatarStyle(profile.avatarUrl);
+  const avatarStyle = getMemberBackgroundStyle(profile.avatarUrl);
   const publicRole = isFighter ? "Kämpfer" : "Mitglied";
   const location = profile.fighter?.origin || "Standort noch offen";
   const description =
@@ -102,12 +74,10 @@ export default async function AccountPage() {
         <section className="account-hero account-hero--profile">
           <div className="account-hero__identity account-hero__identity--profile">
             <span
-              className={avatarStyle ? "account-avatar account-avatar--profile account-avatar--image" : "account-avatar account-avatar--profile"}
+              className="account-avatar account-avatar--profile account-avatar--image"
               style={avatarStyle}
               aria-hidden="true"
-            >
-              {avatarStyle ? null : initials(profile.displayName)}
-            </span>
+            />
             <div className="account-hero__copy">
               <div className="account-hero__title-row">
                 <h1>{profile.displayName}</h1>

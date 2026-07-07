@@ -21,9 +21,9 @@ insert into public.events (
 )
 values (
   'smashtime-3-respekt-steigt-in-den-ring',
-  'SmashTime 3 - Respekt steigt in den Ring',
+  'SmashTime 3 - Gemeinsam gegen Mobbing',
   'SmashTime 3',
-  'Respekt steigt in den Ring',
+  'Gemeinsam gegen Mobbing',
   '2026-10-17T18:00:00+02:00',
   '17. Oktober 2026',
   'Jahnturnhalle St. Pölten',
@@ -32,7 +32,7 @@ values (
   '18:00',
   array['Xtreme Boxen', 'K1', 'MMA', 'Boxen', 'Influenza Kämpfe'],
   null,
-  '/images/events/smashtime-3-respekt-steigt-in-den-ring.png',
+  '/images/events/smashtime-3-gemeinsam-gegen-mobbing.png',
   null,
   'published'
 )

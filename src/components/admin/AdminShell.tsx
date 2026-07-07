@@ -29,6 +29,7 @@ import {
 } from "lucide-react";
 import { hasAdminPermission, type AdminPermission } from "@/lib/admin/permissions";
 import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
+import { getMemberImageSrc } from "@/lib/media-placeholders";
 import { site } from "@/data/site";
 import { cn } from "@/lib/utils";
 import { AdminUiProvider } from "@/components/admin/ui/AdminUiProvider";
@@ -38,6 +39,7 @@ type AdminShellUser = {
   userId: string;
   email: string;
   displayName: string;
+  avatarUrl: string | null;
   role: "admin" | "staff";
   permissions: AdminPermission[];
 };
@@ -87,6 +89,7 @@ export function AdminShell({ user, children }: AdminShellProps) {
   const referenceMode = process.env.NODE_ENV !== "production" && searchParams.get("reference") === "1";
   const displayName = referenceMode ? "Thomas Roman" : user.displayName;
   const roleLabel = referenceMode ? "Administrator" : user.role === "admin" ? "Administrator" : "Mitarbeiter";
+  const avatarSrc = referenceMode ? "/images/admin/thomas-roman-avatar.png" : getMemberImageSrc(user.avatarUrl);
   const canManageUsers = hasAdminPermission(user, "users.manage");
   const canManageSettings = hasAdminPermission(user, "settings.manage");
   const permissionSummary = user.role === "admin" ? "Vollzugriff" : `${user.permissions.length} aktive Rechte`;
@@ -181,7 +184,7 @@ export function AdminShell({ user, children }: AdminShellProps) {
                   </span>
                   <span className="adm-topbar__photo">
                     <Image
-                      src="/images/admin/thomas-roman-avatar.png"
+                      src={avatarSrc}
                       alt=""
                       width={34}
                       height={34}
@@ -197,7 +200,7 @@ export function AdminShell({ user, children }: AdminShellProps) {
                   aria-label="Profilmenü"
                 >
                   <div className="adm-profile-menu__identity">
-                    <InitialsAvatar name={displayName} online />
+                    <InitialsAvatar name={displayName} src={avatarSrc} online />
                     <div>
                       <strong>{displayName}</strong>
                       <span>{user.email}</span>

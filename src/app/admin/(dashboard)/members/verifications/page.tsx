@@ -95,7 +95,7 @@ export default async function AdminMemberVerificationsPage() {
               {queue.map((member) => (
                 <div className="adm-table__row" key={member.userId} style={{ gridTemplateColumns: "minmax(240px, 1.2fr) 180px 180px 130px 150px 170px" }}>
                   <div className="adm-user-cell">
-                    <InitialsAvatar name={member.displayName} size="sm" />
+                    <InitialsAvatar name={member.displayName} src={member.avatarUrl} size="sm" />
                     <span>
                       <strong>{member.displayName}</strong>
                       <small>{member.email ?? "Keine E-Mail"}</small>
@@ -155,7 +155,7 @@ export default async function AdminMemberVerificationsPage() {
             {selected ? (
               <div className="adm-verification-detail">
                 <div className="adm-profile-summary">
-                  <InitialsAvatar name={selected.displayName} online={selected.status === "active"} />
+                  <InitialsAvatar name={selected.displayName} src={selected.avatarUrl} online={selected.status === "active"} />
                   <div>
                     <strong>{selected.displayName}</strong>
                     <span>{selected.email ?? "Keine E-Mail"}</span>

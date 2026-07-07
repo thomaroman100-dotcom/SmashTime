@@ -28,7 +28,7 @@ export const newsItems: NewsItem[] = [
   {
     id: "tickets-smashtime-3",
     slug: "tickets-smashtime-3",
-    title: "SmashTime 3: Respekt steigt in den Ring",
+    title: "SmashTime 3: Gemeinsam gegen Mobbing",
     date: "03. Juli 2026",
     category: "Veranstaltung",
     excerpt:
@@ -37,7 +37,7 @@ export const newsItems: NewsItem[] = [
     heroImage: "/images/backgrounds/smashtime-hero-news-press-table.png",
     body: [
       "Die nächste SmashTime-Ausgabe nimmt Form an. Am 17. Oktober 2026 steht SmashTime 3 in der Jahnturnhalle St. Pölten an.",
-      "Der Abend steht unter dem Motto \"Respekt steigt in den Ring\" und setzt ein klares Zeichen für Respekt, Stärke und Zusammenhalt gegen Mobbing.",
+      "Der Abend steht unter dem Motto \"Gemeinsam gegen Mobbing\" und setzt ein klares Zeichen für Respekt, Stärke und Zusammenhalt.",
       "Tickets, Fightcard und weitere organisatorische Informationen werden datengetrieben vorbereitet, damit die Seite später sauber mit echten Verwaltungsdaten verbunden werden kann."
     ],
     quote: {
@@ -45,7 +45,7 @@ export const newsItems: NewsItem[] = [
       author: "SmashTime Team"
     },
     eventInfo: {
-      title: "SmashTime 3 - Respekt steigt in den Ring",
+      title: "SmashTime 3 - Gemeinsam gegen Mobbing",
       date: "17. Oktober 2026",
       location: "Jahnturnhalle St. Pölten",
       admission: "17:00 Uhr",
@@ -126,7 +126,7 @@ export const newsItems: NewsItem[] = [
       "Sobald offizielle Paarungen vorliegen, werden sie im Fightcard-Bereich als echte UI veröffentlicht."
     ],
     eventInfo: {
-      title: "SmashTime 3 - Respekt steigt in den Ring",
+      title: "SmashTime 3 - Gemeinsam gegen Mobbing",
       date: "17. Oktober 2026",
       location: "Jahnturnhalle St. Pölten",
       admission: "17:00 Uhr",
