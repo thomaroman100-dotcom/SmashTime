@@ -2331,6 +2331,13 @@
   white-space: nowrap;
 }
 
+.adm-fight__meta .adm-badge {
+  display: flex;
+  width: fit-content;
+  margin-right: auto;
+  margin-left: auto;
+}
+
 .adm-vs-hex {
   display: inline-flex;
   align-items: center;
@@ -4223,6 +4230,64 @@
   line-height: 1.45;
 }
 
+.adm-team-matchup-editor {
+  display: grid;
+  gap: 14px;
+}
+
+.adm-team-name-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 92px minmax(0, 1fr) 92px;
+  gap: 10px;
+  align-items: end;
+}
+
+.adm-team-name-grid label {
+  display: grid;
+  gap: 7px;
+  color: var(--adm-muted);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.adm-team-slot-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 58px minmax(0, 1fr);
+  gap: 18px;
+  align-items: start;
+}
+
+.adm-team-slot-group {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+}
+
+.adm-team-slot-group h3 {
+  margin: 0;
+  color: var(--adm-red);
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.adm-team-slot-group--blue h3 {
+  color: var(--adm-gold);
+  text-align: right;
+}
+
+.adm-team-slot {
+  display: grid;
+  gap: 8px;
+  border: 1px solid var(--adm-border-soft);
+  border-radius: 7px;
+  padding: 10px;
+  background: rgba(0, 0, 0, 0.18);
+}
+
 .adm-fight-modal__vs {
   width: 58px;
   height: 58px;
@@ -4407,6 +4472,15 @@
   .adm-fight-modal__detail-grid {
     grid-template-columns: minmax(0, 1fr);
   }
+
+  .adm-team-name-grid,
+  .adm-team-slot-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .adm-team-slot-group--blue h3 {
+    text-align: left;
+  }
 }
 
 @media (max-width: 720px) {
@@ -4460,6 +4534,12 @@
   }
 
   .adm-fighter-picker-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+  }
+
+  .adm-team-name-grid,
+  .adm-team-slot-grid {
     grid-template-columns: minmax(0, 1fr);
     gap: 12px;
   }

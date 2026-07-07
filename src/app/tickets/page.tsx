@@ -18,9 +18,8 @@ export default function TicketsPage() {
       <PageHero
         title="Tickets."
         redTitle="Sichere dir deinen Platz."
-        text="Alle Informationen zu Ticketpaketen, Einlass und Veranstaltungsort für den nächsten SmashTime-Kampfabend."
+        text="Alle Ticketpakete, Hinweise und organisatorischen Details zum nächsten SmashTime-Kampfabend findest du auf dieser Seite."
         preset={pageHeroes.tickets}
-        meta={[ticketEvent.date, ticketEvent.location, `Einlass ${ticketEvent.admission}`]}
         compact
       />
       <div className="container tickets-page">

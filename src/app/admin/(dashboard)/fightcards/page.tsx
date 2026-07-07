@@ -82,7 +82,7 @@ export default async function AdminFightcardsPage({ searchParams }: AdminFightca
     const { data, error } = await supabase
       .from("fight_cards")
       .select(
-        "id, event_id, sort_order, label, fighter_a_user_id, fighter_b_user_id, fighter_a, fighter_b, fighter_a_image_path, fighter_b_image_path, fighter_a_is_tba, fighter_b_is_tba, weight_class, discipline, is_main_event, is_visible, status, notes"
+        "id, event_id, sort_order, matchup_type, label, corner_a_label, corner_b_label, corner_a_country_code, corner_b_country_code, fighter_a_user_id, fighter_b_user_id, fighter_a, fighter_b, fighter_a_image_path, fighter_b_image_path, fighter_a_is_tba, fighter_b_is_tba, weight_class, discipline, is_main_event, is_visible, status, notes, fight_card_participants(id, fight_card_id, corner, slot, fighter_user_id, display_name, image_path, is_tba)"
       )
       .eq("event_id", activeEventId)
       .order("sort_order", { ascending: true });

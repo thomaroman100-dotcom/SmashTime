@@ -9,6 +9,13 @@ export const CONTACT_STATUSES = ["neu", "gelesen", "erledigt"] as const;
 
 export const FIGHT_STATUSES = ["planned", "confirmed", "cancelled", "completed"] as const;
 
+export const FIGHT_MATCHUP_TYPES = ["single", "team_2v2"] as const;
+
+export const FIGHT_MATCHUP_TYPE_LABELS: Record<(typeof FIGHT_MATCHUP_TYPES)[number], string> = {
+  single: "Einzelkampf",
+  team_2v2: "Länderduell 2 gegen 2"
+};
+
 export const FIGHT_STATUS_LABELS: Record<(typeof FIGHT_STATUSES)[number], string> = {
   planned: "Geplant",
   confirmed: "Bestätigt",
@@ -16,7 +23,7 @@ export const FIGHT_STATUS_LABELS: Record<(typeof FIGHT_STATUSES)[number], string
   completed: "Beendet"
 };
 
-export const FIGHT_SECTIONS = ["Main Event", "Co-Main Event", "Main Card", "Preliminary Card"] as const;
+export const FIGHT_SECTIONS = ["Länderturnier", "Main Event", "Co-Main Event", "Main Card", "Preliminary Card"] as const;
 
 export const MEDIA_TYPES = ["Hintergrund", "Champion", "Veranstaltung", "News", "Sponsor", "Logo", "Sonstiges"] as const;
 
@@ -41,10 +48,10 @@ export const SETTING_FIELDS = [
   { key: "homepage.hero.title", label: "Hero Titel", placeholder: "SmashTime 3" },
   { key: "homepage.hero.subtitle", label: "Hero Untertitel", placeholder: "Die Elite des Kampfes." },
   { key: "homepage.hero.backgroundImageUrl", label: "Hero Hintergrundbild", placeholder: "/images/backgrounds/..." },
-  { key: "homepage.cta.primaryLabel", label: "Haupt-CTA Text", placeholder: "Tickets sichern" },
-  { key: "homepage.cta.primaryUrl", label: "Haupt-CTA Link", placeholder: "/tickets" },
-  { key: "homepage.cta.secondaryLabel", label: "Sekundärer CTA Text", placeholder: "Fightcard ansehen" },
-  { key: "homepage.cta.secondaryUrl", label: "Sekundärer CTA Link", placeholder: "/fight-night#fightcard" },
+  { key: "homepage.cta.primaryLabel", label: "Haupt-CTA Text", placeholder: "Nächste Veranstaltung" },
+  { key: "homepage.cta.primaryUrl", label: "Haupt-CTA Link", placeholder: "/veranstaltungen/smashtime-3-respekt-steigt-in-den-ring" },
+  { key: "homepage.cta.secondaryLabel", label: "Sekundärer CTA Text", placeholder: "Über SmashTime" },
+  { key: "homepage.cta.secondaryUrl", label: "Sekundärer CTA Link", placeholder: "/ueber-uns" },
   { key: "homepage.modules.champions.enabled", label: "Champions-Modul aktiv", placeholder: "true" },
   { key: "homepage.modules.champions.title", label: "Champions Titel", placeholder: "Unsere Champions" },
   { key: "homepage.modules.champions.description", label: "Champions Beschreibung", placeholder: "Lerne die Athleten kennen..." },

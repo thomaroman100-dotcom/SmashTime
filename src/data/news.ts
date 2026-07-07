@@ -32,9 +32,9 @@ export const newsItems: NewsItem[] = [
     date: "03. Juli 2026",
     category: "Veranstaltung",
     excerpt:
-      "Die nächste Ausgabe findet am 17. Oktober 2026 in der Jahnturnhalle St. Pölten statt.",
+      "Die nächste Ausgabe setzt ein klares Zeichen für Respekt, Stärke und Zusammenhalt.",
     image: "/images/backgrounds/arena-brush-wide.png",
-    heroImage: "/images/backgrounds/hero-news-cage-smoke.png",
+    heroImage: "/images/backgrounds/smashtime-hero-news-press-table.png",
     body: [
       "Die nächste SmashTime-Ausgabe nimmt Form an. Am 17. Oktober 2026 steht SmashTime 3 in der Jahnturnhalle St. Pölten an.",
       "Der Abend steht unter dem Motto \"Respekt steigt in den Ring\" und setzt ein klares Zeichen für Respekt, Stärke und Zusammenhalt gegen Mobbing.",
@@ -64,7 +64,7 @@ export const newsItems: NewsItem[] = [
     excerpt:
       "Die Kampfpaarungen werden als echte Datenstruktur vorbereitet und später offiziell ergänzt.",
     image: "/images/ui/dark-grunge-texture.png",
-    heroImage: "/images/backgrounds/hero-events-cage-wide.png",
+    heroImage: "/images/backgrounds/smashtime-hero-news-press-table.png",
     body: [
       "Die Fightcard wird erst veröffentlicht, wenn die Paarungen offiziell bestätigt sind.",
       "Technisch ist der Bereich bereits vorbereitet: Jede Paarung kann später mit Reihenfolge, Disziplin, Gewichtsklasse, Label und Sichtbarkeit gepflegt werden.",
@@ -85,7 +85,7 @@ export const newsItems: NewsItem[] = [
     excerpt:
       "Sponsorplätze, Pakete und Kontaktwege sind als lokale Daten angelegt und später verwaltbar.",
     image: "/images/sponsors/handshake-cage.png",
-    heroImage: "/images/backgrounds/hero-sponsors-corridor.png",
+    heroImage: "/images/backgrounds/smashtime-hero-news-press-table.png",
     body: [
       "Der Sponsorenbereich ist so aufgebaut, dass Sponsorplätze, Vorteile und Pakete später verwaltbar bleiben.",
       "In Phase 2 werden Kontaktwege, Pakete und Sponsorenflächen weiter verdichtet, ohne echte Logos oder Zusagen zu erfinden.",
@@ -102,7 +102,7 @@ export const newsItems: NewsItem[] = [
     excerpt:
       "Backstage, Licht und Aufbau prägen den Look einer SmashTime-Veranstaltung.",
     image: "/images/backgrounds/backstage-wide.png",
-    heroImage: "/images/backgrounds/hero-contact-backstage.png",
+    heroImage: "/images/backgrounds/smashtime-hero-news-press-table.png",
     body: [
       "Der SmashTime-Look entsteht nicht erst im Cage. Backstage, Licht, Sound und Wegeführung prägen das gesamte Erlebnis.",
       "Die Website nimmt diese Stimmung auf und übersetzt sie in harte Kanten, dunkle Flächen, rote Akzente und klare Informationsbereiche.",
@@ -119,7 +119,7 @@ export const newsItems: NewsItem[] = [
     excerpt:
       "Xtreme Boxen, K1, MMA und Boxen stehen im Mittelpunkt der kommenden Ausgabe.",
     image: "/images/events/k1-ring.png",
-    heroImage: "/images/backgrounds/hero-events-stage.png",
+    heroImage: "/images/backgrounds/smashtime-hero-news-press-table.png",
     body: [
       "SmashTime 3 konzentriert sich auf MMA, K1, Xtreme Boxen und Boxen.",
       "Diese Disziplinen werden auf der Website konsistent geführt und nicht durch alte Referenzdaten ersetzt.",
@@ -144,7 +144,7 @@ export const newsItems: NewsItem[] = [
     excerpt:
       "Das Kontaktformular bündelt Anfragen zu Sponsoring, Presse, Kämpfern und allgemeinen Themen.",
     image: "/images/backgrounds/backstage-corridor.png",
-    heroImage: "/images/backgrounds/backstage-corridor.png",
+    heroImage: "/images/backgrounds/smashtime-hero-news-press-table.png",
     body: [
       "Anfragen zu Sponsoring, Presse, Kämpfern und allgemeinen Themen werden über den Kontaktbereich gebündelt.",
       "Das Formular ist in Phase 2 als öffentliche Oberfläche vorbereitet. Eine echte Backend- oder Mail-Anbindung folgt erst nach ausdrücklicher Freigabe.",

@@ -20,14 +20,16 @@ export const site = {
     { label: "Über uns", href: "/ueber-uns" },
     {
       label: "Mehr",
-      href: "/veranstaltungen",
+      href: "/events",
       children: [
-        { label: "Veranstaltungen", href: "/veranstaltungen" },
-        { label: "Nächste Veranstaltung", href: "/veranstaltungen/smashtime-3-respekt-steigt-in-den-ring" },
-        { label: "Kampfabend", href: "/fight-night" },
-        { label: "Fightcard", href: "/fight-night#fightcard" },
-        { label: "Sponsoren", href: "/sponsoren" },
-        { label: "Kontakt", href: "/kontakt" }
+        { label: "Ranglisten", href: "/rankings" },
+        { label: "Events", href: "/events" },
+        { label: "Kämpfer", href: "/fighters" },
+        { label: "Partner", href: "/partners" },
+        { label: "Merch", href: "/shop" },
+        { label: "Karriere", href: "/career" },
+        { label: "FAQ", href: "/faq" },
+        { label: "Kontakt", href: "/contact" }
       ]
     }
   ] satisfies NavigationItem[],
@@ -51,23 +53,26 @@ export const site = {
       title: "SmashTime",
       links: [
         { label: "Über uns", href: "/ueber-uns" },
-        { label: "Sponsoren", href: "/sponsoren" },
+        { label: "Karriere", href: "/career" },
+        { label: "Partner", href: "/partners" },
         { label: "Kontakt", href: "/kontakt" },
-        { label: "Kampfabend", href: "/fight-night" }
+        { label: "Kampfabend", href: "/veranstaltungen/smashtime-3-respekt-steigt-in-den-ring#fightcard" }
       ]
     },
     {
       title: "Service",
       links: [
         { label: "Tickets sichern", href: "/tickets" },
-        { label: "Veranstaltungen", href: "/veranstaltungen" },
-        { label: "Champions", href: "/champions" },
-        { label: "Neuigkeiten", href: "/neuigkeiten" }
+        { label: "Events", href: "/events" },
+        { label: "Ranglisten", href: "/rankings" },
+        { label: "Kämpfer", href: "/fighters" },
+        { label: "FAQ", href: "/faq" }
       ]
     },
     {
       title: "Rechtliches",
       links: [
+        { label: "AGB", href: "/legal/agb" },
         { label: "Impressum", href: "/impressum" },
         { label: "Datenschutz", href: "/datenschutz" }
       ]
@@ -82,7 +87,7 @@ export const site = {
   },
   ticketHref: "/tickets",
   eventHref: "/veranstaltungen/smashtime-3-respekt-steigt-in-den-ring",
-  fightNightHref: "/fight-night#fightcard",
+  fightNightHref: "/veranstaltungen/smashtime-3-respekt-steigt-in-den-ring#fightcard",
   socialLinks: [
     { label: "Instagram", href: "https://www.instagram.com/smash_time_st/" },
     { label: "YouTube", href: "https://www.youtube.com/@Smashtimestp" }

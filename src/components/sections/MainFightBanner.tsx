@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import type { SmashEvent } from "@/data/events";
-import { formatFightCardLabel, type FightCardEntry } from "@/data/fightcards";
+import { formatFightCardLabel, isTeamFight, type FightCardEntry } from "@/data/fightcards";
 
 type MainFightBannerProps = {
   event: SmashEvent;
@@ -41,6 +41,7 @@ export function MainFightBanner({ event, fight, fights = [], fallback }: MainFig
   const featuredFight = fight ?? fightcard[0];
   const marqueeItems = fightcard.length > 1 ? [...fightcard, ...fightcard] : fightcard;
   const hasFightcard = Boolean(featuredFight);
+  const featuredIsTeamFight = featuredFight ? isTeamFight(featuredFight) : false;
 
   return (
     <section className="main-fight" aria-label="Fightcard">
@@ -51,7 +52,11 @@ export function MainFightBanner({ event, fight, fights = [], fallback }: MainFig
           ) : null}
           <div className="main-fight__content">
             <span className="main-fight__label">
-              {featuredFight ? formatFightCardLabel(featuredFight.label) : fallback.label}
+              {featuredFight
+                ? featuredIsTeamFight
+                  ? "2 gegen 2 Länderduell"
+                  : formatFightCardLabel(featuredFight.label)
+                : fallback.label}
             </span>
             {featuredFight ? (
               <h2 className="main-fight__title">
@@ -70,7 +75,7 @@ export function MainFightBanner({ event, fight, fights = [], fallback }: MainFig
                 <div className="main-fight__track">
                   {marqueeItems.map((item, index) => (
                     <span className="main-fight__pill" key={`${item.id}-${index}`}>
-                      <b>{formatFightCardLabel(item.label)}</b>
+                      <b>{isTeamFight(item) ? "2 gegen 2" : formatFightCardLabel(item.label)}</b>
                       <strong>
                         {item.fighterA} <em>vs</em> {item.fighterB}
                       </strong>

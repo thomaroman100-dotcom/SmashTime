@@ -58,6 +58,23 @@ function setting(rows: Record<string, string>, key: string, fallback: string) {
   return value ? value : fallback;
 }
 
+function normalizeHomeHeroPrimaryCta(label: string, href: string, ticketLabel: string, ticketHref: string) {
+  const lowerLabel = label.trim().toLowerCase();
+  const isLegacyTicketCta =
+    (lowerLabel === "tickets sichern" || lowerLabel === "ticket sichern") &&
+    (href === ticketHref || href === site.ticketHref || href === "/tickets");
+
+  return isLegacyTicketCta ? homeHero.primaryCta : { label, href };
+}
+
+function normalizeHomeHeroSecondaryCta(label: string, href: string) {
+  const lowerLabel = label.trim().toLowerCase();
+  const isLegacyFightcardCta =
+    (lowerLabel === "fightcard ansehen" || lowerLabel === "kampfabend ansehen") && href.startsWith("/fight-night");
+
+  return isLegacyFightcardCta ? homeHero.secondaryCta : { label, href };
+}
+
 function boolSetting(rows: Record<string, string>, key: string, fallback: boolean) {
   const value = rows[key];
   if (value === "true" || value === "1" || value === "on") {
@@ -76,6 +93,20 @@ function intSetting(rows: Record<string, string>, key: string, fallback: number)
 
 function normalizePath(path: string) {
   return normalizePublicHref(path);
+}
+
+function normalizeNavigationLabel(label: string) {
+  const trimmed = label.trim();
+  const publicLabelAliases: Record<string, string> = {
+    home: "Startseite",
+    news: "Neuigkeiten",
+    sponsors: "Partner",
+    contact: "Kontakt",
+    fighters: "Kämpfer",
+    rankings: "Ranglisten"
+  };
+
+  return publicLabelAliases[trimmed.toLowerCase()] ?? trimmed;
 }
 
 const legacyHomeHeroBackgroundImages = new Set([
@@ -109,7 +140,7 @@ function parseNavigation(rows: Record<string, string>) {
     .filter((item) => item.isVisible !== false && (item.label ?? "").trim())
     .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
     .map((item) => ({
-      label: item.label!.trim(),
+      label: normalizeNavigationLabel(item.label!),
       href: normalizePath(item.path ?? item.href ?? "/")
     }));
 
@@ -164,13 +195,24 @@ export const getPublicSiteSettings = cache(async (): Promise<PublicSettings> => 
   const textColor = setting(rows, "branding.theme.textColor", "#E5E5E5");
   const heroTitle = setting(rows, "homepage.hero.title", "");
   const heroSubtitle = setting(rows, "homepage.hero.subtitle", "");
-  const ticketHref = normalizePublicHref(setting(rows, "homepage.cta.primaryUrl", site.ticketHref), site.ticketHref);
-  const ticketLabel = setting(rows, "homepage.cta.primaryLabel", site.headerCta.label);
+  const ticketHref = normalizePublicHref(setting(rows, "header.cta.url", site.ticketHref), site.ticketHref);
+  const ticketLabel = setting(rows, "header.cta.label", site.headerCta.label);
+  const heroPrimaryHref = normalizePublicHref(
+    setting(rows, "homepage.cta.primaryUrl", homeHero.primaryCta.href),
+    homeHero.primaryCta.href
+  );
+  const heroPrimaryCta = normalizeHomeHeroPrimaryCta(
+    setting(rows, "homepage.cta.primaryLabel", homeHero.primaryCta.label),
+    heroPrimaryHref,
+    ticketLabel,
+    ticketHref
+  );
   const secondaryLabel = setting(rows, "homepage.cta.secondaryLabel", homeHero.secondaryCta.label);
   const secondaryHref = normalizePublicHref(
     setting(rows, "homepage.cta.secondaryUrl", homeHero.secondaryCta.href),
     homeHero.secondaryCta.href
   );
+  const heroSecondaryCta = normalizeHomeHeroSecondaryCta(secondaryLabel, secondaryHref);
 
   const configuredSite: PublicSiteContent = {
     ...site,
@@ -208,16 +250,16 @@ export const getPublicSiteSettings = cache(async (): Promise<PublicSettings> => 
         title: heroTitle,
         subtitle: heroSubtitle,
         backgroundImage: homeHeroBackgroundImage(rows),
-        primaryCta: { label: ticketLabel, href: ticketHref },
-        secondaryCta: { label: secondaryLabel, href: secondaryHref }
+        primaryCta: heroPrimaryCta,
+        secondaryCta: heroSecondaryCta
       },
       countdown: {
         ...homeCountdown,
         enabled: boolSetting(rows, "countdown.enabled", true),
         label: setting(rows, "countdown.label", homeCountdown.label),
         targetDate: setting(rows, "countdown.countdownEndAt", homeCountdown.targetDate),
-        ctaLabel: ticketLabel,
-        ctaHref: ticketHref
+        ctaLabel: setting(rows, "countdown.ctaLabel", homeCountdown.ctaLabel),
+        ctaHref: normalizePublicHref(setting(rows, "countdown.ctaHref", homeCountdown.ctaHref), homeCountdown.ctaHref)
       },
       sections: {
         ...homeSections,

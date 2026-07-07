@@ -22,10 +22,34 @@ type FightFormProps = {
 
 export function FightForm({ action, events, fighterOptions, initial, defaultEventId }: FightFormProps) {
   const [state, formAction] = useActionState(action, null);
+  const initialParticipant = (corner: "red" | "blue", slot: number) =>
+    initial?.fight_card_participants?.find((participant) => participant.corner === corner && participant.slot === slot);
+  const hiddenTeamParticipants = [
+    ["participant_red_1", initialParticipant("red", 1)],
+    ["participant_red_2", initialParticipant("red", 2)],
+    ["participant_blue_1", initialParticipant("blue", 1)],
+    ["participant_blue_2", initialParticipant("blue", 2)]
+  ] as const;
 
   return (
     <form className="admin-panel admin-form" action={formAction}>
       <h2>{initial ? "Kampf bearbeiten" : "Kampfdetails"}</h2>
+      <input type="hidden" name="matchup_type" value={initial?.matchup_type ?? "single"} />
+      {initial?.matchup_type === "team_2v2" ? (
+        <>
+          <input type="hidden" name="corner_a_label" value={initial.corner_a_label ?? ""} />
+          <input type="hidden" name="corner_b_label" value={initial.corner_b_label ?? ""} />
+          <input type="hidden" name="corner_a_country_code" value={initial.corner_a_country_code ?? ""} />
+          <input type="hidden" name="corner_b_country_code" value={initial.corner_b_country_code ?? ""} />
+          {hiddenTeamParticipants.map(([prefix, participant]) => (
+            <span hidden key={prefix}>
+              <input type="hidden" name={`${prefix}_user_id`} value={participant?.fighter_user_id ?? ""} />
+              <input type="hidden" name={prefix} value={participant?.display_name ?? ""} />
+              <input type="hidden" name={`${prefix}_image_path`} value={participant?.image_path ?? ""} />
+            </span>
+          ))}
+        </>
+      ) : null}
       <label>
         Veranstaltung *
         <select name="event_id" required defaultValue={initial?.event_id ?? defaultEventId ?? ""}>

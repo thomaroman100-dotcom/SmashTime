@@ -3,11 +3,12 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import { CallToActionBand } from "@/components/sections/CallToActionBand";
+import { PageHero } from "@/components/sections/PageHero";
 import { SponsorStrip } from "@/components/sections/SponsorStrip";
-import { FightBoutCard } from "@/components/sections/FightBoutCard";
-import { CTAButton } from "@/components/ui/CTAButton";
+import { FightCardList } from "@/components/sections/FightCardList";
 import { IconBadge } from "@/components/ui/IconBadge";
 import { eventRecaps, getEventRecap } from "@/data/eventRecaps";
+import { pageHeroes } from "@/data/heroes";
 import { site } from "@/data/site";
 import { getPublicFightcardsForEvent } from "@/lib/public-fightcards";
 
@@ -41,48 +42,45 @@ export default async function EventDetailPage({ params }: EventDetailPageProps) 
   return (
     <>
       <article className="event-detail">
-        <div className="container">
-          <Link className="news-detail__back" href="/veranstaltungen">
-            <ArrowLeft aria-hidden="true" size={18} /> Zurück zu den Veranstaltungen
-          </Link>
+        <PageHero
+          className="page-hero--detail"
+          kicker="SmashTime Kampfabend"
+          preset={pageHeroes.events}
+          preContent={
+            <Link className="page-hero__back" href="/veranstaltungen">
+              <ArrowLeft aria-hidden="true" size={18} /> Zurück zu den Veranstaltungen
+            </Link>
+          }
+          redTitle={event.redTitle}
+          text={event.intro}
+          title={event.title}
+        />
 
-          <header className="event-detail__hero">
-            <div>
-              <span className="page-hero__kicker event-detail__kicker">SmashTime Kampfabend</span>
-              <h1>
-                <span>{event.title}</span>
-                <span>{event.redTitle}</span>
-              </h1>
-              <p>{event.intro}</p>
-              <div className="event-detail__info card-grunge">
-                <dl>
-                  <div>
-                    <dt>Datum</dt>
-                    <dd>{event.date}</dd>
-                  </div>
-                  <div>
-                    <dt>Ort</dt>
-                    <dd>{event.location}</dd>
-                  </div>
-                  <div>
-                    <dt>Einlass</dt>
-                    <dd>{event.admission}</dd>
-                  </div>
-                  <div>
-                    <dt>Beginn</dt>
-                    <dd>{event.start}</dd>
-                  </div>
-                  <div>
-                    <dt>Disziplinen</dt>
-                    <dd>{event.disciplines.join(" · ")}</dd>
-                  </div>
-                </dl>
+        <div className="container">
+          <div className="event-detail__info card-grunge">
+            <dl>
+              <div>
+                <dt>Datum</dt>
+                <dd>{event.date}</dd>
               </div>
-            </div>
-            <div className="event-detail__image">
-              <Image src={event.image} alt="" fill priority sizes="(max-width: 920px) 100vw, 52vw" />
-            </div>
-          </header>
+              <div>
+                <dt>Ort</dt>
+                <dd>{event.location}</dd>
+              </div>
+              <div>
+                <dt>Einlass</dt>
+                <dd>{event.admission}</dd>
+              </div>
+              <div>
+                <dt>Beginn</dt>
+                <dd>{event.start}</dd>
+              </div>
+              <div>
+                <dt>Disziplinen</dt>
+                <dd>{event.disciplines.join(" · ")}</dd>
+              </div>
+            </dl>
+          </div>
 
           <section className="event-stats">
             {event.stats.map((stat) => (
@@ -94,6 +92,14 @@ export default async function EventDetailPage({ params }: EventDetailPageProps) 
             ))}
           </section>
 
+          <FightCardList
+            fights={visibleFights}
+            title="Fightcard"
+            description="Die zentrale Kampfkarte für diesen Kampfabend: Länderduelle, Hauptkarte und weitere Paarungen werden hier gepflegt."
+            ctaHref={site.ticketHref}
+            ctaLabel="Tickets sichern"
+          />
+
           <section className="event-detail__content">
             <div className="event-description card-grunge">
               <h2>Die Veranstaltung</h2>
@@ -102,25 +108,25 @@ export default async function EventDetailPage({ params }: EventDetailPageProps) 
               ))}
             </div>
 
-            <div className="event-results card-grunge">
+            <div className="event-results card-grunge" id="ergebnisse">
               <div className="event-results__head">
-                <h2>Bestätigte Paarungen</h2>
-                <CTAButton href={site.fightNightHref} variant="outline">
-                  Fightcard ansehen
-                </CTAButton>
+                <h2>Ergebnisse</h2>
               </div>
-              {visibleFights.length === 0 ? (
-                <p className="event-results__empty">Paarungen werden veröffentlicht, sobald sie offiziell bestätigt sind.</p>
+              {event.results.length === 0 ? (
+                <p className="event-results__empty">Ergebnisse werden nach der Veranstaltung veröffentlicht.</p>
               ) : (
-                <div className="event-results__grid event-results__grid--fights">
-                  {visibleFights.map((fight) => (
-                    <FightBoutCard key={fight.id} fight={fight} variant="compact" />
+                <div className="event-results__grid">
+                  {event.results.map((result) => (
+                    <article key={result.id}>
+                      <span>{result.label}</span>
+                      <strong>
+                        {result.fighterA} <em>vs.</em> {result.fighterB}
+                      </strong>
+                      <small>{result.method}</small>
+                    </article>
                   ))}
                 </div>
               )}
-              {event.results.length === 0 ? (
-                <p className="event-results__empty">Ergebnisse werden nach der Veranstaltung veröffentlicht.</p>
-              ) : null}
             </div>
           </section>
 

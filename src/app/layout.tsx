@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { RouteBodyClass } from "@/components/layout/RouteBodyClass";
 import { SiteChrome } from "@/components/layout/SiteChrome";
 import { getSessionProfile } from "@/lib/admin/auth";
 import { getPublicSiteSettings } from "@/lib/site-settings";
@@ -26,7 +25,6 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
         <link rel="icon" href={publicSettings.faviconUrl} />
       </head>
       <body>
-        <RouteBodyClass />
         <SiteChrome publicSettings={publicSettings} sessionProfile={sessionProfile}>{children}</SiteChrome>
       </body>
     </html>

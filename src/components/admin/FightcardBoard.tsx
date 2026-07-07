@@ -14,9 +14,12 @@ import {
   Save,
   Star,
   Trash2,
+  UsersRound,
   X
 } from "lucide-react";
 import {
+  type FightMatchupType,
+  type FightParticipantRow,
   type FightRow,
   createFightAction,
   deleteFightAction,
@@ -24,7 +27,14 @@ import {
   reorderFightsAction,
   updateFightAction
 } from "@/lib/admin/actions/fightcards";
-import { EVENT_DISCIPLINES, FIGHT_SECTIONS, FIGHT_STATUSES, FIGHT_STATUS_LABELS } from "@/lib/admin/resource-shared";
+import {
+  EVENT_DISCIPLINES,
+  FIGHT_MATCHUP_TYPE_LABELS,
+  FIGHT_MATCHUP_TYPES,
+  FIGHT_SECTIONS,
+  FIGHT_STATUSES,
+  FIGHT_STATUS_LABELS
+} from "@/lib/admin/resource-shared";
 import { useAdminUi } from "@/components/admin/ui/AdminUiProvider";
 import { InitialsAvatar } from "@/components/admin/ui/primitives";
 import { FighterProfilePicker, type FighterProfileOption } from "@/components/admin/FighterProfilePicker";
@@ -46,6 +56,10 @@ type FightcardBoardProps = {
 type Section = (typeof FIGHT_SECTIONS)[number];
 
 function sectionOf(fight: FightRow): Section {
+  if (fight.matchup_type === "team_2v2" && (!fight.label || fight.label === "Main Card")) {
+    return "Länderturnier";
+  }
+
   const label = (fight.label ?? "").trim();
   const match = FIGHT_SECTIONS.find((section) => section.toLowerCase() === label.toLowerCase());
   if (match) {
@@ -55,11 +69,56 @@ function sectionOf(fight: FightRow): Section {
 }
 
 const SECTION_ICONS: Record<Section, typeof Star> = {
+  "Länderturnier": UsersRound,
   "Main Event": Star,
   "Co-Main Event": Star,
   "Main Card": Flag,
   "Preliminary Card": Flag
 };
+
+function participantsFor(fight: FightRow, corner: "red" | "blue") {
+  return (fight.fight_card_participants ?? [])
+    .filter((participant) => participant.corner === corner)
+    .sort((a, b) => a.slot - b.slot);
+}
+
+function participantLabel(participant: FightParticipantRow | undefined, fallback = "Wird bekanntgegeben") {
+  return participant?.display_name || fallback;
+}
+
+function cornerLabel(fight: FightRow, corner: "red" | "blue") {
+  if (fight.matchup_type === "team_2v2") {
+    return corner === "red"
+      ? fight.corner_a_label ?? fight.fighter_a ?? "Team Rot"
+      : fight.corner_b_label ?? fight.fighter_b ?? "Team Blau";
+  }
+
+  const participant = participantsFor(fight, corner)[0];
+  return corner === "red"
+    ? participantLabel(participant, fight.fighter_a ?? "Wird bekanntgegeben")
+    : participantLabel(participant, fight.fighter_b ?? "Wird bekanntgegeben");
+}
+
+function cornerMeta(fight: FightRow, corner: "red" | "blue") {
+  if (fight.matchup_type !== "team_2v2") {
+    return corner === "red"
+      ? fight.fighter_a_is_tba ? "TBA" : FIGHT_STATUS_LABELS[fight.status]
+      : fight.fighter_b_is_tba ? "TBA" : sectionOf(fight);
+  }
+
+  const participants = participantsFor(fight, corner);
+  const names = [1, 2].map((slot) => participantLabel(participants.find((item) => item.slot === slot), "TBA"));
+  return names.join(" / ");
+}
+
+function cornerImage(fight: FightRow, corner: "red" | "blue") {
+  const participant = participantsFor(fight, corner).find((item) => item.image_path);
+  if (participant?.image_path) {
+    return participant.image_path;
+  }
+
+  return corner === "red" ? fight.fighter_a_image_path : fight.fighter_b_image_path;
+}
 
 function StepHeader({
   step,
@@ -99,6 +158,47 @@ function ModalSection({
       <StepHeader step={step} title={title} description={description} />
       <div className="adm-fsection__body adm-fight-modal__card-body">{children}</div>
     </section>
+  );
+}
+
+type ManualFighterFieldsProps = {
+  idPrefix: string;
+  name: string;
+  imagePath: string;
+  disabled: boolean;
+  placeholder: string;
+  onNameChange: (value: string) => void;
+  onImageChange: (value: string) => void;
+};
+
+function ManualFighterFields({
+  idPrefix,
+  name,
+  imagePath,
+  disabled,
+  placeholder,
+  onNameChange,
+  onImageChange
+}: ManualFighterFieldsProps) {
+  return (
+    <div className="adm-manual-fighter">
+      <label htmlFor={`${idPrefix}-name`}>Manueller Name</label>
+      <input
+        id={`${idPrefix}-name`}
+        value={name}
+        onChange={(event) => onNameChange(event.target.value)}
+        placeholder={placeholder}
+        disabled={disabled}
+      />
+      <label htmlFor={`${idPrefix}-image`}>Portrait-URL optional</label>
+      <input
+        id={`${idPrefix}-image`}
+        value={imagePath}
+        onChange={(event) => onImageChange(event.target.value)}
+        placeholder="/images/fightcards/..."
+        disabled={disabled}
+      />
+    </div>
   );
 }
 
@@ -202,7 +302,7 @@ export function FightcardBoard({ events, activeEventId, fights, fighterOptions }
     const confirmed = await ui.confirm({
       title: "Kampf löschen?",
       message: "Der Kampf wird dauerhaft aus der Fightcard entfernt.",
-      itemLabel: `${fight.fighter_a ?? "TBA"} vs. ${fight.fighter_b ?? "TBA"}`,
+      itemLabel: `${cornerLabel(fight, "red")} vs. ${cornerLabel(fight, "blue")}`,
       itemMeta: fight.weight_class ?? sectionOf(fight)
     });
     if (!confirmed) {
@@ -241,6 +341,9 @@ export function FightcardBoard({ events, activeEventId, fights, fighterOptions }
           <button className="adm-btn" type="button" onClick={() => setModal({ mode: "create", section: "Main Event" })}>
             <Plus aria-hidden="true" size={16} /> Kampf hinzufügen
           </button>
+          <button className="adm-btn" type="button" onClick={() => setModal({ mode: "create", section: "Länderturnier" })}>
+            <UsersRound aria-hidden="true" size={16} /> Länderduell hinzufügen
+          </button>
           <button className="adm-btn" type="button" disabled={pending || !orderDirty} onClick={saveOrder}>
             {pending ? <Loader2 aria-hidden="true" size={16} className="adm-spin" /> : <Save aria-hidden="true" size={16} />}
             Fightcard speichern
@@ -278,7 +381,7 @@ export function FightcardBoard({ events, activeEventId, fights, fighterOptions }
             ) : (
               sectionFights.map((fight) => (
                 <article
-                  className={`adm-fight${dragId === fight.id ? " adm-fight--dragging" : ""}`}
+                  className={`adm-fight${fight.matchup_type === "team_2v2" ? " adm-fight--team" : ""}${dragId === fight.id ? " adm-fight--dragging" : ""}`}
                   key={fight.id}
                   draggable
                   onDragStart={() => setDragId(fight.id)}
@@ -294,16 +397,19 @@ export function FightcardBoard({ events, activeEventId, fights, fighterOptions }
                     <GripVertical aria-hidden="true" size={17} />
                   </button>
                   <div className="adm-fight__fighter">
-                    <InitialsAvatar name={fight.fighter_a ?? "T B A"} src={fight.fighter_a_image_path} />
+                    <InitialsAvatar name={cornerLabel(fight, "red")} src={cornerImage(fight, "red")} />
                     <div style={{ minWidth: 0 }}>
-                      <strong>{fight.fighter_a ?? "Wird bekanntgegeben"}</strong>
-                      <span>{fight.fighter_a_is_tba ? "TBA" : FIGHT_STATUS_LABELS[fight.status]}</span>
+                      <strong>{cornerLabel(fight, "red")}</strong>
+                      <span>{cornerMeta(fight, "red")}</span>
                     </div>
                   </div>
                   <span className="adm-fight__vs">vs.</span>
                   <div className="adm-fight__meta">
                     <strong>{fight.weight_class ?? "Klasse offen"}</strong>
                     {fight.discipline ?? "Disziplin offen"}
+                    <span className="adm-badge adm-badge--gold adm-badge--uppercase" style={{ marginTop: 4 }}>
+                      {FIGHT_MATCHUP_TYPE_LABELS[fight.matchup_type]}
+                    </span>
                     {!fight.is_visible ? (
                       <span className="adm-badge adm-badge--gray" style={{ marginTop: 4 }}>
                         Verborgen
@@ -311,10 +417,10 @@ export function FightcardBoard({ events, activeEventId, fights, fighterOptions }
                     ) : null}
                   </div>
                   <div className="adm-fight__fighter adm-fight__fighter--right">
-                    <InitialsAvatar name={fight.fighter_b ?? "T B A"} src={fight.fighter_b_image_path} />
+                    <InitialsAvatar name={cornerLabel(fight, "blue")} src={cornerImage(fight, "blue")} />
                     <div style={{ minWidth: 0 }}>
-                      <strong>{fight.fighter_b ?? "Wird bekanntgegeben"}</strong>
-                      <span>{fight.fighter_b_is_tba ? "TBA" : sectionOf(fight)}</span>
+                      <strong>{cornerLabel(fight, "blue")}</strong>
+                      <span>{cornerMeta(fight, "blue")}</span>
                     </div>
                   </div>
                   <div className="adm-row-actions">
@@ -382,14 +488,33 @@ function FightModal({ eventId, eventName, fighterOptions, initial, initialSectio
   const ui = useAdminUi();
   const router = useRouter();
   const [pending, startTransition] = useTransition();
+  const initialRedParticipants = initial ? participantsFor(initial, "red") : [];
+  const initialBlueParticipants = initial ? participantsFor(initial, "blue") : [];
+  const initialRedSlot1 = initialRedParticipants.find((participant) => participant.slot === 1);
+  const initialRedSlot2 = initialRedParticipants.find((participant) => participant.slot === 2);
+  const initialBlueSlot1 = initialBlueParticipants.find((participant) => participant.slot === 1);
+  const initialBlueSlot2 = initialBlueParticipants.find((participant) => participant.slot === 2);
 
+  const [matchupType, setMatchupType] = useState<FightMatchupType>(
+    initial?.matchup_type ?? (initialSection === "Länderturnier" ? "team_2v2" : "single")
+  );
   const [section, setSection] = useState<Section>(initial ? sectionOf(initial) : initialSection ?? "Main Event");
-  const [fighterAUserId, setFighterAUserId] = useState(initial?.fighter_a_user_id ?? "");
-  const [fighterBUserId, setFighterBUserId] = useState(initial?.fighter_b_user_id ?? "");
-  const [manualFighterA, setManualFighterA] = useState(initial?.fighter_a ?? "");
-  const [manualFighterB, setManualFighterB] = useState(initial?.fighter_b ?? "");
-  const [manualFighterAImage, setManualFighterAImage] = useState(initial?.fighter_a_image_path ?? "");
-  const [manualFighterBImage, setManualFighterBImage] = useState(initial?.fighter_b_image_path ?? "");
+  const [cornerALabel, setCornerALabel] = useState(initial?.corner_a_label ?? "");
+  const [cornerBLabel, setCornerBLabel] = useState(initial?.corner_b_label ?? "");
+  const [cornerACountryCode, setCornerACountryCode] = useState(initial?.corner_a_country_code ?? "");
+  const [cornerBCountryCode, setCornerBCountryCode] = useState(initial?.corner_b_country_code ?? "");
+  const [fighterAUserId, setFighterAUserId] = useState(initialRedSlot1?.fighter_user_id ?? initial?.fighter_a_user_id ?? "");
+  const [fighterBUserId, setFighterBUserId] = useState(initialBlueSlot1?.fighter_user_id ?? initial?.fighter_b_user_id ?? "");
+  const [fighterRed2UserId, setFighterRed2UserId] = useState(initialRedSlot2?.fighter_user_id ?? "");
+  const [fighterBlue2UserId, setFighterBlue2UserId] = useState(initialBlueSlot2?.fighter_user_id ?? "");
+  const [manualFighterA, setManualFighterA] = useState(initialRedSlot1?.display_name ?? initial?.fighter_a ?? "");
+  const [manualFighterB, setManualFighterB] = useState(initialBlueSlot1?.display_name ?? initial?.fighter_b ?? "");
+  const [manualFighterRed2, setManualFighterRed2] = useState(initialRedSlot2?.display_name ?? "");
+  const [manualFighterBlue2, setManualFighterBlue2] = useState(initialBlueSlot2?.display_name ?? "");
+  const [manualFighterAImage, setManualFighterAImage] = useState(initialRedSlot1?.image_path ?? initial?.fighter_a_image_path ?? "");
+  const [manualFighterBImage, setManualFighterBImage] = useState(initialBlueSlot1?.image_path ?? initial?.fighter_b_image_path ?? "");
+  const [manualFighterRed2Image, setManualFighterRed2Image] = useState(initialRedSlot2?.image_path ?? "");
+  const [manualFighterBlue2Image, setManualFighterBlue2Image] = useState(initialBlueSlot2?.image_path ?? "");
   const [weightClass, setWeightClass] = useState(initial?.weight_class ?? "");
   const [discipline, setDiscipline] = useState(initial?.discipline ?? "");
   const [status, setStatus] = useState(initial?.status ?? "planned");
@@ -399,25 +524,57 @@ function FightModal({ eventId, eventName, fighterOptions, initial, initialSectio
   const fighterOptionById = useMemo(() => new Map(fighterOptions.map((option) => [option.userId, option])), [fighterOptions]);
   const selectedFighterA = fighterOptionById.get(fighterAUserId);
   const selectedFighterB = fighterOptionById.get(fighterBUserId);
+  const selectedFighterRed2 = fighterOptionById.get(fighterRed2UserId);
+  const selectedFighterBlue2 = fighterOptionById.get(fighterBlue2UserId);
   const fighterA = selectedFighterA?.name ?? manualFighterA;
   const fighterB = selectedFighterB?.name ?? manualFighterB;
+  const fighterRed2 = selectedFighterRed2?.name ?? manualFighterRed2;
+  const fighterBlue2 = selectedFighterBlue2?.name ?? manualFighterBlue2;
   const fighterAImage = selectedFighterA?.imagePath ?? manualFighterAImage;
   const fighterBImage = selectedFighterB?.imagePath ?? manualFighterBImage;
 
   const submit = () => {
     const formData = new FormData();
     formData.set("event_id", String(eventId));
+    formData.set("matchup_type", matchupType);
     formData.set("label", section);
-    formData.set("fighter_a_user_id", fighterAUserId);
-    formData.set("fighter_b_user_id", fighterBUserId);
-    if (!fighterAUserId) {
-      formData.set("fighter_a", manualFighterA);
+    if (matchupType === "team_2v2") {
+      formData.set("corner_a_label", cornerALabel);
+      formData.set("corner_b_label", cornerBLabel);
+      formData.set("corner_a_country_code", cornerACountryCode);
+      formData.set("corner_b_country_code", cornerBCountryCode);
+      formData.set("participant_red_1_user_id", fighterAUserId);
+      formData.set("participant_red_2_user_id", fighterRed2UserId);
+      formData.set("participant_blue_1_user_id", fighterBUserId);
+      formData.set("participant_blue_2_user_id", fighterBlue2UserId);
+      if (!fighterAUserId) {
+        formData.set("participant_red_1", manualFighterA);
+        formData.set("participant_red_1_image_path", manualFighterAImage);
+      }
+      if (!fighterRed2UserId) {
+        formData.set("participant_red_2", manualFighterRed2);
+        formData.set("participant_red_2_image_path", manualFighterRed2Image);
+      }
+      if (!fighterBUserId) {
+        formData.set("participant_blue_1", manualFighterB);
+        formData.set("participant_blue_1_image_path", manualFighterBImage);
+      }
+      if (!fighterBlue2UserId) {
+        formData.set("participant_blue_2", manualFighterBlue2);
+        formData.set("participant_blue_2_image_path", manualFighterBlue2Image);
+      }
+    } else {
+      formData.set("fighter_a_user_id", fighterAUserId);
+      formData.set("fighter_b_user_id", fighterBUserId);
+      if (!fighterAUserId) {
+        formData.set("fighter_a", manualFighterA);
+        formData.set("fighter_a_image_path", manualFighterAImage);
+      }
+      if (!fighterBUserId) {
+        formData.set("fighter_b", manualFighterB);
+        formData.set("fighter_b_image_path", manualFighterBImage);
+      }
     }
-    if (!fighterBUserId) {
-      formData.set("fighter_b", manualFighterB);
-    }
-    formData.set("fighter_a_image_path", fighterAImage);
-    formData.set("fighter_b_image_path", fighterBImage);
     formData.set("weight_class", weightClass);
     formData.set("discipline", discipline);
     formData.set("status", status);
@@ -475,16 +632,51 @@ function FightModal({ eventId, eventName, fighterOptions, initial, initialSectio
         </div>
 
         <div className="adm-modal__body adm-fight-modal__body">
-          <ModalSection step={1} title="Abschnitt auswählen" className="adm-fight-modal__section-card">
+          <ModalSection
+            step={1}
+            title="Format auswählen"
+            description="Bestimmt, ob die Paarung als klassischer Einzelkampf oder als Länderduell angezeigt wird."
+            className="adm-fight-modal__section-card"
+          >
+              <div className="adm-fight-modal__section-buttons adm-fight-modal__format-buttons">
+                {FIGHT_MATCHUP_TYPES.map((value) => (
+                  <button
+                    key={value}
+                    type="button"
+                    className={`adm-btn adm-fight-modal__section-button${matchupType === value ? " adm-btn--primary" : ""}`}
+                    onClick={() => {
+                      setMatchupType(value);
+                      if (value === "team_2v2") {
+                        setSection("Länderturnier");
+                      } else if (section === "Länderturnier") {
+                        setSection("Main Card");
+                      }
+                    }}
+                  >
+                    {value === "team_2v2" ? <UsersRound aria-hidden="true" size={14} /> : <Star aria-hidden="true" size={14} />}
+                    {FIGHT_MATCHUP_TYPE_LABELS[value].toUpperCase()}
+                  </button>
+                ))}
+              </div>
+          </ModalSection>
+
+          <ModalSection step={2} title="Abschnitt auswählen" className="adm-fight-modal__section-card">
               <div className="adm-fight-modal__section-buttons">
                 {FIGHT_SECTIONS.map((value) => (
                   <button
                     key={value}
                     type="button"
                     className={`adm-btn adm-fight-modal__section-button${section === value ? " adm-btn--primary" : ""}`}
-                    onClick={() => setSection(value)}
+                    onClick={() => {
+                      setSection(value);
+                      if (value === "Länderturnier") {
+                        setMatchupType("team_2v2");
+                      }
+                    }}
                   >
-                    {value === "Main Event" || value === "Co-Main Event" ? (
+                    {value === "Länderturnier" ? (
+                      <UsersRound aria-hidden="true" size={14} />
+                    ) : value === "Main Event" || value === "Co-Main Event" ? (
                       <Star aria-hidden="true" size={14} />
                     ) : (
                       <Flag aria-hidden="true" size={14} />
@@ -496,81 +688,211 @@ function FightModal({ eventId, eventName, fighterOptions, initial, initialSectio
           </ModalSection>
 
           <div className="adm-fight-modal__feature-grid">
-            <ModalSection step={2} title="Kämpfer auswählen" className="adm-fight-modal__fighters-card">
-                <div className="adm-fighter-picker-grid">
-                  <div className="adm-field adm-fighter-picker adm-fighter-picker--red">
-                    <label htmlFor="fight-fighter-a">
-                      KÄMPFER A
-                    </label>
-                    <FighterProfilePicker
-                      name="fighter_a_user_id"
-                      label="KÄMPFER A"
-                      options={fighterOptions}
-                      initialUserId={fighterAUserId}
-                      legacyName={initial?.fighter_a}
-                      legacyFieldName="fighter_a"
-                      corner="red"
-                      onSelectionChange={(option) => setFighterAUserId(option?.userId ?? "")}
-                    />
-                    <div className="adm-manual-fighter">
-                      <label htmlFor="manual-fighter-a">Manueller Name</label>
-                      <input
-                        id="manual-fighter-a"
-                        value={manualFighterA}
-                        onChange={(event) => setManualFighterA(event.target.value)}
+            <ModalSection step={3} title={matchupType === "team_2v2" ? "Länderduell aufstellen" : "Kämpfer auswählen"} className="adm-fight-modal__fighters-card">
+                {matchupType === "team_2v2" ? (
+                  <div className="adm-team-matchup-editor">
+                    <div className="adm-team-name-grid">
+                      <label>
+                        Land / Team rote Ecke
+                        <input
+                          value={cornerALabel}
+                          onChange={(event) => setCornerALabel(event.target.value)}
+                          placeholder="z. B. Albanien"
+                        />
+                      </label>
+                      <label>
+                        Kürzel
+                        <input
+                          value={cornerACountryCode}
+                          onChange={(event) => setCornerACountryCode(event.target.value.toUpperCase().slice(0, 3))}
+                          placeholder="ALB"
+                        />
+                      </label>
+                      <label>
+                        Land / Team blaue Ecke
+                        <input
+                          value={cornerBLabel}
+                          onChange={(event) => setCornerBLabel(event.target.value)}
+                          placeholder="z. B. Deutschland"
+                        />
+                      </label>
+                      <label>
+                        Kürzel
+                        <input
+                          value={cornerBCountryCode}
+                          onChange={(event) => setCornerBCountryCode(event.target.value.toUpperCase().slice(0, 3))}
+                          placeholder="GER"
+                        />
+                      </label>
+                    </div>
+                    <div className="adm-team-slot-grid">
+                      <div className="adm-team-slot-group adm-team-slot-group--red">
+                        <h3>Rote Ecke</h3>
+                        <div className="adm-team-slot">
+                          <FighterProfilePicker
+                            name="participant_red_1_user_id"
+                            label="Slot 1"
+                            options={fighterOptions}
+                            initialUserId={fighterAUserId}
+                            legacyName={manualFighterA}
+                            corner="red"
+                            onSelectionChange={(option) => setFighterAUserId(option?.userId ?? "")}
+                          />
+                          <ManualFighterFields
+                            idPrefix="team-red-1"
+                            name={manualFighterA}
+                            imagePath={manualFighterAImage}
+                            onNameChange={setManualFighterA}
+                            onImageChange={setManualFighterAImage}
+                            placeholder="Kämpfer 1"
+                            disabled={Boolean(fighterAUserId)}
+                          />
+                        </div>
+                        <div className="adm-team-slot">
+                          <FighterProfilePicker
+                            name="participant_red_2_user_id"
+                            label="Slot 2"
+                            options={fighterOptions}
+                            initialUserId={fighterRed2UserId}
+                            legacyName={manualFighterRed2}
+                            corner="red"
+                            onSelectionChange={(option) => setFighterRed2UserId(option?.userId ?? "")}
+                          />
+                          <ManualFighterFields
+                            idPrefix="team-red-2"
+                            name={manualFighterRed2}
+                            imagePath={manualFighterRed2Image}
+                            onNameChange={setManualFighterRed2}
+                            onImageChange={setManualFighterRed2Image}
+                            placeholder="Kämpfer 2"
+                            disabled={Boolean(fighterRed2UserId)}
+                          />
+                        </div>
+                      </div>
+                      <span className="adm-vs-hex adm-fight-modal__vs">VS.</span>
+                      <div className="adm-team-slot-group adm-team-slot-group--blue">
+                        <h3>Blaue Ecke</h3>
+                        <div className="adm-team-slot">
+                          <FighterProfilePicker
+                            name="participant_blue_1_user_id"
+                            label="Slot 1"
+                            options={fighterOptions}
+                            initialUserId={fighterBUserId}
+                            legacyName={manualFighterB}
+                            corner="blue"
+                            onSelectionChange={(option) => setFighterBUserId(option?.userId ?? "")}
+                          />
+                          <ManualFighterFields
+                            idPrefix="team-blue-1"
+                            name={manualFighterB}
+                            imagePath={manualFighterBImage}
+                            onNameChange={setManualFighterB}
+                            onImageChange={setManualFighterBImage}
+                            placeholder="Kämpfer 1"
+                            disabled={Boolean(fighterBUserId)}
+                          />
+                        </div>
+                        <div className="adm-team-slot">
+                          <FighterProfilePicker
+                            name="participant_blue_2_user_id"
+                            label="Slot 2"
+                            options={fighterOptions}
+                            initialUserId={fighterBlue2UserId}
+                            legacyName={manualFighterBlue2}
+                            corner="blue"
+                            onSelectionChange={(option) => setFighterBlue2UserId(option?.userId ?? "")}
+                          />
+                          <ManualFighterFields
+                            idPrefix="team-blue-2"
+                            name={manualFighterBlue2}
+                            imagePath={manualFighterBlue2Image}
+                            onNameChange={setManualFighterBlue2}
+                            onImageChange={setManualFighterBlue2Image}
+                            placeholder="Kämpfer 2"
+                            disabled={Boolean(fighterBlue2UserId)}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="adm-fighter-picker-grid">
+                    <div className="adm-field adm-fighter-picker adm-fighter-picker--red">
+                      <FighterProfilePicker
+                        name="fighter_a_user_id"
+                        label="KÄMPFER A"
+                        options={fighterOptions}
+                        initialUserId={fighterAUserId}
+                        legacyName={manualFighterA}
+                        legacyFieldName="fighter_a"
+                        corner="red"
+                        onSelectionChange={(option) => setFighterAUserId(option?.userId ?? "")}
+                      />
+                      <ManualFighterFields
+                        idPrefix="manual-fighter-a"
+                        name={manualFighterA}
+                        imagePath={manualFighterAImage}
+                        onNameChange={setManualFighterA}
+                        onImageChange={setManualFighterAImage}
                         placeholder="z. B. Just Rob"
                         disabled={Boolean(fighterAUserId)}
                       />
-                      <label htmlFor="manual-fighter-a-image">Portrait-URL optional</label>
-                      <input
-                        id="manual-fighter-a-image"
-                        value={manualFighterAImage}
-                        onChange={(event) => setManualFighterAImage(event.target.value)}
-                        placeholder="/images/fightcards/..."
-                        disabled={Boolean(fighterAUserId)}
-                      />
                     </div>
-                  </div>
-                  <span className="adm-vs-hex adm-fight-modal__vs">VS.</span>
-                  <div className="adm-field adm-fighter-picker adm-fighter-picker--blue">
-                    <FighterProfilePicker
-                      name="fighter_b_user_id"
-                      label="KÄMPFER B"
-                      options={fighterOptions}
-                      initialUserId={fighterBUserId}
-                      legacyName={initial?.fighter_b}
-                      legacyFieldName="fighter_b"
-                      corner="blue"
-                      onSelectionChange={(option) => setFighterBUserId(option?.userId ?? "")}
-                    />
-                    <div className="adm-manual-fighter">
-                      <label htmlFor="manual-fighter-b">Manueller Name</label>
-                      <input
-                        id="manual-fighter-b"
-                        value={manualFighterB}
-                        onChange={(event) => setManualFighterB(event.target.value)}
+                    <span className="adm-vs-hex adm-fight-modal__vs">VS.</span>
+                    <div className="adm-field adm-fighter-picker adm-fighter-picker--blue">
+                      <FighterProfilePicker
+                        name="fighter_b_user_id"
+                        label="KÄMPFER B"
+                        options={fighterOptions}
+                        initialUserId={fighterBUserId}
+                        legacyName={manualFighterB}
+                        legacyFieldName="fighter_b"
+                        corner="blue"
+                        onSelectionChange={(option) => setFighterBUserId(option?.userId ?? "")}
+                      />
+                      <ManualFighterFields
+                        idPrefix="manual-fighter-b"
+                        name={manualFighterB}
+                        imagePath={manualFighterBImage}
+                        onNameChange={setManualFighterB}
+                        onImageChange={setManualFighterBImage}
                         placeholder="z. B. Karl-Heinz"
                         disabled={Boolean(fighterBUserId)}
                       />
-                      <label htmlFor="manual-fighter-b-image">Portrait-URL optional</label>
-                      <input
-                        id="manual-fighter-b-image"
-                        value={manualFighterBImage}
-                        onChange={(event) => setManualFighterBImage(event.target.value)}
-                        placeholder="/images/fightcards/..."
-                        disabled={Boolean(fighterBUserId)}
-                      />
                     </div>
                   </div>
-                </div>
+                )}
             </ModalSection>
 
             <ModalSection
-              step={9}
+              step={10}
               title="Vorschau"
               description="So wird der Kampf in der Fightcard angezeigt."
               className="adm-fight-modal__preview-card"
             >
+              {matchupType === "team_2v2" ? (
+                <div className="adm-fight-preview-card adm-fight-preview-card--team">
+                  <div className="adm-fight-preview-card__fighter">
+                    <span className="adm-fight-preview-card__avatar">
+                      {(cornerACountryCode || cornerALabel || "A").slice(0, 2).toUpperCase()}
+                    </span>
+                    <div>
+                      <strong>{cornerALabel || "Land / Team A"}</strong>
+                      <span>{fighterA || "Kämpfer 1"} / {fighterRed2 || "Kämpfer 2"}</span>
+                    </div>
+                  </div>
+                  <span className="adm-fight-preview-card__vs">2 vs. 2</span>
+                  <div className="adm-fight-preview-card__fighter adm-fight-preview-card__fighter--right">
+                    <span className="adm-fight-preview-card__avatar">
+                      {(cornerBCountryCode || cornerBLabel || "B").slice(0, 2).toUpperCase()}
+                    </span>
+                    <div>
+                      <strong>{cornerBLabel || "Land / Team B"}</strong>
+                      <span>{fighterB || "Kämpfer 1"} / {fighterBlue2 || "Kämpfer 2"}</span>
+                    </div>
+                  </div>
+                </div>
+              ) : (
                 <div className="adm-fight-preview-card">
                   <div className="adm-fight-preview-card__fighter">
                     <span className="adm-fight-preview-card__avatar">
@@ -604,14 +926,15 @@ function FightModal({ eventId, eventName, fighterOptions, initial, initialSectio
                     </div>
                   </div>
                 </div>
-                <p className="adm-preview__hintnote adm-fight-preview-card__meta">
-                  {section} · {FIGHT_STATUS_LABELS[status as keyof typeof FIGHT_STATUS_LABELS]}
-                </p>
+              )}
+              <p className="adm-preview__hintnote adm-fight-preview-card__meta">
+                {FIGHT_MATCHUP_TYPE_LABELS[matchupType]} · {section} · {FIGHT_STATUS_LABELS[status as keyof typeof FIGHT_STATUS_LABELS]}
+              </p>
             </ModalSection>
           </div>
 
           <div className="adm-fight-modal__detail-grid">
-            <ModalSection step={3} title="Gewichtsklasse" className="adm-fight-modal__detail-card">
+            <ModalSection step={4} title="Gewichtsklasse" className="adm-fight-modal__detail-card">
                 <input
                   aria-label="Gewichtsklasse"
                   value={weightClass}
@@ -619,7 +942,7 @@ function FightModal({ eventId, eventName, fighterOptions, initial, initialSectio
                   placeholder="z. B. Mittelgewicht (-84 kg)"
                 />
             </ModalSection>
-            <ModalSection step={4} title="Disziplin" className="adm-fight-modal__detail-card">
+            <ModalSection step={5} title="Disziplin" className="adm-fight-modal__detail-card">
                 <select aria-label="Disziplin" value={discipline} onChange={(event) => setDiscipline(event.target.value)}>
                   <option value="">Disziplin wählen</option>
                   {EVENT_DISCIPLINES.map((value) => (
@@ -629,7 +952,7 @@ function FightModal({ eventId, eventName, fighterOptions, initial, initialSectio
                   ))}
                 </select>
             </ModalSection>
-            <ModalSection step={5} title="Kampfstatus" className="adm-fight-modal__detail-card">
+            <ModalSection step={6} title="Kampfstatus" className="adm-fight-modal__detail-card">
                 <select aria-label="Kampfstatus" value={status} onChange={(event) => setStatus(event.target.value as FightRow["status"])}>
                   {FIGHT_STATUSES.map((value) => (
                     <option key={value} value={value}>
@@ -638,7 +961,7 @@ function FightModal({ eventId, eventName, fighterOptions, initial, initialSectio
                   ))}
                 </select>
             </ModalSection>
-            <ModalSection step={6} title="Sichtbarkeit" className="adm-fight-modal__detail-card">
+            <ModalSection step={7} title="Sichtbarkeit" className="adm-fight-modal__detail-card">
                 <label className="adm-switch-row" htmlFor="fight-visible">
                   <span>
                     <strong>Öffentlich sichtbar</strong>
@@ -655,7 +978,7 @@ function FightModal({ eventId, eventName, fighterOptions, initial, initialSectio
                   </span>
                 </label>
             </ModalSection>
-            <ModalSection step={7} title="Reihenfolge" className="adm-fight-modal__detail-card">
+            <ModalSection step={8} title="Reihenfolge" className="adm-fight-modal__detail-card">
                 <input
                   aria-label="Reihenfolge"
                   type="number"
@@ -664,7 +987,7 @@ function FightModal({ eventId, eventName, fighterOptions, initial, initialSectio
                 />
                 <span className="adm-field__hint">Bestimmt die Reihenfolge im Abschnitt.</span>
             </ModalSection>
-            <ModalSection step={8} title="Notizen (optional)" className="adm-fight-modal__detail-card">
+            <ModalSection step={9} title="Notizen (optional)" className="adm-fight-modal__detail-card">
                 <textarea
                   aria-label="Notizen"
                   rows={3}

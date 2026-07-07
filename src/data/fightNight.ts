@@ -17,7 +17,7 @@ export const fightNight = {
     weightClass: "Gewichtsklasse wird bekanntgegeben",
     discipline: "Kampfart wird bekanntgegeben"
   },
-  backgroundImage: "/images/backgrounds/hero-events-cage-wide.png"
+  backgroundImage: "/images/backgrounds/smashtime-hero-arena-crowd-screens.png"
 };
 
 export const fightNightRules = upcomingEvent.disciplines.map((discipline) => ({

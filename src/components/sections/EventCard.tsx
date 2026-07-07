@@ -38,7 +38,7 @@ export function EventCard({ event, ticketHref }: EventCardProps) {
         <p>{event.location}</p>
       </div>
       <Link href={ticketHref} className="event-row__tickets">
-        Tickets sichern <ArrowRight aria-hidden="true" size={15} strokeWidth={2.6} />
+        Ticketinfos <ArrowRight aria-hidden="true" size={15} strokeWidth={2.6} />
       </Link>
     </article>
   );

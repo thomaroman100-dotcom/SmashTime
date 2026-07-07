@@ -16,6 +16,9 @@ export function HeroSection({ hero, poster }: HeroSectionProps) {
   const hasConfiguredTitle = Boolean(hero.title?.trim());
   const claimLines = hero.claimLines.length > 0 ? hero.claimLines : ["Keine Regeln.", "Nur Respekt."];
   const showPoster = poster.showInHero && Boolean(poster.image || poster.eventTitle);
+  const posterClassName = poster.image
+    ? "home-hero__poster home-hero__poster--image"
+    : "home-hero__poster home-hero__poster--fallback";
 
   return (
     <section
@@ -29,9 +32,8 @@ export function HeroSection({ hero, poster }: HeroSectionProps) {
             {claimLines.map((line) => (
               <span key={line}>{line}</span>
             ))}
-            <span className="home-hero__brand">{hero.brandLine}</span>
+            {hero.brandLine ? <span className="home-hero__brand">{hero.brandLine}</span> : null}
           </h1>
-          {hero.subtitle ? <p className="home-hero__subtitle">{hero.subtitle}</p> : null}
           <p className="home-hero__tagline">{hero.tagline}</p>
           <div className="home-hero__actions">
             <Link href={hero.primaryCta.href} className="btn btn--primary">
@@ -46,7 +48,7 @@ export function HeroSection({ hero, poster }: HeroSectionProps) {
         </div>
 
         {showPoster ? (
-          <div className="home-hero__poster">
+          <div className={posterClassName}>
             {poster.image ? (
               <div className="home-hero__poster-media">
                 <Image

@@ -26,6 +26,16 @@ export type PublicHomeEvent = SmashEvent & {
   ticketHref?: string;
 };
 
+export type PublicEventStatus = "upcoming" | "past" | "archived";
+
+export type PublicEvent = Omit<PublicHomeEvent, "status"> & {
+  databaseStatus: PublicEventRow["status"];
+  eventStatus: PublicEventStatus;
+};
+
+const publicEventSelect =
+  "slug, name, short_name, subtitle, event_date, date_label, location, address, admission, starts_at, disciplines, gastro, image_path, ticket_url, status, show_in_hero";
+
 function formatEventDate(value: string | null) {
   if (!value) {
     return "Datum wird bekanntgegeben";
@@ -41,6 +51,23 @@ function formatEventDate(value: string | null) {
     month: "long",
     year: "numeric"
   }).format(date);
+}
+
+function getEventStatus(row: PublicEventRow): PublicEventStatus {
+  if (row.status === "archived") {
+    return "archived";
+  }
+
+  if (!row.event_date) {
+    return "upcoming";
+  }
+
+  const date = new Date(row.event_date);
+  if (Number.isNaN(date.getTime())) {
+    return "upcoming";
+  }
+
+  return date.getTime() >= Date.now() ? "upcoming" : "past";
 }
 
 function rowToPublicEvent(row: PublicEventRow): PublicHomeEvent {
@@ -65,6 +92,16 @@ function rowToPublicEvent(row: PublicEventRow): PublicHomeEvent {
   };
 }
 
+function rowToEventLibraryItem(row: PublicEventRow): PublicEvent {
+  const event = rowToPublicEvent(row);
+
+  return {
+    ...event,
+    databaseStatus: row.status,
+    eventStatus: getEventStatus(row)
+  };
+}
+
 function fallbackHeroEvent(): PublicHomeEvent {
   return {
     ...upcomingEvent,
@@ -86,9 +123,7 @@ export async function getPublicHeroEvent(): Promise<PublicHomeEvent | null> {
 
   const { data, error } = await supabase
     .from("events")
-    .select(
-      "slug, name, short_name, subtitle, event_date, date_label, location, address, admission, starts_at, disciplines, gastro, image_path, ticket_url, status, show_in_hero"
-    )
+    .select(publicEventSelect)
     .eq("status", "published")
     .eq("show_in_hero", true)
     .order("event_date", { ascending: true, nullsFirst: false })
@@ -105,4 +140,45 @@ export async function getPublicHeroEvent(): Promise<PublicHomeEvent | null> {
   }
 
   return data ? rowToPublicEvent(data as PublicEventRow) : null;
+}
+
+export async function getPublicEvents(): Promise<PublicEvent[]> {
+  if (!isSupabaseConfigured()) {
+    return [
+      {
+        ...fallbackHeroEvent(),
+        databaseStatus: "published",
+        eventStatus: "upcoming"
+      }
+    ];
+  }
+
+  const supabase = createClient(supabaseUrl!, supabaseAnonKey!, {
+    auth: {
+      persistSession: false,
+      autoRefreshToken: false
+    }
+  });
+
+  const { data, error } = await supabase
+    .from("events")
+    .select(publicEventSelect)
+    .in("status", ["published", "archived"])
+    .order("event_date", { ascending: true, nullsFirst: false })
+    .order("name", { ascending: true });
+
+  if (error) {
+    if (error.code === "42703") {
+      return [
+        {
+          ...fallbackHeroEvent(),
+          databaseStatus: "published",
+          eventStatus: "upcoming"
+        }
+      ];
+    }
+    return [];
+  }
+
+  return ((data ?? []) as PublicEventRow[]).map(rowToEventLibraryItem);
 }

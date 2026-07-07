@@ -7,6 +7,7 @@ import { EventCard } from "@/components/sections/EventCard";
 import { HeroSection } from "@/components/sections/HeroSection";
 import { MainFightBanner } from "@/components/sections/MainFightBanner";
 import { RankingPreview } from "@/components/sections/RankingPreview";
+import { SectionHead } from "@/components/ui/SectionHead";
 import { champions } from "@/data/champions";
 import { upcomingEvent } from "@/data/events";
 import {
@@ -22,32 +23,6 @@ import { sponsorLogos } from "@/data/sponsors";
 import { getPublicHeroEvent, type PublicHomeEvent } from "@/lib/public-events";
 import { getPublicFightcardsForEvent, pickFeaturedFight } from "@/lib/public-fightcards";
 import { getPublicSiteSettings } from "@/lib/site-settings";
-
-function SectionHead({
-  title,
-  description,
-  ctaLabel,
-  ctaHref
-}: {
-  title: string;
-  description?: string;
-  ctaLabel?: string;
-  ctaHref?: string;
-}) {
-  return (
-    <div className="section-head">
-      <div>
-        <h2>{title}</h2>
-        {description ? <p className="section-head__description">{description}</p> : null}
-      </div>
-      {ctaLabel && ctaHref ? (
-        <Link href={ctaHref} className="section-head__cta">
-          {ctaLabel} <ArrowRight aria-hidden="true" size={15} strokeWidth={2.6} />
-        </Link>
-      ) : null}
-    </div>
-  );
-}
 
 function eventNumberFromShortName(shortName: string) {
   return (/\d+/.exec(shortName)?.[0] ?? shortName.replace(/smashtime/i, "").trim()) || "ST";

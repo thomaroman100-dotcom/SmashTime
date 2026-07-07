@@ -32,15 +32,16 @@ export const nextEvent: SmashEvent = upcomingEvent;
 export const featuredEvent: SmashEvent = upcomingEvent;
 
 export const homeHero: HomeHero = {
-  claimLines: ["Keine Regeln.", "Nur Respekt."],
-  brandLine: "SmashTime.",
-  tagline: "Kämpfe. Ehre. Vermächtnis.",
+  claimLines: ["Wo Kampf Charakter zeigt."],
+  brandLine: "",
+  tagline:
+    "SmashTime ist die Bühne für Live-Kampfsport, starke Athleten und echte Emotionen. Hier geht es nicht nur ums Gewinnen – sondern um Respekt, Haltung und Momente, die bleiben.",
   backgroundImage: "/images/backgrounds/hero-smash-cage-arena-wide.png",
   backgroundPosition: "center center",
-  primaryCta: { label: "Tickets sichern", href: "/tickets" },
+  primaryCta: { label: "Nächste Veranstaltung", href: nextEvent.detailHref ?? "/veranstaltungen" },
   secondaryCta: {
-    label: "Details ansehen",
-    href: nextEvent.detailHref ?? "/veranstaltungen"
+    label: "Über SmashTime",
+    href: "/ueber-uns"
   }
 };
 
@@ -57,8 +58,8 @@ export const homeEventPoster: HomeEventPoster = {
 export const homeCountdown = {
   label: "Nächste Veranstaltung in",
   targetDate: nextEvent.date,
-  ctaLabel: "Tickets sichern",
-  ctaHref: "/tickets",
+  ctaLabel: "Zur Veranstaltung",
+  ctaHref: nextEvent.detailHref ?? "/veranstaltungen",
   fallback: "Nächste Veranstaltung wird bald bekanntgegeben"
 };
 
@@ -68,8 +69,8 @@ export const mainFightFallback = {
   label: "Fightcard",
   title: "Fightcard wird bald veröffentlicht",
   text: "Die Kampfpaarungen für den nächsten Kampfabend werden offiziell bestätigt und danach hier angekündigt.",
-  ctaLabel: "Fightcard ansehen",
-  ctaHref: "/fight-night#fightcard"
+  ctaLabel: "Kampfabend ansehen",
+  ctaHref: nextEvent.detailHref ? `${nextEvent.detailHref}#fightcard` : "/veranstaltungen#fightcard"
 };
 
 export const homeSections = {

@@ -39,7 +39,7 @@ export const eventRecaps: EventRecap[] = [
     title: "SmashTime 3.",
     redTitle: "Respekt steigt in den Ring.",
     intro:
-      "Gemeinsam gegen Mobbing: SmashTime 3 bringt Respekt, Stärke und Zusammenhalt in die Jahnturnhalle St. Pölten.",
+      "Gemeinsam gegen Mobbing: SmashTime 3 bringt Respekt, Stärke und Zusammenhalt in den Ring.",
     date: upcomingEvent.dateLabel,
     location: upcomingEvent.location,
     address: upcomingEvent.address,
@@ -65,7 +65,7 @@ export const eventRecaps: EventRecap[] = [
     },
     gallery: [
       { src: "/images/events/smashtime-3-respekt-steigt-in-den-ring.png", alt: "SmashTime 3 Eventposter Respekt steigt in den Ring" },
-      { src: "/images/backgrounds/hero-events-cage-wide.png", alt: "Cage und Arena bei SmashTime" },
+      { src: "/images/backgrounds/smashtime-hero-faceoff-cage.png", alt: "Cage und Arena bei SmashTime" },
       { src: "/images/backgrounds/arena-seats-cage.png", alt: "Arena mit Käfig" }
     ]
   }
