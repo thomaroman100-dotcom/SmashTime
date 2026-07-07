@@ -1,4 +1,3 @@
-import Image from "next/image";
 import Link from "next/link";
 import {
   Archive,
@@ -7,7 +6,6 @@ import {
   ChevronRight,
   Download,
   Eye,
-  Image as ImageIcon,
   MapPin,
   Pencil,
   Plus,
@@ -22,6 +20,7 @@ import {
 } from "@/lib/admin/actions/events";
 import { eventSelectColumns } from "@/lib/admin/resource-shared";
 import { calendarBadge, formatDate, parseDate } from "@/lib/admin/format";
+import { AdminImagePreview } from "@/components/admin/ui/AdminImagePreview";
 import { Badge, type BadgeTone, EmptyState, Pagination, Panel, StatCard } from "@/components/admin/ui/primitives";
 import { RowMenu } from "@/components/admin/ui/RowMenu";
 
@@ -236,21 +235,14 @@ export default async function AdminEventsPage({ searchParams }: PageProps) {
               {pageRows.map((event) => (
                 <div className="adm-table__row" key={event.id} style={{ gridTemplateColumns: tableColumns }}>
                   <div style={{ display: "flex", gap: 12, alignItems: "center", minWidth: 0 }}>
-                    <span className="adm-thumb">
-                      {event.image_path ? (
-                        <Image
-                          src={event.image_path}
-                          alt=""
-                          width={76}
-                          height={44}
-                          style={{ width: "100%", height: "100%", objectFit: "cover" }}
-                        />
-                      ) : (
-                        <span className="adm-thumb--empty" style={{ display: "flex", width: "100%", height: "100%" }}>
-                          <ImageIcon aria-hidden="true" size={16} />
-                        </span>
-                      )}
-                    </span>
+                    <AdminImagePreview
+                      src={event.image_path}
+                      alt={`${event.name} Eventbild`}
+                      fallback="Kein Bild"
+                      aspectRatio="76 / 44"
+                      sizes="76px"
+                      className="adm-thumb"
+                    />
                     <div style={{ minWidth: 0 }}>
                       <strong>{event.name}</strong>
                       {event.subtitle ? <span className="adm-cell-sub adm-cell-sub--red">{event.subtitle}</span> : null}
@@ -271,6 +263,11 @@ export default async function AdminEventsPage({ searchParams }: PageProps) {
                   </div>
                   <span>
                     <Badge tone={statusMeta[event.status].tone}>{statusMeta[event.status].label}</Badge>
+                    {event.show_in_hero ? (
+                      <span style={{ display: "block", marginTop: 6 }}>
+                        <Badge tone={event.image_path ? "orange" : "gray"}>Hero</Badge>
+                      </span>
+                    ) : null}
                   </span>
                   <div className="adm-row-actions">
                     <Link className="adm-icon-btn" href={`/admin/events/${event.id}`} aria-label={`${event.name} bearbeiten`}>
@@ -280,6 +277,7 @@ export default async function AdminEventsPage({ searchParams }: PageProps) {
                       className="adm-icon-btn"
                       href="/veranstaltungen"
                       target="_blank"
+                      rel="noopener noreferrer"
                       aria-label={`${event.name} auf der Website ansehen`}
                     >
                       <Eye aria-hidden="true" size={15} />

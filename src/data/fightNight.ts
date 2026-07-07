@@ -17,7 +17,7 @@ export const fightNight = {
     weightClass: "Gewichtsklasse wird bekanntgegeben",
     discipline: "Kampfart wird bekanntgegeben"
   },
-  backgroundImage: "/images/backgrounds/hero-events-cage-wide.png"
+  backgroundImage: "/images/backgrounds/smashtime-hero-arena-crowd-screens.png"
 };
 
 export const fightNightRules = upcomingEvent.disciplines.map((discipline) => ({
@@ -29,13 +29,15 @@ export const fightNightRules = upcomingEvent.disciplines.map((discipline) => ({
         ? "Standkampf mit Tempo, Präzision und kompromisslosen Runden."
         : discipline === "Xtreme Boxen"
           ? "Boxen mit besonderer Härte und SmashTime-Inszenierung."
-          : "Klassisches Boxen: klare Fäuste, klare Regeln, echte Action."
+          : discipline === "Influenza Kämpfe"
+            ? "Bestätigte Sonderpaarungen mit Show, Respekt und klar kontrolliertem Rahmen."
+            : "Klassisches Boxen: klare Fäuste, klare Regeln, echte Action."
 }));
 
 export const fightNightHighlights = [
   {
     title: "Top-Paarungen",
-    text: "Die Paarungen werden erst veröffentlicht, wenn sie offiziell bestätigt sind.",
+    text: "Just Rob vs. Karl-Heinz ist bestätigt. Weitere Paarungen werden veröffentlicht, sobald sie offiziell feststehen.",
     icon: "target"
   },
   {

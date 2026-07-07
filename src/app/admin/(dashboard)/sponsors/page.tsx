@@ -1,9 +1,9 @@
-import Image from "next/image";
 import Link from "next/link";
 import { Handshake, Image as ImageIcon, Pencil, Plus, Search, ShieldCheck, ShieldOff, Star } from "lucide-react";
 import { type SponsorRow, deleteSponsorAction, setSponsorActiveAction } from "@/lib/admin/actions/sponsors";
 import { sponsorPackages } from "@/data/sponsors";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { AdminImagePreview } from "@/components/admin/ui/AdminImagePreview";
 import { Badge, EmptyState, Pagination, Panel, StatCard } from "@/components/admin/ui/primitives";
 import { RowMenu } from "@/components/admin/ui/RowMenu";
 
@@ -151,22 +151,14 @@ export default async function AdminSponsorsPage({ searchParams }: PageProps) {
               {pageRows.map((sponsor) => (
                 <div className="adm-table__row" key={sponsor.id} style={{ gridTemplateColumns: tableColumns }}>
                   <div style={{ display: "flex", gap: 12, alignItems: "center", minWidth: 0 }}>
-                    <span className="adm-thumb">
-                      {sponsor.logo_path ? (
-                        <Image
-                          src={sponsor.logo_path}
-                          alt=""
-                          width={76}
-                          height={44}
-                          style={{ width: "100%", height: "100%", objectFit: "contain", padding: 7 }}
-                          unoptimized
-                        />
-                      ) : (
-                        <span className="adm-thumb--empty" style={{ display: "flex", width: "100%", height: "100%" }}>
-                          <ImageIcon aria-hidden="true" size={16} />
-                        </span>
-                      )}
-                    </span>
+                    <AdminImagePreview
+                      src={sponsor.logo_path}
+                      alt={`${sponsor.name} Logo`}
+                      fallback="Kein Logo"
+                      aspectRatio="76 / 44"
+                      sizes="76px"
+                      className="adm-thumb"
+                    />
                     <strong>{sponsor.name}</strong>
                   </div>
                   <span className="adm-chip">{sponsor.package_name ?? "Kein Paket"}</span>

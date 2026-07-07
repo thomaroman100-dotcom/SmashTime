@@ -1,13 +1,14 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { useActionState, useEffect, useState } from "react";
-import { ArrowLeft, Eye, Image as ImageIcon, Loader2, Save } from "lucide-react";
+import { ArrowLeft, Eye, Loader2, Save } from "lucide-react";
 import type { ActionResult } from "@/lib/admin/action-helpers";
 import type { SponsorRow } from "@/lib/admin/actions/sponsors";
 import { SPONSOR_PACKAGES } from "@/lib/admin/resource-shared";
 import { useAdminUi } from "@/components/admin/ui/AdminUiProvider";
+import { AdminImagePreview } from "@/components/admin/ui/AdminImagePreview";
+import { AdminImageUploadField } from "@/components/admin/ui/AdminImageUploadField";
 import { Badge } from "@/components/admin/ui/primitives";
 
 type SponsorFormProps = {
@@ -50,7 +51,7 @@ export function SponsorForm({ action, initial, heading, subheading }: SponsorFor
           <p>{subheading}</p>
         </div>
         <div className="adm-head__actions">
-          <Link className="adm-btn" href="/sponsoren" target="_blank">
+          <Link className="adm-btn" href="/sponsoren" target="_blank" rel="noopener noreferrer">
             <Eye aria-hidden="true" size={16} /> Vorschau
           </Link>
           <button className="adm-btn adm-btn--primary" type="submit" disabled={pending}>
@@ -125,23 +126,21 @@ export function SponsorForm({ action, initial, heading, subheading }: SponsorFor
               <h2>Logo &amp; Medien</h2>
             </div>
             <div className="adm-fsection__body">
-              <div className="adm-grid-2">
-                <div className="adm-field">
-                  <label htmlFor="sponsor-logo">Logo-Pfad</label>
-                  <input
-                    id="sponsor-logo"
-                    name="logo_path"
-                    value={logoPath}
-                    onChange={(event) => setLogoPath(event.target.value)}
-                    placeholder="/images/sponsors/… oder Medien-URL"
-                  />
-                </div>
-                <div className="adm-field">
-                  <label htmlFor="sponsor-logo-file">Logo hochladen</label>
-                  <input id="sponsor-logo-file" name="sponsor_logo_file" type="file" accept="image/png,image/jpeg,image/webp,image/avif,image/svg+xml" />
-                  <span className="adm-field__hint">Max. 6 MB. Ersetzt den Logo-Pfad beim Speichern.</span>
-                </div>
-              </div>
+              <AdminImageUploadField
+                id="sponsor-logo"
+                label="Sponsor-Logo"
+                pathName="logo_path"
+                fileName="sponsor_logo_file"
+                clearName="clear_logo_path"
+                value={logoPath}
+                onValueChange={setLogoPath}
+                pathLabel="Logo-Pfad"
+                fileLabel="Logo hochladen"
+                fallback="Logo fehlt"
+                previewAlt={`${name || "Sponsor"} Logo`}
+                aspectRatio="16 / 9"
+                uploadHint="Max. 6 MB. Ein Upload ersetzt das gespeicherte Logo beim Speichern."
+              />
             </div>
           </section>
 
@@ -176,16 +175,14 @@ export function SponsorForm({ action, initial, heading, subheading }: SponsorFor
             </div>
             <div className="adm-panel__body">
               <div className="adm-preview">
-                <div className="adm-preview__img" style={{ aspectRatio: "16 / 9" }}>
-                  {logoPath ? (
-                    <Image src={logoPath} alt="" fill sizes="380px" style={{ objectFit: "contain", padding: 28 }} unoptimized />
-                  ) : (
-                    <span className="adm-thumb--empty" style={{ display: "flex", height: "100%", flexDirection: "column", gap: 8 }}>
-                      <ImageIcon aria-hidden="true" size={26} />
-                      Logo fehlt
-                    </span>
-                  )}
-                </div>
+                <AdminImagePreview
+                  src={logoPath}
+                  alt={`${name || "Sponsor"} Logo`}
+                  fallback="Logo fehlt"
+                  aspectRatio="16 / 9"
+                  sizes="380px"
+                  className="adm-preview__img"
+                />
                 <div className="adm-preview__body">
                   <Badge tone={isActive ? "green" : "gray"} uppercase>
                     {isActive ? "Aktiv" : "Inaktiv"}

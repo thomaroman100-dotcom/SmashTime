@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import {
   type ActionResult,
+  fieldBool,
   fieldText,
   fieldTextOrNull,
   formFile,
@@ -12,7 +13,9 @@ import {
   slugify,
   supabaseErrorMessage,
   toParagraphs,
-  uploadAdminMediaAsset
+  uploadAdminMediaAsset,
+  cleanupAdminMediaUrls,
+  cleanupReplacedAdminMedia
 } from "@/lib/admin/action-helpers";
 import { NEWS_CATEGORIES } from "@/lib/admin/resource-shared";
 
@@ -62,8 +65,8 @@ function newsPayload(formData: FormData) {
       category,
       excerpt: fieldTextOrNull(formData, "excerpt"),
       body: toParagraphs(fieldText(formData, "body")),
-      image_path: fieldTextOrNull(formData, "image_path"),
-      hero_image_path: fieldTextOrNull(formData, "hero_image_path"),
+      image_path: fieldBool(formData, "clear_image_path") ? null : fieldTextOrNull(formData, "image_path"),
+      hero_image_path: fieldBool(formData, "clear_hero_image_path") ? null : fieldTextOrNull(formData, "hero_image_path"),
       status: status as NewsStatus
     }
   };
@@ -97,7 +100,8 @@ async function applyNewsImageUploads({
       assetType: "News",
       altText: `${payload.title} Beitragsbild`,
       usageNote: `News-Beitragsbild: ${payload.title}`,
-      isPublic: true
+      isPublic: true,
+      isChecked: true
     });
     if (!uploaded.ok) {
       return uploaded;
@@ -113,7 +117,8 @@ async function applyNewsImageUploads({
       assetType: "News",
       altText: `${payload.title} Hero-Bild`,
       usageNote: `News-Hero: ${payload.title}`,
-      isPublic: true
+      isPublic: true,
+      isChecked: true
     });
     if (!uploaded.ok) {
       return uploaded;
@@ -128,7 +133,7 @@ export async function createNewsAction(
   _prev: ActionResult | null,
   formData: FormData
 ): Promise<ActionResult> {
-  const admin = await getAdminClient();
+  const admin = await getAdminClient("news.manage");
   if (!admin.ok) {
     return { ok: false, error: admin.error };
   }
@@ -161,7 +166,7 @@ export async function updateNewsAction(
   _prev: ActionResult | null,
   formData: FormData
 ): Promise<ActionResult> {
-  const admin = await getAdminClient();
+  const admin = await getAdminClient("news.manage");
   if (!admin.ok) {
     return { ok: false, error: admin.error };
   }
@@ -176,13 +181,17 @@ export async function updateNewsAction(
     return { ok: false, error: uploadResult.error };
   }
 
-  const { data: existingData } = await admin.supabase
+  const { data: existingData, error: existingError } = await admin.supabase
     .from("news_posts")
-    .select("published_at")
+    .select("published_at, image_path, hero_image_path")
     .eq("id", id)
     .maybeSingle();
 
-  const existing = existingData as { published_at: string | null } | null;
+  if (existingError) {
+    return { ok: false, error: supabaseErrorMessage(existingError) };
+  }
+
+  const existing = existingData as { published_at: string | null; image_path: string | null; hero_image_path: string | null } | null;
   const publishedAt =
     result.payload.status === "published" ? existing?.published_at ?? new Date().toISOString() : existing?.published_at ?? null;
 
@@ -195,12 +204,30 @@ export async function updateNewsAction(
     return { ok: false, error: supabaseErrorMessage(error) };
   }
 
+  const cleanupCard = await cleanupReplacedAdminMedia({
+    supabase: admin.supabase,
+    previousUrl: existing?.image_path,
+    nextUrl: result.payload.image_path
+  });
+  if (!cleanupCard.ok) {
+    return cleanupCard;
+  }
+
+  const cleanupHero = await cleanupReplacedAdminMedia({
+    supabase: admin.supabase,
+    previousUrl: existing?.hero_image_path,
+    nextUrl: result.payload.hero_image_path
+  });
+  if (!cleanupHero.ok) {
+    return cleanupHero;
+  }
+
   revalidateNews();
   return { ok: true, message: "Beitrag gespeichert." };
 }
 
 export async function setNewsStatusAction(id: number, status: NewsStatus): Promise<ActionResult> {
-  const admin = await getAdminClient();
+  const admin = await getAdminClient("news.manage");
   if (!admin.ok) {
     return { ok: false, error: admin.error };
   }
@@ -225,14 +252,33 @@ export async function setNewsStatusAction(id: number, status: NewsStatus): Promi
 }
 
 export async function deleteNewsAction(id: number): Promise<ActionResult> {
-  const admin = await getAdminClient();
+  const admin = await getAdminClient("news.manage");
   if (!admin.ok) {
     return { ok: false, error: admin.error };
+  }
+
+  const { data: existingData, error: selectError } = await admin.supabase
+    .from("news_posts")
+    .select("image_path, hero_image_path")
+    .eq("id", id)
+    .maybeSingle();
+
+  if (selectError) {
+    return { ok: false, error: supabaseErrorMessage(selectError) };
   }
 
   const { error } = await admin.supabase.from("news_posts").delete().eq("id", id);
   if (error) {
     return { ok: false, error: supabaseErrorMessage(error) };
+  }
+
+  const existing = existingData as { image_path: string | null; hero_image_path: string | null } | null;
+  const cleanup = await cleanupAdminMediaUrls({
+    supabase: admin.supabase,
+    publicUrls: [existing?.image_path, existing?.hero_image_path]
+  });
+  if (!cleanup.ok) {
+    return cleanup;
   }
 
   revalidateNews();

@@ -1,6 +1,8 @@
 import Link from "next/link";
+import Image from "next/image";
 import type { LucideIcon } from "lucide-react";
 import { ArrowDownRight, ArrowUpRight, ChevronLeft, ChevronRight } from "lucide-react";
+import { getMemberImageSrc } from "@/lib/media-placeholders";
 import { cn } from "@/lib/utils";
 
 /* ---------- Stat-Card (Kennzahlenkarten oben auf jeder Seite) ---------- */
@@ -102,32 +104,26 @@ export function Badge({
   );
 }
 
-/* ---------- Avatar mit Initialen ---------- */
+/* ---------- Avatar mit zentralem Bild-Fallback ---------- */
 
 export function InitialsAvatar({
   name,
+  src,
   size = "md",
   online = false
 }: {
   name: string;
+  src?: string | null;
   size?: "sm" | "md";
   online?: boolean;
 }) {
-  const initials =
-    name
-      .split(" ")
-      .filter(Boolean)
-      .slice(0, 2)
-      .map((part) => part[0])
-      .join("")
-      .toUpperCase() || "–";
-
   return (
     <span
       className={cn("adm-avatar", size === "sm" && "adm-avatar--sm", online && "adm-avatar--online")}
       aria-hidden="true"
     >
-      {initials}
+      <Image src={getMemberImageSrc(src)} alt="" fill sizes={size === "sm" ? "30px" : "38px"} />
+      <span className="adm-avatar__sr-name">{name}</span>
     </span>
   );
 }

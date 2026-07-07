@@ -2,6 +2,7 @@ import { cache } from "react";
 import { createClient } from "@supabase/supabase-js";
 import { homeCountdown, homeHero, homeSections, homeTicketCta } from "@/data/homepage";
 import { site, type NavigationItem } from "@/data/site";
+import { normalizePublicHref } from "@/lib/public-url";
 import { isSupabaseConfigured, supabaseAnonKey, supabaseUrl } from "@/lib/supabase/config";
 
 type SettingRow = {
@@ -52,19 +53,26 @@ export type PublicSettings = {
   };
 };
 
-const routeAliases: Record<string, string> = {
-  "/events": "/events",
-  "/news": "/news",
-  "/sponsors": "/sponsors",
-  "/about": "/about",
-  "/contact": "/contact",
-  "/fighters": "/fighters",
-  "/rankings": "/rankings"
-};
-
 function setting(rows: Record<string, string>, key: string, fallback: string) {
   const value = rows[key]?.trim();
   return value ? value : fallback;
+}
+
+function normalizeHomeHeroPrimaryCta(label: string, href: string, ticketLabel: string, ticketHref: string) {
+  const lowerLabel = label.trim().toLowerCase();
+  const isLegacyTicketCta =
+    (lowerLabel === "tickets sichern" || lowerLabel === "ticket sichern") &&
+    (href === ticketHref || href === site.ticketHref || href === "/tickets");
+
+  return isLegacyTicketCta ? homeHero.primaryCta : { label, href };
+}
+
+function normalizeHomeHeroSecondaryCta(label: string, href: string) {
+  const lowerLabel = label.trim().toLowerCase();
+  const isLegacyFightcardCta =
+    (lowerLabel === "fightcard ansehen" || lowerLabel === "kampfabend ansehen") && href.startsWith("/fight-night");
+
+  return isLegacyFightcardCta ? homeHero.secondaryCta : { label, href };
 }
 
 function boolSetting(rows: Record<string, string>, key: string, fallback: boolean) {
@@ -84,15 +92,73 @@ function intSetting(rows: Record<string, string>, key: string, fallback: number)
 }
 
 function normalizePath(path: string) {
-  const trimmed = path.trim();
-  if (!trimmed) {
-    return "/";
-  }
-  if (/^https?:\/\//.test(trimmed)) {
-    return trimmed;
-  }
-  const normalized = trimmed.startsWith("/") ? trimmed : `/${trimmed}`;
-  return routeAliases[normalized] ?? normalized;
+  return normalizePublicHref(path);
+}
+
+function normalizeNavigationLabel(label: string) {
+  const trimmed = label.trim();
+  const publicLabelAliases: Record<string, string> = {
+    home: "Startseite",
+    news: "Neuigkeiten",
+    sponsors: "Partner",
+    contact: "Kontakt",
+    fighters: "Kämpfer"
+  };
+
+  return publicLabelAliases[trimmed.toLowerCase()] ?? trimmed;
+}
+
+function isRankingNavigationLink(labelValue?: string, hrefValue?: string) {
+  const label = (labelValue ?? "").trim().toLowerCase();
+  const href = (hrefValue ?? "").trim().toLowerCase();
+  return label === "ranglisten" || label === "rankings" || href === "/rankings" || href.startsWith("/rankings?");
+}
+
+function isRankingNavigationItem(item: StoredNavigationItem) {
+  return isRankingNavigationLink(item.label, item.path ?? item.href);
+}
+
+function defaultNavigationWithoutRankings() {
+  return site.navigation
+    .filter((item) => !isRankingNavigationLink(item.label, item.href))
+    .map((item) => ({
+      ...item,
+      children: item.children?.filter((child) => !isRankingNavigationLink(child.label, child.href))
+    }));
+}
+
+const legacyHomeHeroBackgroundImages = new Set([
+  "/images/backgrounds/atmosphere-fight-action-grunge-wide.png",
+  "/images/backgrounds/atmosphere-fighters-faceoff-wide.png"
+]);
+
+function homeHeroBackgroundImage(rows: Record<string, string>) {
+  const configuredImage = setting(rows, "homepage.hero.backgroundImageUrl", homeHero.backgroundImage);
+  return legacyHomeHeroBackgroundImages.has(configuredImage) ? homeHero.backgroundImage : configuredImage;
+}
+
+function normalizeHomeHeroTitle(value: string) {
+  const normalized = value.trim().toLowerCase().replace(/\s+/g, " ");
+  const legacyTitles = new Set([
+    "smashtime 3",
+    "über smashtime.",
+    "ueber smashtime.",
+    "bei uns wird nicht gespielt.",
+    "bei uns wird nicht gespielt"
+  ]);
+  return legacyTitles.has(normalized) ? homeHero.title : value;
+}
+
+function normalizeHomeHeroSubtitle(value: string) {
+  const normalized = value.trim().toLowerCase();
+  const isLegacySubtitle =
+    normalized.includes("geboren als untergrund-format") ||
+    normalized.includes("smashtime bringt kämpfer") ||
+    normalized.includes("smashtime bringt kaempfer") ||
+    normalized.includes("die elite des kampfes") ||
+    normalized.includes("respekt steigt in den ring");
+
+  return isLegacySubtitle ? homeHero.subtitle : value;
 }
 
 function parseNavigation(rows: Record<string, string>) {
@@ -109,14 +175,15 @@ function parseNavigation(rows: Record<string, string>) {
   }
 
   if (parsed.length === 0) {
-    return site.navigation;
+    return defaultNavigationWithoutRankings();
   }
 
   const visibleItems = parsed
+    .filter((item) => !isRankingNavigationItem(item))
     .filter((item) => item.isVisible !== false && (item.label ?? "").trim())
     .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
     .map((item) => ({
-      label: item.label!.trim(),
+      label: normalizeNavigationLabel(item.label!),
       href: normalizePath(item.path ?? item.href ?? "/")
     }));
 
@@ -169,12 +236,26 @@ export const getPublicSiteSettings = cache(async (): Promise<PublicSettings> => 
   const primaryColor = setting(rows, "branding.theme.primaryColor", "#D71920");
   const accentColor = setting(rows, "branding.theme.accentColor", "#C9A24A");
   const textColor = setting(rows, "branding.theme.textColor", "#E5E5E5");
-  const heroTitle = setting(rows, "homepage.hero.title", "");
-  const heroSubtitle = setting(rows, "homepage.hero.subtitle", "");
-  const ticketHref = setting(rows, "homepage.cta.primaryUrl", site.ticketHref);
-  const ticketLabel = setting(rows, "homepage.cta.primaryLabel", site.headerCta.label);
+  const heroTitle = normalizeHomeHeroTitle(setting(rows, "homepage.hero.title", homeHero.title));
+  const heroSubtitle = normalizeHomeHeroSubtitle(setting(rows, "homepage.hero.subtitle", homeHero.subtitle));
+  const ticketHref = normalizePublicHref(setting(rows, "header.cta.url", site.ticketHref), site.ticketHref);
+  const ticketLabel = setting(rows, "header.cta.label", site.headerCta.label);
+  const heroPrimaryHref = normalizePublicHref(
+    setting(rows, "homepage.cta.primaryUrl", homeHero.primaryCta.href),
+    homeHero.primaryCta.href
+  );
+  const heroPrimaryCta = normalizeHomeHeroPrimaryCta(
+    setting(rows, "homepage.cta.primaryLabel", homeHero.primaryCta.label),
+    heroPrimaryHref,
+    ticketLabel,
+    ticketHref
+  );
   const secondaryLabel = setting(rows, "homepage.cta.secondaryLabel", homeHero.secondaryCta.label);
-  const secondaryHref = setting(rows, "homepage.cta.secondaryUrl", homeHero.secondaryCta.href);
+  const secondaryHref = normalizePublicHref(
+    setting(rows, "homepage.cta.secondaryUrl", homeHero.secondaryCta.href),
+    homeHero.secondaryCta.href
+  );
+  const heroSecondaryCta = normalizeHomeHeroSecondaryCta(secondaryLabel, secondaryHref);
 
   const configuredSite: PublicSiteContent = {
     ...site,
@@ -199,7 +280,7 @@ export const getPublicSiteSettings = cache(async (): Promise<PublicSettings> => 
   };
 
   return {
-    faviconUrl: setting(rows, "branding.faviconUrl", "/favicon.ico"),
+    faviconUrl: setting(rows, "branding.faviconUrl", "/favicon.svg"),
     theme: {
       primaryColor,
       accentColor,
@@ -211,17 +292,17 @@ export const getPublicSiteSettings = cache(async (): Promise<PublicSettings> => 
         ...homeHero,
         title: heroTitle,
         subtitle: heroSubtitle,
-        backgroundImage: setting(rows, "homepage.hero.backgroundImageUrl", homeHero.backgroundImage),
-        primaryCta: { label: ticketLabel, href: ticketHref },
-        secondaryCta: { label: secondaryLabel, href: secondaryHref }
+        backgroundImage: homeHeroBackgroundImage(rows),
+        primaryCta: heroPrimaryCta,
+        secondaryCta: heroSecondaryCta
       },
       countdown: {
         ...homeCountdown,
         enabled: boolSetting(rows, "countdown.enabled", true),
         label: setting(rows, "countdown.label", homeCountdown.label),
         targetDate: setting(rows, "countdown.countdownEndAt", homeCountdown.targetDate),
-        ctaLabel: ticketLabel,
-        ctaHref: ticketHref
+        ctaLabel: setting(rows, "countdown.ctaLabel", homeCountdown.ctaLabel),
+        ctaHref: normalizePublicHref(setting(rows, "countdown.ctaHref", homeCountdown.ctaHref), homeCountdown.ctaHref)
       },
       sections: {
         ...homeSections,
@@ -232,7 +313,10 @@ export const getPublicSiteSettings = cache(async (): Promise<PublicSettings> => 
           description: setting(rows, "homepage.modules.champions.description", ""),
           displayLimit: intSetting(rows, "homepage.modules.champions.displayLimit", 4),
           ctaLabel: setting(rows, "homepage.modules.champions.buttonLabel", homeSections.champions.ctaLabel),
-          ctaHref: setting(rows, "homepage.modules.champions.buttonUrl", homeSections.champions.ctaHref)
+          ctaHref: normalizePublicHref(
+            setting(rows, "homepage.modules.champions.buttonUrl", homeSections.champions.ctaHref),
+            homeSections.champions.ctaHref
+          )
         },
         news: {
           ...homeSections.news,
@@ -241,7 +325,10 @@ export const getPublicSiteSettings = cache(async (): Promise<PublicSettings> => 
           description: setting(rows, "homepage.modules.news.description", ""),
           displayLimit: intSetting(rows, "homepage.modules.news.displayLimit", 3),
           ctaLabel: setting(rows, "homepage.modules.news.buttonLabel", homeSections.news.ctaLabel),
-          ctaHref: setting(rows, "homepage.modules.news.buttonUrl", homeSections.news.ctaHref)
+          ctaHref: normalizePublicHref(
+            setting(rows, "homepage.modules.news.buttonUrl", homeSections.news.ctaHref),
+            homeSections.news.ctaHref
+          )
         },
         sponsors: {
           enabled: boolSetting(rows, "homepage.modules.sponsors.enabled", true),
@@ -249,7 +336,7 @@ export const getPublicSiteSettings = cache(async (): Promise<PublicSettings> => 
           description: setting(rows, "homepage.modules.sponsors.description", ""),
           displayLimit: intSetting(rows, "homepage.modules.sponsors.displayLimit", 6),
           ctaLabel: setting(rows, "homepage.modules.sponsors.buttonLabel", "Alle Partner ansehen"),
-          ctaHref: setting(rows, "homepage.modules.sponsors.buttonUrl", "/sponsors")
+          ctaHref: normalizePublicHref(setting(rows, "homepage.modules.sponsors.buttonUrl", "/sponsoren"), "/sponsoren")
         }
       },
       ticketCta: {

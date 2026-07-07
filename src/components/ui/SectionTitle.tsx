@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils";
+import { SectionHead } from "@/components/ui/SectionHead";
 
 type SectionTitleProps = {
   children: React.ReactNode;
@@ -14,9 +15,11 @@ export function SectionTitle({
   className
 }: SectionTitleProps) {
   return (
-    <div className={cn("section-title", align === "left" && "section-title--left", className)}>
-      {kicker ? <p className="section-title__kicker">{kicker}</p> : null}
-      <h2>{children}</h2>
-    </div>
+    <SectionHead
+      title={String(children)}
+      description={kicker}
+      align={align}
+      className={cn("section-title", align === "left" && "section-title--left", className)}
+    />
   );
 }

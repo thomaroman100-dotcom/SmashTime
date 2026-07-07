@@ -9,19 +9,19 @@ type CallToActionBandProps = {
 };
 
 export function CallToActionBand({
-  title = "Bereit für SmashTime?",
-  text = "Sieh dir die nächste Veranstaltung an und bleib nah am Kampfabend.",
-  button = "Nächste Veranstaltung ansehen",
+  title = "Sei dabei. Erlebe Geschichte.",
+  text = "Alle Ticketpakete, Einlassinfos und Hinweise zum nächsten Kampfabend findest du auf der Ticketseite.",
+  button = "Ticketinfos ansehen",
   href = site.headerCta.href
 }: CallToActionBandProps) {
   return (
-    <section className="cta-band card-grunge card-grunge--cta" aria-label={title}>
-      <div className="cta-band__inner">
+    <section className="ticket-cta-band cta-band" aria-label={title}>
+      <div className="container ticket-cta-band__inner cta-band__inner">
         <div>
           <h2>{title}</h2>
           <p>{text}</p>
         </div>
-        <CTAButton href={href} variant="outline">
+        <CTAButton href={href} variant="premium">
           {button}
         </CTAButton>
       </div>

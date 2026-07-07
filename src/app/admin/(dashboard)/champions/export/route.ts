@@ -1,15 +1,11 @@
 import { NextResponse } from "next/server";
 import { getAdminClient } from "@/lib/admin/action-helpers";
+import { csvCell, csvDownloadHeaders } from "@/lib/admin/csv";
 
 export const dynamic = "force-dynamic";
 
-function csvCell(value: unknown): string {
-  const text = value == null ? "" : String(value);
-  return `"${text.replaceAll('"', '""')}"`;
-}
-
 export async function GET() {
-  const admin = await getAdminClient();
+  const admin = await getAdminClient("champions.manage");
   if (!admin.ok) {
     return NextResponse.json({ error: admin.error }, { status: 401 });
   }
@@ -42,9 +38,6 @@ export async function GET() {
   const csv = [header.map(csvCell).join(";"), ...rows].join("\r\n");
 
   return new NextResponse(`﻿${csv}`, {
-    headers: {
-      "Content-Type": "text/csv; charset=utf-8",
-      "Content-Disposition": 'attachment; filename="smashtime-champions.csv"'
-    }
+    headers: csvDownloadHeaders("smashtime-champions.csv")
   });
 }

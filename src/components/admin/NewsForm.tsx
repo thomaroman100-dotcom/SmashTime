@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { useActionState, useEffect, useState } from "react";
 import { ArrowLeft, Eye, Image as ImageIcon, Loader2, Rocket, Save } from "lucide-react";
@@ -9,6 +8,8 @@ import type { NewsRow, NewsStatus } from "@/lib/admin/actions/news";
 import { NEWS_CATEGORIES } from "@/lib/admin/resource-shared";
 import { slugify } from "@/lib/slug";
 import { useAdminUi } from "@/components/admin/ui/AdminUiProvider";
+import { AdminImagePreview } from "@/components/admin/ui/AdminImagePreview";
+import { AdminImageUploadField } from "@/components/admin/ui/AdminImageUploadField";
 import { Badge } from "@/components/admin/ui/primitives";
 
 type NewsFormProps = {
@@ -60,7 +61,12 @@ export function NewsForm({ action, initial, heading, subheading }: NewsFormProps
           <p>{subheading}</p>
         </div>
         <div className="adm-head__actions">
-          <Link className="adm-btn" href={initial ? `/neuigkeiten/${initial.slug}` : "/neuigkeiten"} target="_blank">
+          <Link
+            className="adm-btn"
+            href={initial ? `/neuigkeiten/${initial.slug}` : "/neuigkeiten"}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
             <Eye aria-hidden="true" size={16} /> Vorschau
           </Link>
           <button className="adm-btn" type="submit" disabled={pending} onClick={() => setStatus("draft")}>
@@ -209,35 +215,34 @@ export function NewsForm({ action, initial, heading, subheading }: NewsFormProps
               </div>
             </div>
             <div className="adm-panel__body">
-              <div className="adm-field">
-                <label htmlFor="news-image">Bildpfad (Karte)</label>
-                <input
-                  id="news-image"
-                  name="image_path"
-                  value={imagePath}
-                  onChange={(event) => setImagePath(event.target.value)}
-                  placeholder="/images/news/… oder Medien-URL"
-                />
-              </div>
-              <div className="adm-field">
-                <label htmlFor="news-image-file">Beitragsbild hochladen</label>
-                <input id="news-image-file" name="news_image_file" type="file" accept="image/png,image/jpeg,image/webp,image/avif,image/svg+xml" />
-                <span className="adm-field__hint">Max. 6 MB. Ersetzt den Bildpfad beim Speichern.</span>
-              </div>
-              <div className="adm-field">
-                <label htmlFor="news-hero">Hero-Bildpfad</label>
-                <input
-                  id="news-hero"
-                  name="hero_image_path"
-                  value={heroImagePath}
-                  onChange={(event) => setHeroImagePath(event.target.value)}
-                  placeholder="optional"
-                />
-              </div>
-              <div className="adm-field">
-                <label htmlFor="news-hero-file">Hero-Bild hochladen</label>
-                <input id="news-hero-file" name="news_hero_image_file" type="file" accept="image/png,image/jpeg,image/webp,image/avif,image/svg+xml" />
-              </div>
+              <AdminImageUploadField
+                id="news-image"
+                label="Beitragsbild"
+                pathName="image_path"
+                fileName="news_image_file"
+                clearName="clear_image_path"
+                value={imagePath}
+                onValueChange={setImagePath}
+                pathLabel="Bildpfad (Karte)"
+                fileLabel="Beitragsbild hochladen"
+                fallback="Beitragsbild fehlt"
+                previewAlt={`${title || "Neuigkeit"} Beitragsbild`}
+                uploadHint="Max. 6 MB. Ein Upload ersetzt das gespeicherte Beitragsbild beim Speichern."
+              />
+              <AdminImageUploadField
+                id="news-hero"
+                label="Hero-Bild"
+                pathName="hero_image_path"
+                fileName="news_hero_image_file"
+                clearName="clear_hero_image_path"
+                value={heroImagePath}
+                onValueChange={setHeroImagePath}
+                pathLabel="Hero-Bildpfad"
+                fileLabel="Hero-Bild hochladen"
+                fallback="Hero-Bild fehlt"
+                previewAlt={`${title || "Neuigkeit"} Hero-Bild`}
+                uploadHint="Max. 6 MB. Ein Upload ersetzt das gespeicherte Hero-Bild beim Speichern."
+              />
             </div>
           </section>
 
@@ -251,16 +256,14 @@ export function NewsForm({ action, initial, heading, subheading }: NewsFormProps
             </div>
             <div className="adm-panel__body">
               <div className="adm-preview">
-                <div className="adm-preview__img">
-                  {imagePath || heroImagePath ? (
-                    <Image src={heroImagePath || imagePath} alt="" fill sizes="380px" style={{ objectFit: "cover" }} unoptimized />
-                  ) : (
-                    <span className="adm-thumb--empty" style={{ display: "flex", height: "100%", flexDirection: "column", gap: 8 }}>
-                      <ImageIcon aria-hidden="true" size={26} />
-                      Titelbild fehlt
-                    </span>
-                  )}
-                </div>
+                <AdminImagePreview
+                  src={heroImagePath || imagePath}
+                  alt={`${title || "Neuigkeit"} Titelbild`}
+                  fallback="Titelbild fehlt"
+                  aspectRatio="16 / 9"
+                  sizes="380px"
+                  className="adm-preview__img"
+                />
                 <div className="adm-preview__body">
                   <Badge tone={statusMeta[status].tone} uppercase>
                     {statusMeta[status].label}

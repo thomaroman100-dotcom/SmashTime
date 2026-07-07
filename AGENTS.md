@@ -18,9 +18,9 @@ Ab sofort gilt diese Reihenfolge:
 5. `SECURITY_NOTES.md` - Supabase-/Secret-/Zugangsdaten-Regeln.
 6. `CLAUDE.md` - Kurzfassung fuer KI-Werkzeuge.
 
-Wenn alte Archivdateien, alte Referenzbilder oder alte Routenplaene widersprechen, gilt der finale Designbrief plus diese Datei.
+Wenn alte Referenzbilder, alte Routenplaene oder Chat-Verlaeufe widersprechen, gilt der finale Designbrief plus diese Datei.
 
-Archivdateien im Root (`01_...`, `02_...`, `CODEX_PHASE...`, `CODEX_NAVIGATION...`) bleiben Historie und duerfen nicht als aktuelle Arbeitsanweisung verwendet werden.
+Alte Root-Archivdateien (`01_...`, `02_...`, `CODEX_PHASE...`, `CODEX_NAVIGATION...`) sind geloescht und duerfen nicht neu als Projektsteuerung angelegt werden. Historie gehoert in Git, nicht in neue widerspruechliche Markdown-Quellen im Root.
 
 ---
 
@@ -58,6 +58,18 @@ Arbeite sauber, kontrolliert und zielgerichtet.
 - Keine sichtbaren Fake-Daten als echte Inhalte.
 - Kein Code/Asset loeschen, wenn nicht eindeutig falsch, doppelt oder vom Nutzer gewuenscht.
 - Bei widerspruechlichen alten Plaenen gilt der finale Designbrief.
+- Root sauber halten: keine neuen Phase-/Codex-Archivdateien, temporären Screenshots, lokalen Logs, Buildinfos oder einmaligen Hilfsskripte einchecken.
+- Jede Aenderung muss auf konkret gelesenen Projektdateien basieren, nicht auf Erinnerung oder Vermutung.
+
+### 2.1 Arbeitsablauf pro Aufgabe
+
+1. `git status --short --branch` ausfuehren und fremde Aenderungen respektieren.
+2. Betroffene Quellen lesen: mindestens aktuelle Datenquelle, Route, Komponente und relevante Regeln aus `AGENTS.md`/`ROADMAP.md`.
+3. Scope klein halten und nur Dateien aendern, die fuer die Aufgabe noetig sind.
+4. Daten vor UI: vorhandene `src/data/*`-Quellen nutzen oder erweitern, keine verstreuten JSX-Fakten.
+5. Nach neuen Links/Routen pruefen: keine Navigation, CTA oder Card darf auf 404 zeigen.
+6. Nach relevanten Codeaenderungen `npm run lint` und `npm run build` ausfuehren.
+7. Abschlussbericht immer mit `Geändert`, `Geprüft`, `Offen`.
 
 ---
 
@@ -393,6 +405,9 @@ Regeln:
 Perspektive:
 
 - Das finale Datenmodell soll Fighter, Champions, Rankings, Events, News und Fightcards sauber trennen.
+- Bis ein eigenes Fighter-Modell oder Supabase-Daten existieren, duerfen oeffentliche Fighter-/Profilseiten nur aus bestaetigten Champion-/Projekt-Daten abgeleitet werden.
+- `/fighters` und `/fighters/[slug]` zeigen bestaetigte Profile; fehlende Fakten werden sichtbar als "wird nachgetragen" oder "wird bald bekanntgegeben" markiert.
+- Profilseiten duerfen starke Inszenierung haben, aber keine fiktiven Kampfstile, Herkunftsorte, Records, Last-Fight-Ergebnisse oder Biografien als echt ausgeben.
 - Wenn Daten noch fehlen: ehrlich "wird bald bekanntgegeben" anzeigen, nicht erfinden.
 
 ---
@@ -538,6 +553,7 @@ Zusatzchecks:
 - keine Lorem-Ipsum-Texte
 - keine erfundenen echten Fighter
 - Fightcard nicht statisch
+- keine wieder eingefuehrten Root-Altplaene (`CODEX_PHASE...`, `CODEX_NAVIGATION...`, `01_...`)
 - Mobile/Desktop pruefen, besonders 390, 430, 768, 1280, 1440
 
 Wenn ein Check fehlschlaegt, Ursache konkret nennen.

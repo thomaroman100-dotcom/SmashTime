@@ -12,6 +12,9 @@ export const metadata = {
 };
 
 export default function ContactPage() {
+  const instagramHref = site.socialLinks.find((item) => item.label === "Instagram" && item.href !== "#")?.href;
+  const contactEmail = site.contact.email.trim();
+
   return (
     <>
       <PageHero
@@ -83,16 +86,24 @@ export default function ContactPage() {
               <AtSign aria-hidden="true" />
               <div>
                 <strong>Instagram</strong>
-                <span>{site.contact.instagram}</span>
+                {instagramHref ? (
+                  <a href={instagramHref} target="_blank" rel="noreferrer">
+                    {site.contact.instagram}
+                  </a>
+                ) : (
+                  <span>{site.contact.instagram}</span>
+                )}
               </div>
             </div>
-            <div className="contact-info__row">
-              <Mail aria-hidden="true" />
-              <div>
-                <strong>E-Mail</strong>
-                <span>{site.contact.email}</span>
+            {contactEmail ? (
+              <div className="contact-info__row">
+                <Mail aria-hidden="true" />
+                <div>
+                  <strong>E-Mail</strong>
+                  <span>{contactEmail}</span>
+                </div>
               </div>
-            </div>
+            ) : null}
           </aside>
         </div>
       </section>

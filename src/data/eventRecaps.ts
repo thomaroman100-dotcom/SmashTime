@@ -1,4 +1,5 @@
 import { upcomingEvent } from "@/data/events";
+import { fightcards } from "@/data/fightcards";
 
 export type EventResult = {
   id: string;
@@ -36,9 +37,9 @@ export const eventRecaps: EventRecap[] = [
   {
     slug: "smashtime-3-respekt-steigt-in-den-ring",
     title: "SmashTime 3.",
-    redTitle: "Respekt steigt in den Ring.",
+    redTitle: "Gemeinsam gegen Mobbing.",
     intro:
-      "Gemeinsam gegen Mobbing: SmashTime 3 bringt Respekt, Stärke und Zusammenhalt in die Jahnturnhalle St. Pölten.",
+      "Gemeinsam gegen Mobbing: SmashTime 3 bringt Respekt, Stärke und Zusammenhalt in den Ring.",
     date: upcomingEvent.dateLabel,
     location: upcomingEvent.location,
     address: upcomingEvent.address,
@@ -49,13 +50,13 @@ export const eventRecaps: EventRecap[] = [
     stats: [
       { value: "17.10.", label: "Veranstaltungsdatum", icon: "calendar" },
       { value: "18:00", label: "Beginn", icon: "clock" },
-      { value: "4", label: "Disziplinen", icon: "fighter" },
-      { value: "Bald", label: "Fightcard", icon: "list" }
+      { value: upcomingEvent.disciplines.length.toString(), label: "Disziplinen", icon: "fighter" },
+      { value: fightcards.filter((fight) => fight.eventId === upcomingEvent.id && fight.visible).length.toString(), label: "Bestätigte Paarung", icon: "list" }
     ],
     description: [
       "SmashTime 3 findet am 17. Oktober 2026 in der Jahnturnhalle St. Pölten statt. Einlass ist um 17:00 Uhr, Beginn um 18:00 Uhr.",
-      "Die Veranstaltung steht unter dem Motto \"Respekt steigt in den Ring\" und setzt ein klares Zeichen für Respekt, Stärke und Zusammenhalt gegen Mobbing.",
-      "Die Fightcard wird erst veröffentlicht, sobald Paarungen offiziell bestätigt sind. Bis dahin bleiben Ergebnisse und Rückblick bewusst vorbereitet, ohne Namen zu erfinden."
+      "Die Veranstaltung steht unter dem Motto \"Gemeinsam gegen Mobbing\" und setzt ein klares Zeichen für Respekt, Stärke und Zusammenhalt.",
+      "Die erste bestätigte Paarung ist Just Rob vs. Karl-Heinz unter Influenza Kämpfe. Weitere Paarungen werden ergänzt, sobald sie offiziell feststehen."
     ],
     results: [],
     quote: {
@@ -63,8 +64,8 @@ export const eventRecaps: EventRecap[] = [
       author: "SmashTime Team"
     },
     gallery: [
-      { src: "/images/events/smashtime-3-respekt-steigt-in-den-ring.png", alt: "SmashTime 3 Eventposter Respekt steigt in den Ring" },
-      { src: "/images/backgrounds/hero-events-cage-wide.png", alt: "Cage und Arena bei SmashTime" },
+      { src: "/images/events/smashtime-3-gemeinsam-gegen-mobbing.png", alt: "SmashTime 3 Eventposter Gemeinsam gegen Mobbing" },
+      { src: "/images/backgrounds/smashtime-hero-faceoff-cage.png", alt: "Cage und Arena bei SmashTime" },
       { src: "/images/backgrounds/arena-seats-cage.png", alt: "Arena mit Käfig" }
     ]
   }

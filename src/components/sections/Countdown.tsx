@@ -7,13 +7,6 @@ type CountdownProps = {
   vertical?: boolean;
 };
 
-const initialParts = [
-  { label: "Tage", value: 0 },
-  { label: "Std", value: 0 },
-  { label: "Min", value: 0 },
-  { label: "Sek", value: 0 }
-];
-
 function getParts(targetDate: string) {
   const diff = Math.max(new Date(targetDate).getTime() - Date.now(), 0);
   const seconds = Math.floor(diff / 1000);
@@ -31,7 +24,7 @@ function getParts(targetDate: string) {
 }
 
 export function Countdown({ targetDate, vertical }: CountdownProps) {
-  const [parts, setParts] = useState(initialParts);
+  const [parts, setParts] = useState(() => getParts(targetDate));
 
   useEffect(() => {
     const update = () => setParts(getParts(targetDate));
@@ -48,7 +41,7 @@ export function Countdown({ targetDate, vertical }: CountdownProps) {
     <div className={vertical ? "countdown countdown--vertical" : "countdown"}>
       {parts.map((part) => (
         <div className="countdown__box" key={part.label}>
-          <strong>{String(part.value).padStart(part.label === "Tage" ? 1 : 2, "0")}</strong>
+          <strong suppressHydrationWarning>{String(part.value).padStart(part.label === "Tage" ? 1 : 2, "0")}</strong>
           <span>{part.label}</span>
         </div>
       ))}

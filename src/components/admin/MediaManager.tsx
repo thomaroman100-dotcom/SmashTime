@@ -1,12 +1,13 @@
 "use client";
 
-import Image from "next/image";
 import { useActionState, useEffect, useTransition } from "react";
 import { Loader2, Save, Trash2, Upload } from "lucide-react";
 import type { ActionResult } from "@/lib/admin/action-helpers";
 import type { MediaAssetRow } from "@/lib/admin/actions/media";
 import { MEDIA_TYPES } from "@/lib/admin/resource-shared";
 import { useAdminUi } from "@/components/admin/ui/AdminUiProvider";
+import { AdminImagePreview } from "@/components/admin/ui/AdminImagePreview";
+import { AdminImageUploadField } from "@/components/admin/ui/AdminImageUploadField";
 import { Badge } from "@/components/admin/ui/primitives";
 
 type UploadAction = (prev: ActionResult | null, formData: FormData) => Promise<ActionResult>;
@@ -41,13 +42,15 @@ export function MediaUploadForm({ action }: MediaUploadFormProps) {
         </div>
       </div>
       <div className="adm-panel__body">
-        <div className="adm-field">
-          <label htmlFor="media-file">
-            Bilddatei <em>*</em>
-          </label>
-          <input id="media-file" name="file" type="file" accept="image/png,image/jpeg,image/webp,image/avif,image/svg+xml" required />
-          <span className="adm-field__hint">PNG, JPG, WebP, AVIF oder SVG. Max. 6 MB.</span>
-        </div>
+        <AdminImageUploadField
+          id="media-file"
+          label="Bilddatei"
+          fileName="file"
+          fileLabel="Bilddatei auswählen"
+          fallback="Dateivorschau"
+          uploadHint="PNG, JPG, WebP, AVIF oder SVG. Max. 6 MB."
+          required
+        />
         <div className="adm-grid-2">
           <div className="adm-field">
             <label htmlFor="media-type">Asset-Typ</label>
@@ -146,9 +149,14 @@ export function MediaAssetCard({ asset, publicUrl, updateAction, deleteAction }:
 
   return (
     <article className="adm-media-card">
-      <div className="adm-media-card__img">
-        <Image src={publicUrl} alt={asset.alt_text ?? ""} fill sizes="(max-width: 720px) 100vw, 260px" style={{ objectFit: "cover" }} unoptimized />
-      </div>
+      <AdminImagePreview
+        src={publicUrl}
+        alt={asset.alt_text ?? asset.path}
+        fallback="Medienbild"
+        aspectRatio="16 / 10"
+        sizes="(max-width: 720px) 100vw, 260px"
+        className="adm-media-card__img"
+      />
       <form className="adm-media-card__body" action={formAction}>
         <strong>{asset.path}</strong>
         <small>{asset.created_at ? new Intl.DateTimeFormat("de-AT").format(new Date(asset.created_at)) : "Datum offen"}</small>

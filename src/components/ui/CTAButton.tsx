@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 type CTAButtonProps = {
   href?: string;
   children: React.ReactNode;
-  variant?: "solid" | "outline";
+  variant?: "solid" | "outline" | "premium";
   className?: string;
   type?: "button" | "submit";
   onClick?: () => void;
@@ -20,8 +20,10 @@ export function CTAButton({
   onClick
 }: CTAButtonProps) {
   const classes = cn(
-    "cta-button",
-    variant === "outline" && "cta-button--outline",
+    "btn",
+    variant === "solid" && "btn--primary",
+    variant === "outline" && "btn--outline",
+    variant === "premium" && "btn--premium",
     className
   );
 

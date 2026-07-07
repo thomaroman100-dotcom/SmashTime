@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { ChampionForm } from "@/components/admin/ChampionForm";
 import { type ChampionRow, updateChampionAction } from "@/lib/admin/actions/champions";
+import { loadVerifiedFighterOptions } from "@/lib/admin/fighters";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 export const metadata = {
@@ -26,13 +27,16 @@ export default async function AdminChampionEditPage({ params }: AdminChampionEdi
     notFound();
   }
 
-  const { data } = await supabase
-    .from("champions")
-    .select(
-      "id, slug, name, age, weight, weight_class, record, origin, image_path, stance, bio, quote, title, sort_order, is_active, updated_at"
-    )
-    .eq("id", championId)
-    .maybeSingle();
+  const [{ data }, { options: fighterOptions }] = await Promise.all([
+    supabase
+      .from("champions")
+      .select(
+        "id, slug, fighter_user_id, name, age, weight, weight_class, record, origin, image_path, stance, bio, quote, title, sort_order, is_active, updated_at"
+      )
+      .eq("id", championId)
+      .maybeSingle(),
+    loadVerifiedFighterOptions(supabase)
+  ]);
 
   const champion = data as ChampionRow | null;
 
@@ -46,6 +50,7 @@ export default async function AdminChampionEditPage({ params }: AdminChampionEdi
       initial={champion}
       heading="Champion bearbeiten"
       subheading={`Bearbeite Daten, Titel und Profil von ${champion.name}.`}
+      fighterOptions={fighterOptions}
     />
   );
 }

@@ -1,4 +1,3 @@
-import Image from "next/image";
 import Link from "next/link";
 import {
   Award,
@@ -10,8 +9,7 @@ import {
   Plus,
   Search,
   ShieldCheck,
-  SlidersHorizontal,
-  UserRound
+  SlidersHorizontal
 } from "lucide-react";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import {
@@ -20,6 +18,7 @@ import {
   setChampionActiveAction
 } from "@/lib/admin/actions/champions";
 import { formatDate } from "@/lib/admin/format";
+import { AdminImagePreview } from "@/components/admin/ui/AdminImagePreview";
 import { Badge, EmptyState, Pagination, StatCard } from "@/components/admin/ui/primitives";
 import { RowMenu } from "@/components/admin/ui/RowMenu";
 
@@ -54,7 +53,7 @@ export default async function AdminChampionsPage({ searchParams }: PageProps) {
     const { data, error } = await supabase
       .from("champions")
       .select(
-        "id, slug, name, age, weight, weight_class, record, origin, image_path, stance, bio, quote, title, sort_order, is_active, updated_at"
+        "id, slug, fighter_user_id, name, age, weight, weight_class, record, origin, image_path, stance, bio, quote, title, sort_order, is_active, updated_at"
       )
       .order("sort_order", { ascending: true })
       .order("name", { ascending: true });
@@ -209,21 +208,14 @@ export default async function AdminChampionsPage({ searchParams }: PageProps) {
             {pageRows.map((champion) => (
               <div className="adm-table__row" key={champion.id} style={{ gridTemplateColumns: tableColumns }}>
                 <div style={{ display: "flex", gap: 12, alignItems: "center", minWidth: 0 }}>
-                  <span className="adm-thumb adm-thumb--portrait">
-                    {champion.image_path ? (
-                      <Image
-                        src={champion.image_path}
-                        alt=""
-                        width={44}
-                        height={52}
-                        style={{ width: "100%", height: "100%", objectFit: "cover" }}
-                      />
-                    ) : (
-                      <span className="adm-thumb--empty" style={{ display: "flex", width: "100%", height: "100%" }}>
-                        <UserRound aria-hidden="true" size={18} />
-                      </span>
-                    )}
-                  </span>
+                  <AdminImagePreview
+                    src={champion.image_path}
+                    alt={`${champion.name} Championfoto`}
+                    fallback="Kein Foto"
+                    aspectRatio="44 / 52"
+                    sizes="52px"
+                    className="adm-thumb adm-thumb--portrait"
+                  />
                   <div style={{ minWidth: 0 }}>
                     <strong>{champion.name}</strong>
                     <span className="adm-cell-sub">{champion.origin ?? "Herkunft offen"}</span>
@@ -274,6 +266,7 @@ export default async function AdminChampionsPage({ searchParams }: PageProps) {
                     className="adm-icon-btn"
                     href="/champions"
                     target="_blank"
+                    rel="noopener noreferrer"
                     aria-label={`${champion.name} auf der Website ansehen`}
                   >
                     <Eye aria-hidden="true" size={15} />

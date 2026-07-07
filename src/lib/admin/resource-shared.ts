@@ -1,13 +1,25 @@
-export const EVENT_DISCIPLINES = ["Xtreme Boxen", "K1", "MMA", "Boxen"] as const;
+export const EVENT_DISCIPLINES = ["Xtreme Boxen", "K1", "MMA", "Boxen", "Influenza Kämpfe"] as const;
 
 export const eventSelectColumns =
-  "id, slug, name, short_name, subtitle, event_date, date_label, location, address, admission, starts_at, disciplines, gastro, image_path, ticket_url, status, updated_at";
+  "id, slug, name, short_name, subtitle, event_date, date_label, location, address, admission, starts_at, disciplines, gastro, image_path, ticket_url, status, show_in_hero, updated_at";
 
 export const NEWS_CATEGORIES = ["Veranstaltung", "Fightcard", "Sponsoring", "Neuigkeit"] as const;
 
 export const CONTACT_STATUSES = ["neu", "gelesen", "erledigt"] as const;
 
 export const FIGHT_STATUSES = ["planned", "confirmed", "cancelled", "completed"] as const;
+
+export const FIGHT_TEAM_SIZES = [1, 2, 3, 4] as const;
+
+export const FIGHT_MATCHUP_TYPES = ["single", "team_1v1", "team_2v2", "team_3v3", "team_4v4"] as const;
+
+export const FIGHT_MATCHUP_TYPE_LABELS: Record<(typeof FIGHT_MATCHUP_TYPES)[number], string> = {
+  single: "Einzelkampf",
+  team_1v1: "Länderduell 1 gegen 1",
+  team_2v2: "Länderduell 2 gegen 2",
+  team_3v3: "Länderduell 3 gegen 3",
+  team_4v4: "Länderduell 4 gegen 4"
+};
 
 export const FIGHT_STATUS_LABELS: Record<(typeof FIGHT_STATUSES)[number], string> = {
   planned: "Geplant",
@@ -16,7 +28,7 @@ export const FIGHT_STATUS_LABELS: Record<(typeof FIGHT_STATUSES)[number], string
   completed: "Beendet"
 };
 
-export const FIGHT_SECTIONS = ["Main Event", "Co-Main Event", "Main Card", "Preliminary Card"] as const;
+export const FIGHT_SECTIONS = ["Länderturnier", "Main Event", "Co-Main Event", "Main Card", "Preliminary Card"] as const;
 
 export const MEDIA_TYPES = ["Hintergrund", "Champion", "Veranstaltung", "News", "Sponsor", "Logo", "Sonstiges"] as const;
 
@@ -38,13 +50,18 @@ export const SETTING_FIELDS = [
   { key: "countdown.featuredEventId", label: "Nächste Veranstaltung", placeholder: "smashtime-3-respekt-steigt-in-den-ring" },
   { key: "countdown.countdownEndAt", label: "Countdown-Ende", placeholder: "2026-10-17T18:00:00+02:00" },
   { key: "countdown.label", label: "Countdown-Text", placeholder: "Der Kampf beginnt in" },
-  { key: "homepage.hero.title", label: "Hero Titel", placeholder: "SmashTime 3" },
-  { key: "homepage.hero.subtitle", label: "Hero Untertitel", placeholder: "Die Elite des Kampfes." },
+  { key: "homepage.hero.title", label: "Hero Titel", placeholder: "WO KAMPF\nCHARAKTER ZEIGT." },
+  {
+    key: "homepage.hero.subtitle",
+    label: "Hero Untertitel",
+    placeholder:
+      "SmashTime ist die Bühne für Live-Kampfsport, starke Athleten und echte Emotionen.\nHier geht es nicht nur ums Gewinnen, sondern um Respekt, Haltung und Momente, die bleiben."
+  },
   { key: "homepage.hero.backgroundImageUrl", label: "Hero Hintergrundbild", placeholder: "/images/backgrounds/..." },
-  { key: "homepage.cta.primaryLabel", label: "Haupt-CTA Text", placeholder: "Tickets sichern" },
-  { key: "homepage.cta.primaryUrl", label: "Haupt-CTA Link", placeholder: "https://smashtime.at/tickets" },
-  { key: "homepage.cta.secondaryLabel", label: "Sekundärer CTA Text", placeholder: "Fightcard ansehen" },
-  { key: "homepage.cta.secondaryUrl", label: "Sekundärer CTA Link", placeholder: "https://smashtime.at/fightcard" },
+  { key: "homepage.cta.primaryLabel", label: "Haupt-CTA Text", placeholder: "Nächste Veranstaltung" },
+  { key: "homepage.cta.primaryUrl", label: "Haupt-CTA Link", placeholder: "/veranstaltungen/smashtime-3-respekt-steigt-in-den-ring" },
+  { key: "homepage.cta.secondaryLabel", label: "Sekundärer CTA Text", placeholder: "Über SmashTime" },
+  { key: "homepage.cta.secondaryUrl", label: "Sekundärer CTA Link", placeholder: "/ueber-uns" },
   { key: "homepage.modules.champions.enabled", label: "Champions-Modul aktiv", placeholder: "true" },
   { key: "homepage.modules.champions.title", label: "Champions Titel", placeholder: "Unsere Champions" },
   { key: "homepage.modules.champions.description", label: "Champions Beschreibung", placeholder: "Lerne die Athleten kennen..." },
@@ -56,14 +73,14 @@ export const SETTING_FIELDS = [
   { key: "homepage.modules.news.description", label: "News Beschreibung", placeholder: "Bleib auf dem Laufenden..." },
   { key: "homepage.modules.news.displayLimit", label: "Anzahl News", placeholder: "3" },
   { key: "homepage.modules.news.buttonLabel", label: "News Button", placeholder: "Alle News ansehen" },
-  { key: "homepage.modules.news.buttonUrl", label: "News Link", placeholder: "/news" },
+  { key: "homepage.modules.news.buttonUrl", label: "News Link", placeholder: "/neuigkeiten" },
   { key: "homepage.modules.sponsors.enabled", label: "Sponsorenbereich aktiv", placeholder: "true" },
   { key: "homepage.modules.sponsors.title", label: "Sponsoren Titel", placeholder: "Unsere Partner" },
   { key: "homepage.modules.sponsors.description", label: "Sponsoren Beschreibung", placeholder: "Gemeinsam stark..." },
   { key: "homepage.modules.sponsors.displayLimit", label: "Anzahl Logos", placeholder: "8" },
   { key: "homepage.modules.sponsors.buttonLabel", label: "Sponsoren Button", placeholder: "Alle Partner ansehen" },
-  { key: "homepage.modules.sponsors.buttonUrl", label: "Sponsoren Link", placeholder: "/sponsors" },
-  { key: "contact_email", label: "Kontakt-E-Mail", placeholder: "kontakt@smashtime.at" },
+  { key: "homepage.modules.sponsors.buttonUrl", label: "Sponsoren Link", placeholder: "/sponsoren" },
+  { key: "contact_email", label: "Kontakt-E-Mail", placeholder: "kontakt@example.com" },
   { key: "ticket_url", label: "Ticketlink", placeholder: "https://… oder /tickets" },
   { key: "instagram_url", label: "Instagram-Link", placeholder: "https://instagram.com/…" },
   { key: "facebook_url", label: "Facebook-Link", placeholder: "https://facebook.com/…" },

@@ -1,5 +1,5 @@
 import { upcomingEvent, type SmashEvent } from "@/data/events";
-import { fightcards, type FightCardEntry } from "@/data/fightcards";
+import type { FightCardEntry } from "@/data/fightcards";
 
 // Zentrale, austauschbare Inhalte der Startseite. Alles, was sich mit einem
 // neuen Event ändert (Eventnummer, Name, Datum, Ort, Countdown-Ziel, Poster,
@@ -7,11 +7,8 @@ import { fightcards, type FightCardEntry } from "@/data/fightcards";
 // und src/data/fightcards.ts – nichts davon ist im JSX festgeschrieben.
 
 export type HomeHero = {
-  title?: string;
-  subtitle?: string;
-  claimLines: string[];
-  brandLine: string;
-  tagline: string;
+  title: string;
+  subtitle: string;
   backgroundImage: string;
   backgroundPosition: string;
   primaryCta: { label: string; href: string };
@@ -23,21 +20,24 @@ export type HomeEventPoster = {
   eventTitle: string;
   dateLabel: string;
   venueLabel: string;
+  image?: string | null;
+  imageAlt?: string;
+  showInHero: boolean;
 };
 
 export const nextEvent: SmashEvent = upcomingEvent;
 export const featuredEvent: SmashEvent = upcomingEvent;
 
 export const homeHero: HomeHero = {
-  claimLines: ["Keine Regeln.", "Nur Respekt."],
-  brandLine: "SmashTime.",
-  tagline: "Kämpfe. Ehre. Vermächtnis.",
-  backgroundImage: "/images/backgrounds/atmosphere-fight-action-grunge-wide.png",
-  backgroundPosition: "center 30%",
-  primaryCta: { label: "Tickets sichern", href: "/tickets" },
+  title: "WO KAMPF\nCHARAKTER ZEIGT.",
+  subtitle:
+    "SmashTime ist die Bühne für Live-Kampfsport, starke Athleten und echte Emotionen.\nHier geht es nicht nur ums Gewinnen, sondern um Respekt, Haltung und Momente, die bleiben.",
+  backgroundImage: "/images/backgrounds/hero-smash-cage-arena-wide.png",
+  backgroundPosition: "center center",
+  primaryCta: { label: "Nächste Veranstaltung", href: nextEvent.detailHref ?? "/veranstaltungen" },
   secondaryCta: {
-    label: "Details ansehen",
-    href: nextEvent.detailHref ?? "/veranstaltungen"
+    label: "Über SmashTime",
+    href: "/ueber-uns"
   }
 };
 
@@ -45,30 +45,28 @@ export const homeEventPoster: HomeEventPoster = {
   eventNumber: "3",
   eventTitle: nextEvent.subtitle,
   dateLabel: nextEvent.dateLabel,
-  venueLabel: nextEvent.location
+  venueLabel: nextEvent.location,
+  image: nextEvent.image,
+  imageAlt: `${nextEvent.name} Eventposter`,
+  showInHero: true
 };
 
 export const homeCountdown = {
   label: "Nächste Veranstaltung in",
   targetDate: nextEvent.date,
-  ctaLabel: "Tickets sichern",
-  ctaHref: "/tickets",
+  ctaLabel: "Zur Veranstaltung",
+  ctaHref: nextEvent.detailHref ?? "/veranstaltungen",
   fallback: "Nächste Veranstaltung wird bald bekanntgegeben"
 };
 
-// Main Fight aus der kanonischen Fightcard-Datenquelle ableiten. Solange keine
-// bestätigten Paarungen existieren, greift der ehrliche Fallback – es werden
-// keine Kämpfe oder Namen erfunden.
-export const mainFight: FightCardEntry | undefined = [...fightcards]
-  .filter((fight) => fight.visible && fight.eventId === nextEvent.id)
-  .sort((a, b) => a.order - b.order)[0];
+export const mainFight: FightCardEntry | undefined = undefined;
 
 export const mainFightFallback = {
-  label: "Main Event",
+  label: "Fightcard",
   title: "Fightcard wird bald veröffentlicht",
   text: "Die Kampfpaarungen für den nächsten Kampfabend werden offiziell bestätigt und danach hier angekündigt.",
-  ctaLabel: "Details ansehen",
-  ctaHref: nextEvent.detailHref ?? "/veranstaltungen"
+  ctaLabel: "Kampfabend ansehen",
+  ctaHref: nextEvent.detailHref ? `${nextEvent.detailHref}#fightcard` : "/veranstaltungen#fightcard"
 };
 
 export const homeSections = {
@@ -95,11 +93,6 @@ export const homeSections = {
     ctaLabel: "Alle Veranstaltungen ansehen",
     ctaHref: "/veranstaltungen",
     emptyNote: "Weitere Termine werden bald angekündigt."
-  },
-  rankings: {
-    title: "Top Fighter Rangliste",
-    ctaLabel: "Gesamte Rangliste ansehen",
-    ctaHref: "/champions"
   },
   news: {
     title: "Neuigkeiten",

@@ -1,4 +1,4 @@
-export type EventDiscipline = "Xtreme Boxen" | "K1" | "MMA" | "Boxen";
+export type EventDiscipline = "Xtreme Boxen" | "K1" | "MMA" | "Boxen" | "Influenza Kämpfe";
 
 export type SmashEvent = {
   id: string;
@@ -20,18 +20,18 @@ export type SmashEvent = {
 
 export const upcomingEvent: SmashEvent = {
   id: "smashtime-3-respekt-steigt-in-den-ring",
-  name: "SmashTime 3 - Respekt steigt in den Ring",
+  name: "SmashTime 3 - Gemeinsam gegen Mobbing",
   shortName: "SmashTime 3",
-  subtitle: "Respekt steigt in den Ring",
+  subtitle: "Gemeinsam gegen Mobbing",
   date: "2026-10-17T18:00:00+02:00",
   dateLabel: "17. Oktober 2026",
   location: "Jahnturnhalle St. Pölten",
   address: "Jahnstraße 15, 3100 St. Pölten",
   admission: "17:00 Uhr",
   start: "18:00 Uhr",
-  disciplines: ["Xtreme Boxen", "K1", "MMA", "Boxen"],
+  disciplines: ["Xtreme Boxen", "K1", "MMA", "Boxen", "Influenza Kämpfe"],
   status: "upcoming",
-  image: "/images/events/smashtime-3-respekt-steigt-in-den-ring.png",
+  image: "/images/events/smashtime-3-gemeinsam-gegen-mobbing.png",
   detailHref: "/veranstaltungen/smashtime-3-respekt-steigt-in-den-ring"
 };
 
@@ -47,7 +47,7 @@ export const eventArchive: SmashEvent[] = [
     address: "Archivdaten folgen",
     admission: "Wird nachgetragen",
     start: "Wird nachgetragen",
-    disciplines: ["MMA", "K1", "Boxen", "Xtreme Boxen"],
+    disciplines: ["MMA", "K1", "Boxen", "Xtreme Boxen", "Influenza Kämpfe"],
     status: "archive-placeholder",
     image: "/images/backgrounds/cage-chainlink.png",
     detailHref: "/veranstaltungen/smashtime-3-respekt-steigt-in-den-ring"
@@ -63,7 +63,7 @@ export const eventArchive: SmashEvent[] = [
     address: "Archivdaten folgen",
     admission: "Wird nachgetragen",
     start: "Wird nachgetragen",
-    disciplines: ["MMA", "K1", "Boxen", "Xtreme Boxen"],
+    disciplines: ["MMA", "K1", "Boxen", "Xtreme Boxen", "Influenza Kämpfe"],
     status: "archive-placeholder",
     image: "/images/backgrounds/arena-seats-cage.png",
     detailHref: "/veranstaltungen/smashtime-3-respekt-steigt-in-den-ring"

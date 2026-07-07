@@ -18,69 +18,69 @@ export type PageHeroPreset = {
 
 export const pageHeroes = {
   champions: {
-    image: "/images/backgrounds/hero-champions-belt.png",
-    position: "center center",
+    image: "/images/backgrounds/smashtime-hero-champion-victory-belt.png",
+    position: "center 50%",
     variant: "champions",
     kicker: "Vier Namen. Vier Titel.",
     watermark: "CHAMPIONS"
   },
   championProfile: {
-    image: "/images/backgrounds/hero-champion-profile-cage.png",
-    position: "center center",
+    image: "/images/backgrounds/smashtime-hero-champion-victory-belt.png",
+    position: "center 50%",
     variant: "champions",
     kicker: "SmashTime Titelträger",
     watermark: "CHAMPION"
   },
   news: {
-    image: "/images/backgrounds/hero-news-cage-smoke.png",
-    position: "center center",
+    image: "/images/backgrounds/smashtime-hero-news-press-table.png",
+    position: "center 58%",
     variant: "news",
     kicker: "Direkt aus dem Cage",
     watermark: "AKTUELL"
   },
   events: {
-    image: "/images/backgrounds/hero-events-stage.png",
-    position: "center center",
+    image: "/images/backgrounds/smashtime-hero-arena-crowd-screens.png",
+    position: "center 52%",
     variant: "events",
-    kicker: "Live in St. Pölten",
+    kicker: "SmashTime Events",
     watermark: "LIVE"
   },
   eventsModule: {
-    image: "/images/backgrounds/hero-events-cage-wide.png",
-    position: "center center"
+    image: "/images/backgrounds/smashtime-hero-arena-crowd-screens.png",
+    position: "center 52%"
   },
   sponsors: {
-    image: "/images/backgrounds/hero-sponsors-corridor.png",
-    position: "center center",
+    image: "/images/backgrounds/smashtime-hero-partner-handshake-arena.png",
+    position: "center 50%",
     variant: "sponsors",
     kicker: "Partnerschaften mit Wirkung",
     watermark: "SPONSOREN"
   },
   contact: {
-    image: "/images/backgrounds/hero-contact-backstage.png",
-    position: "center center",
+    image: "/images/backgrounds/smashtime-hero-contact-ringside-desk.png",
+    position: "center 56%",
     variant: "contact",
     kicker: "Wir melden uns schnell",
     watermark: "KONTAKT"
   },
   fightNight: {
-    image: "/images/backgrounds/atmosphere-fighters-faceoff-wide.png",
-    position: "center 30%",
+    image: "/images/backgrounds/smashtime-hero-arena-crowd-screens.png",
+    position: "center 52%",
     variant: "fight",
     watermark: "VS"
   },
   tickets: {
-    image: "/images/backgrounds/atmosphere-arena-crowd-cage-wide.png",
-    position: "center 40%",
+    image: "/images/backgrounds/smashtime-hero-arena-crowd-screens.png",
+    position: "center 52%",
     variant: "tickets",
     kicker: "Sei live dabei",
     watermark: "CAGETIME"
   },
   about: {
-    image: "/images/backgrounds/arena-cage-front.png",
-    position: "center center",
+    image: "/images/backgrounds/smashtime-hero-training-logo-ring.png",
+    position: "center 50%",
     variant: "about",
-    kicker: "Kampfsport aus St. Pölten",
+    kicker: "Wofür wir stehen",
     watermark: "SMASHTIME"
   }
 } as const satisfies Record<string, PageHeroPreset>;

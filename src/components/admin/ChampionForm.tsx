@@ -1,13 +1,11 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { useActionState, useEffect, useState } from "react";
 import {
   ArrowLeft,
   Award,
   FileText,
-  Image as ImageIcon,
   Loader2,
   Save,
   Settings2,
@@ -16,16 +14,20 @@ import {
 import type { ActionResult } from "@/lib/admin/action-helpers";
 import type { ChampionRow } from "@/lib/admin/actions/champions";
 import { useAdminUi } from "@/components/admin/ui/AdminUiProvider";
+import { AdminImagePreview } from "@/components/admin/ui/AdminImagePreview";
+import { AdminImageUploadField } from "@/components/admin/ui/AdminImageUploadField";
 import { Badge } from "@/components/admin/ui/primitives";
+import { FighterProfilePicker, type FighterProfileOption } from "@/components/admin/FighterProfilePicker";
 
 type ChampionFormProps = {
   action: (prev: ActionResult | null, formData: FormData) => Promise<ActionResult>;
   initial?: ChampionRow | null;
   heading: string;
   subheading: string;
+  fighterOptions: FighterProfileOption[];
 };
 
-export function ChampionForm({ action, initial, heading, subheading }: ChampionFormProps) {
+export function ChampionForm({ action, initial, heading, subheading, fighterOptions }: ChampionFormProps) {
   const [state, formAction, pending] = useActionState(action, null);
   const ui = useAdminUi();
 
@@ -80,9 +82,17 @@ export function ChampionForm({ action, initial, heading, subheading }: ChampionF
           <section className="adm-fsection">
             <div className="adm-fsection__head">
               <span className="adm-num">1</span>
-              <h2>Basisdaten</h2>
+              <h2>Kämpferprofil &amp; Basisdaten</h2>
             </div>
             <div className="adm-fsection__body">
+              <FighterProfilePicker
+                name="fighter_user_id"
+                label="Registriertes Kämpferprofil"
+                options={fighterOptions}
+                initialUserId={initial?.fighter_user_id}
+                required={!initial}
+                emptyLabel="Kämpferprofil auswählen"
+              />
               <div className="adm-grid-2">
                 <div className="adm-field">
                   <label htmlFor="champion-name">
@@ -196,17 +206,22 @@ export function ChampionForm({ action, initial, heading, subheading }: ChampionF
               <h2>Foto</h2>
             </div>
             <div className="adm-fsection__body">
-              <div className="adm-field">
-                <label htmlFor="champion-image">Bildpfad</label>
-                <input
-                  id="champion-image"
-                  name="image_path"
-                  value={imagePath}
-                  onChange={(event) => setImagePath(event.target.value)}
-                  placeholder="/images/champions/… oder Medien-URL"
-                />
-                <span className="adm-field__hint">Empfohlen: Hochformat, mindestens 800 px Breite.</span>
-              </div>
+              <AdminImageUploadField
+                id="champion-image"
+                label="Champion-Foto"
+                pathName="image_path"
+                fileName="champion_image_file"
+                clearName="clear_image_path"
+                value={imagePath}
+                onValueChange={setImagePath}
+                pathLabel="Bildpfad"
+                fileLabel="Foto hochladen"
+                hint="Empfohlen: Hochformat, mindestens 800 px Breite."
+                fallback="Foto wird hier angezeigt"
+                previewAlt={`${name || "Champion"} Foto`}
+                aspectRatio="4 / 5"
+                uploadHint="Max. 6 MB. Ein Upload ersetzt das gespeicherte Champion-Foto beim Speichern."
+              />
             </div>
           </section>
 
@@ -256,19 +271,14 @@ export function ChampionForm({ action, initial, heading, subheading }: ChampionF
             </div>
             <div className="adm-panel__body">
               <div className="adm-preview">
-                <div className="adm-preview__img" style={{ aspectRatio: "4 / 5" }}>
-                  {imagePath ? (
-                    <Image src={imagePath} alt="" fill sizes="380px" style={{ objectFit: "cover" }} unoptimized />
-                  ) : (
-                    <span
-                      className="adm-thumb--empty"
-                      style={{ display: "flex", height: "100%", flexDirection: "column", gap: 8 }}
-                    >
-                      <ImageIcon aria-hidden="true" size={26} />
-                      Foto wird hier angezeigt
-                    </span>
-                  )}
-                </div>
+                <AdminImagePreview
+                  src={imagePath}
+                  alt={`${name || "Champion"} Foto`}
+                  fallback="Foto wird hier angezeigt"
+                  aspectRatio="4 / 5"
+                  sizes="380px"
+                  className="adm-preview__img"
+                />
                 <div className="adm-preview__body">
                   <span className="adm-preview__kicker">{weightClass || "Gewichtsklasse"}</span>
                   <h3>{name || "Champion Name"}</h3>

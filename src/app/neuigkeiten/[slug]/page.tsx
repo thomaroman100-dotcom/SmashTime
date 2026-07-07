@@ -1,11 +1,12 @@
-import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import { CallToActionBand } from "@/components/sections/CallToActionBand";
 import { NewsCard } from "@/components/sections/NewsCard";
+import { PageHero } from "@/components/sections/PageHero";
 import { SponsorStrip } from "@/components/sections/SponsorStrip";
 import { CTAButton } from "@/components/ui/CTAButton";
+import { pageHeroes } from "@/data/heroes";
 import { getNewsItem, getRelatedNews, newsItems } from "@/data/news";
 
 type NewsDetailPageProps = {
@@ -34,35 +35,27 @@ export default async function NewsDetailPage({ params }: NewsDetailPageProps) {
   }
 
   const relatedNews = getRelatedNews(item).slice(0, 3);
+  const [newsTitle, ...newsRedTitleParts] = item.title.split(": ");
+  const newsRedTitle = newsRedTitleParts.join(": ") || undefined;
 
   return (
     <>
       <article className="news-detail">
+        <PageHero
+          className="page-hero--detail"
+          kicker={item.category}
+          preset={pageHeroes.news}
+          preContent={
+            <Link className="page-hero__back" href="/neuigkeiten">
+              <ArrowLeft aria-hidden="true" size={18} /> Zurück zur Neuigkeiten-Übersicht
+            </Link>
+          }
+          redTitle={newsRedTitle}
+          text={item.excerpt}
+          title={newsTitle}
+        />
+
         <div className="container">
-          <Link className="news-detail__back" href="/neuigkeiten">
-            <ArrowLeft aria-hidden="true" size={18} /> Zurück zur Neuigkeiten-Übersicht
-          </Link>
-
-          <header className="news-detail__hero">
-            <div className="news-detail__copy">
-              <div className="news-detail__meta">
-                <span>{item.category}</span>
-                <time>{item.date}</time>
-              </div>
-              <h1>{item.title}</h1>
-              <p>{item.excerpt}</p>
-            </div>
-            <div className="news-detail__image">
-              <Image
-                src={item.heroImage ?? item.image ?? "/images/backgrounds/hero-news-cage-smoke.png"}
-                alt=""
-                fill
-                priority
-                sizes="(max-width: 920px) 100vw, 46vw"
-              />
-            </div>
-          </header>
-
           <div className="news-detail__grid">
             <div className="news-detail__body card-grunge">
               {item.body.map((paragraph) => (

@@ -26,5 +26,16 @@ Thumbs.db
 .idea
 .vscode
 supabase-temp.js
+supabase/.temp/
 .codex-remote-attachments/
 .claude/settings.local.json
+
+# Removed legacy planning artifacts. Do not reintroduce as active project files.
+01_*.md
+02_*.md
+03_*.md
+04_*.md
+05_*.md
+CODEX_PHASE*.md
+CODEX_NAVIGATION*.md
+scratch_*.png

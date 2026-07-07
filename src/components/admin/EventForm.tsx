@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { useActionState, useEffect, useRef, useState } from "react";
 import {
@@ -10,7 +9,6 @@ import {
   ExternalLink,
   Eye,
   FileText,
-  Image as ImageIcon,
   Loader2,
   MapPin,
   Rocket,
@@ -21,6 +19,8 @@ import { slugify } from "@/lib/slug";
 import type { EventGalleryRow, EventRow, EventStatus } from "@/lib/admin/actions/events";
 import { EVENT_DISCIPLINES } from "@/lib/admin/resource-shared";
 import { useAdminUi } from "@/components/admin/ui/AdminUiProvider";
+import { AdminImagePreview } from "@/components/admin/ui/AdminImagePreview";
+import { AdminImageUploadField, AdminMultiImageUploadField } from "@/components/admin/ui/AdminImageUploadField";
 import { Badge, type BadgeTone } from "@/components/admin/ui/primitives";
 
 type EventFormProps = {
@@ -67,6 +67,7 @@ export function EventForm({ action, initial, gallery = [], heading, subheading }
   const [address, setAddress] = useState(initial?.address ?? "");
   const [ticketUrl, setTicketUrl] = useState(initial?.ticket_url ?? "");
   const [imagePath, setImagePath] = useState(initial?.image_path ?? "");
+  const [showInHero, setShowInHero] = useState(Boolean(initial?.show_in_hero));
 
   useEffect(() => {
     if (!state) {
@@ -365,44 +366,34 @@ export function EventForm({ action, initial, gallery = [], heading, subheading }
             </div>
             <div className="adm-fsection__body">
               <div className="adm-grid-2" style={{ alignItems: "start" }}>
-                <div className="adm-field">
-                  <label htmlFor="event-image">Event-Bild / Poster</label>
+                <AdminImageUploadField
+                  id="event-image"
+                  label="Event-Bild / Poster"
+                  pathName="image_path"
+                  fileName="event_image_file"
+                  clearName="clear_image_path"
+                  value={imagePath}
+                  onValueChange={setImagePath}
+                  hint="Empfohlen für den Hero: 4:5 (z. B. 1200x1500 px)."
+                  uploadHint="Max. 6 MB. Ein Upload ersetzt das gespeicherte Poster beim Speichern."
+                  fallback="Poster wird hier angezeigt"
+                  previewAlt="Event-Poster Vorschau"
+                  aspectRatio="4 / 5"
+                  sizes="360px"
+                  previewClassName="adm-image-preview--field"
+                />
+                <label className="adm-checkbox-line adm-checkbox-line--hero">
                   <input
-                    id="event-image"
-                    name="image_path"
-                    value={imagePath}
-                    onChange={(event) => setImagePath(event.target.value)}
-                    placeholder="/images/events/… oder Medien-URL"
+                    type="checkbox"
+                    name="show_in_hero"
+                    checked={showInHero}
+                    onChange={(event) => setShowInHero(event.target.checked)}
                   />
-                  <span className="adm-field__hint">JPG, PNG oder WebP. Empfohlen: 16:9 (z. B. 1920×1080 px).</span>
-                </div>
-                <div className="adm-field">
-                  <label htmlFor="event-image-file">Neues Poster hochladen</label>
-                  <input id="event-image-file" name="event_image_file" type="file" accept="image/png,image/jpeg,image/webp,image/avif,image/svg+xml" />
-                  <span className="adm-field__hint">Max. 6 MB. Ein Upload ersetzt den gespeicherten Poster-Pfad beim Speichern.</span>
-                  {imagePath ? (
-                    <label className="adm-checkbox-line">
-                      <input type="checkbox" name="clear_image_path" onChange={(event) => event.target.checked && setImagePath("")} />
-                      Poster beim Speichern entfernen
-                    </label>
-                  ) : null}
-                </div>
-                <div className="adm-thumb" style={{ width: "100%", height: 120 }}>
-                  {imagePath ? (
-                    <Image
-                      src={imagePath}
-                      alt="Poster-Vorschau"
-                      width={220}
-                      height={120}
-                      style={{ width: "100%", height: "100%", objectFit: "cover" }}
-                      unoptimized
-                    />
-                  ) : (
-                    <span className="adm-thumb--empty" style={{ display: "flex", width: "100%", height: "100%" }}>
-                      <ImageIcon aria-hidden="true" size={22} />
-                    </span>
-                  )}
-                </div>
+                  <span>
+                    <strong>Im Hero anzeigen</strong>
+                    <small>Zeigt diesen Event-Flyer auf der Startseite. Wenn aktiviert, werden andere Hero-Events automatisch deaktiviert.</small>
+                  </span>
+                </label>
               </div>
             </div>
           </section>
@@ -413,34 +404,25 @@ export function EventForm({ action, initial, gallery = [], heading, subheading }
               <h2>Event-Galerie</h2>
             </div>
             <div className="adm-fsection__body">
-              <div className="adm-field">
-                <label htmlFor="event-gallery-files">Weitere Eventbilder hochladen</label>
-                <input
-                  id="event-gallery-files"
-                  name="gallery_files"
-                  type="file"
-                  multiple
-                  accept="image/png,image/jpeg,image/webp,image/avif,image/svg+xml"
-                />
-                <span className="adm-field__hint">Mehrere Bilder möglich, max. 6 MB pro Datei.</span>
-              </div>
+              <AdminMultiImageUploadField id="event-gallery-files" label="Weitere Eventbilder hochladen" fileName="gallery_files" />
 
               {gallery.length > 0 ? (
                 <div className="adm-gallery-admin" aria-label="Aktuelle Event-Galerie">
                   {gallery.map((image) => (
-                    <label className="adm-gallery-admin__item" key={image.id}>
-                      <span>
-                        {image.image_path ? (
-                          <Image src={image.image_path} alt={image.alt_text ?? ""} fill sizes="160px" style={{ objectFit: "cover" }} unoptimized />
-                        ) : (
-                          <span className="adm-thumb--empty">
-                            <ImageIcon aria-hidden="true" size={18} />
-                          </span>
-                        )}
-                      </span>
-                      <input type="checkbox" name="remove_gallery_ids" value={image.id} />
-                      <em>Beim Speichern entfernen</em>
-                    </label>
+                    <article className="adm-gallery-admin__item" key={image.id}>
+                      <AdminImagePreview
+                        src={image.image_path}
+                        alt={image.alt_text ?? "Event-Galeriebild"}
+                        fallback="Galeriebild"
+                        aspectRatio="16 / 10"
+                        sizes="180px"
+                        className="adm-image-preview--gallery"
+                      />
+                      <label className="adm-gallery-admin__remove">
+                        <input type="checkbox" name="remove_gallery_ids" value={image.id} />
+                        <span>Beim Speichern entfernen</span>
+                      </label>
+                    </article>
                   ))}
                 </div>
               ) : (
@@ -461,23 +443,23 @@ export function EventForm({ action, initial, gallery = [], heading, subheading }
             </div>
             <div className="adm-panel__body">
               <div className="adm-preview">
-                <div className="adm-preview__img">
-                  {imagePath ? (
-                    <Image src={imagePath} alt="" fill sizes="380px" style={{ objectFit: "cover" }} unoptimized />
-                  ) : (
-                    <span
-                      className="adm-thumb--empty"
-                      style={{ display: "flex", height: "100%", flexDirection: "column", gap: 8 }}
-                    >
-                      <ImageIcon aria-hidden="true" size={26} />
-                      Poster wird hier angezeigt
-                    </span>
-                  )}
-                </div>
+                <AdminImagePreview
+                  src={imagePath}
+                  alt={`${name || "Event"} Poster`}
+                  fallback="Poster wird hier angezeigt"
+                  aspectRatio="4 / 5"
+                  sizes="380px"
+                  className="adm-preview__img"
+                />
                 <div className="adm-preview__body">
                   <Badge tone={statusMeta[status].tone} uppercase>
                     {statusMeta[status].label}
                   </Badge>
+                  {showInHero ? (
+                    <Badge tone={imagePath ? "orange" : "gray"} uppercase>
+                      Hero-Flyer {imagePath ? "aktiv" : "ohne Bild"}
+                    </Badge>
+                  ) : null}
                   <h3>{name || "Event-Name"}</h3>
                   {subtitle ? <p className="adm-preview__sub">{subtitle}</p> : null}
                   <div className="adm-preview__meta">
@@ -497,7 +479,12 @@ export function EventForm({ action, initial, gallery = [], heading, subheading }
                       <FileText aria-hidden="true" size={13} /> Event-Details
                     </span>
                     {ticketUrl ? (
-                      <a className="adm-btn adm-btn--primary adm-btn--sm" href={ticketUrl} target="_blank" rel="noreferrer">
+                      <a
+                        className="adm-btn adm-btn--primary adm-btn--sm"
+                        href={ticketUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
                         <ExternalLink aria-hidden="true" size={13} /> Tickets sichern
                       </a>
                     ) : (

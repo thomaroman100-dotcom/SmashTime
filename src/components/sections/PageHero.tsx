@@ -10,9 +10,9 @@ type PageHeroProps = {
   imagePosition?: string;
   kicker?: string;
   watermark?: string;
-  meta?: string[];
   className?: string;
   compact?: boolean;
+  preContent?: React.ReactNode;
   children?: React.ReactNode;
 };
 
@@ -25,9 +25,9 @@ export function PageHero({
   imagePosition,
   kicker,
   watermark,
-  meta,
   className,
   compact,
+  preContent,
   children
 }: PageHeroProps) {
   const heroImage = image ?? preset?.image;
@@ -59,19 +59,13 @@ export function PageHero({
       ) : null}
       <div className="container page-hero__inner">
         <div className="page-hero__copy">
+          {preContent}
           {heroKicker ? <span className="page-hero__kicker">{heroKicker}</span> : null}
           <h1>
             <span>{title}</span>
             {redTitle ? <span>{redTitle}</span> : null}
           </h1>
           <p>{text}</p>
-          {meta && meta.length > 0 ? (
-            <ul className="page-hero__meta">
-              {meta.map((item) => (
-                <li key={item}>{item}</li>
-              ))}
-            </ul>
-          ) : null}
           {children}
         </div>
       </div>

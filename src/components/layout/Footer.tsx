@@ -18,13 +18,14 @@ type FooterProps = {
 
 export function Footer({ siteContent = defaultSite }: FooterProps) {
   const site = siteContent;
+  const socialLinks = site.socialLinks.filter((item) => item.href && item.href !== "#");
 
   return (
     <footer className="site-footer">
       <div className="site-footer__inner">
         <div className="site-footer__brand-col">
           <Link href="/" className="site-footer__brand" aria-label="SmashTime Startseite">
-            <Image src={site.logo} alt="SmashTime" width={180} height={60} unoptimized />
+            <Image src={site.logo} alt="SmashTime" width={180} height={60} />
           </Link>
           <p className="site-footer__claim">{site.claim}</p>
           <p className="site-footer__description">{site.description}</p>
@@ -43,16 +44,20 @@ export function Footer({ siteContent = defaultSite }: FooterProps) {
 
         <div className="site-footer__column site-footer__column--social">
           <h3>Folge uns</h3>
-          <div className="site-footer__social">
-            {site.socialLinks.map((item) => {
-              const Icon = socialIcons[item.label as keyof typeof socialIcons] ?? Camera;
-              return (
-                <Link key={item.label} href={item.href} aria-label={item.label}>
-                  <Icon size={20} strokeWidth={2} />
-                </Link>
-              );
-            })}
-          </div>
+          {socialLinks.length > 0 ? (
+            <div className="site-footer__social">
+              {socialLinks.map((item) => {
+                const Icon = socialIcons[item.label as keyof typeof socialIcons] ?? Camera;
+                return (
+                  <Link key={item.label} href={item.href} aria-label={item.label}>
+                    <Icon size={20} strokeWidth={2} />
+                  </Link>
+                );
+              })}
+            </div>
+          ) : (
+            <p className="site-footer__note">Social Profile werden zum Launch ergänzt.</p>
+          )}
           <h3>{site.newsletter.title}</h3>
           <NewsletterForm />
         </div>

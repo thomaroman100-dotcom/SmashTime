@@ -3,16 +3,20 @@
 import { usePathname } from "next/navigation";
 import { Footer } from "@/components/layout/Footer";
 import { Header } from "@/components/layout/Header";
+import type { SessionProfile } from "@/lib/admin/auth";
 import type { PublicSettings } from "@/lib/site-settings";
+import { cn } from "@/lib/utils";
 
 type SiteChromeProps = {
   children: React.ReactNode;
   publicSettings: PublicSettings;
+  sessionProfile: SessionProfile | null;
 };
 
-export function SiteChrome({ children, publicSettings }: SiteChromeProps) {
+export function SiteChrome({ children, publicSettings, sessionProfile }: SiteChromeProps) {
   const pathname = usePathname();
   const isAdmin = pathname.startsWith("/admin");
+  const isHome = pathname === "/";
 
   if (isAdmin) {
     return <main>{children}</main>;
@@ -26,8 +30,11 @@ export function SiteChrome({ children, publicSettings }: SiteChromeProps) {
   } as React.CSSProperties;
 
   return (
-    <div className="public-site-chrome" style={themeStyle}>
-      <Header siteContent={publicSettings.site} />
+    <div
+      className={cn("public-site-chrome", isHome ? "public-site-chrome--home" : "public-site-chrome--subpage")}
+      style={themeStyle}
+    >
+      <Header siteContent={publicSettings.site} sessionProfile={sessionProfile} />
       <main>{children}</main>
       <Footer siteContent={publicSettings.site} />
     </div>
