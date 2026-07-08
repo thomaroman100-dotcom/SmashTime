@@ -848,6 +848,7 @@ function TournamentTab({ event, fights }: { event: EventOption; fights: FightRow
       link.click();
       link.remove();
       window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+      toast("success", "PNG-Export gestartet", "Der Turnierbaum wurde als PNG-Download vorbereitet.");
     }, "image/png");
   };
 
@@ -1317,7 +1318,7 @@ function SettingsTab({ event, settings }: { event: EventOption; settings: Fightc
   const [isPending, startTransition] = useTransition();
   const [section, setSection] = useState("general");
   const [bannerPreview, setBannerPreview] = useState(settings.media.bannerUrl ?? "");
-  const [logoPreview, setLogoPreview] = useState(settings.media.logoUrl ?? "/images/logo/smashtime-logo.png");
+  const [logoPreview, setLogoPreview] = useState(settings.media.logoUrl ?? "");
   const [bannerCleared, setBannerCleared] = useState(false);
   const [logoCleared, setLogoCleared] = useState(false);
 

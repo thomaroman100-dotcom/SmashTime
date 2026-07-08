@@ -1,10 +1,11 @@
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, Crown } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { CountdownBar } from "@/components/sections/CountdownBar";
 import { CTASection } from "@/components/sections/CTASection";
 import { EventCard } from "@/components/sections/EventCard";
 import { HeroSection } from "@/components/sections/HeroSection";
+import { HomeChampionCarousel } from "@/components/sections/HomeChampionCarousel";
 import { MainFightBanner } from "@/components/sections/MainFightBanner";
 import { SectionHead } from "@/components/ui/SectionHead";
 import { champions } from "@/data/champions";
@@ -76,29 +77,7 @@ export default async function Home() {
               ctaLabel={configuredHome.sections.champions.ctaLabel}
               ctaHref={configuredHome.sections.champions.ctaHref}
             />
-            <div className="home-champions__grid">
-              {champions.slice(0, configuredHome.sections.champions.displayLimit).map((champion) => (
-                <Link
-                  href={`/champions/${champion.slug}`}
-                  className="champion-tile"
-                  key={champion.slug}
-                >
-                  <div className="champion-tile__image">
-                    <Image
-                      src={champion.image}
-                      alt={champion.name}
-                      fill
-                      sizes="(max-width: 767px) 46vw, (max-width: 1023px) 30vw, 22vw"
-                    />
-                    <span className="champion-tile__crown" aria-hidden="true">
-                      <Crown size={16} strokeWidth={2.2} />
-                    </span>
-                  </div>
-                  <strong>{champion.name}</strong>
-                  <span>{champion.weightClass}</span>
-                </Link>
-              ))}
-            </div>
+            <HomeChampionCarousel champions={champions.slice(0, configuredHome.sections.champions.displayLimit)} />
           </div>
         </section>
       ) : null}

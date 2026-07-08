@@ -80,7 +80,7 @@ export const pageHeroes = {
     image: "/images/backgrounds/smashtime-hero-training-logo-ring.png",
     position: "center 50%",
     variant: "about",
-    kicker: "Wofür wir stehen",
+    kicker: "Unsere Geschichte",
     watermark: "SMASHTIME"
   }
 } as const satisfies Record<string, PageHeroPreset>;

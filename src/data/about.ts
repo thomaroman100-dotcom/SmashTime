@@ -1,8 +1,8 @@
 export const aboutHero = {
   title: "Über SmashTime.",
-  redTitle: "Mehr als eine Veranstaltung.",
+  redTitle: "Von 12 m² auf die internationale Bühne.",
   text:
-    "SmashTime steht für echte Action, starke Athleten und unvergessliche Momente. Wir bringen Kampfsport dorthin, wo Leidenschaft entsteht."
+    "Geboren als Untergrund-Format auf 12 Quadratmetern. Heute steht SmashTime für Kampfsport, Respekt und den Anspruch, jede Nacht größer zu machen."
 };
 
 export const aboutPillars = [

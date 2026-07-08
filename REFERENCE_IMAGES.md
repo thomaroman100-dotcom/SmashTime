@@ -57,6 +57,12 @@ public/images/      - von der Website verwendete Assets
 
 ## Public-Bilder
 
+Verbindliche neue Mobile-Startseiten-Referenz vom 07.07.2026:
+
+```text
+Referenzbilder/Public/Mobile/startseite-2026-07-07.png -> / bei ca. 768px Portrait, responsive adaptiert fuer 390/430px
+```
+
 Die bisherigen Public-Bilder bleiben fuer Layoutdetails nutzbar, besonders fuer Unterseiten:
 
 ```text

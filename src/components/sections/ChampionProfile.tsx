@@ -1,8 +1,6 @@
 import Image from "next/image";
 import { Crown } from "lucide-react";
 import type { Champion } from "@/data/champions";
-import { FightCardList } from "@/components/sections/FightCardList";
-import { fightcards } from "@/data/fightcards";
 import { formatRecord } from "@/lib/utils";
 
 type ChampionProfileProps = {
@@ -102,8 +100,6 @@ export function ChampionProfile({ champion }: ChampionProfileProps) {
           </ul>
         )}
       </section>
-
-      <FightCardList fights={fightcards} />
     </article>
   );
 }

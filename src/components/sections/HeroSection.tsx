@@ -43,16 +43,6 @@ export function HeroSection({ hero, poster }: HeroSectionProps) {
             {titlePunch ? <span className="home-hero__headline-punch">{titlePunch}</span> : null}
           </h1>
           <p className="home-hero__tagline">{heroSubtitle}</p>
-          <div className="home-hero__actions">
-            <Link href={hero.primaryCta.href} className="btn btn--primary">
-              <Ticket aria-hidden="true" size={17} strokeWidth={2.4} />
-              <span>{hero.primaryCta.label}</span>
-            </Link>
-            <Link href={hero.secondaryCta.href} className="btn btn--outline">
-              <span>{hero.secondaryCta.label}</span>
-              <ArrowRight aria-hidden="true" size={17} strokeWidth={2.4} />
-            </Link>
-          </div>
         </div>
 
         {showPoster ? (
@@ -80,6 +70,17 @@ export function HeroSection({ hero, poster }: HeroSectionProps) {
             )}
           </div>
         ) : null}
+
+        <div className="home-hero__actions">
+          <Link href={hero.primaryCta.href} className="btn btn--primary">
+            <Ticket aria-hidden="true" size={17} strokeWidth={2.4} />
+            <span>{hero.primaryCta.label}</span>
+          </Link>
+          <Link href={hero.secondaryCta.href} className="btn btn--outline">
+            <span>{hero.secondaryCta.label}</span>
+            <ArrowRight aria-hidden="true" size={17} strokeWidth={2.4} />
+          </Link>
+        </div>
       </div>
     </section>
   );
